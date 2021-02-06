@@ -30,19 +30,19 @@ public class RoomController {
     @Autowired
     private RoomService roomService;
 
-    @PostMapping("/add")
+    @PostMapping("")
     public CommonResult addRoom(@RequestBody(required = true) RoomInfoVo infoVo) {
         Room room = roomService.addNewRoom(RoomInfoVo.convertToPo(infoVo));
         return CommonResult.ok(ResultCode.SUCCESS).data("roomInfo", RoomInfoVo.convertToVo(room));
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public CommonResult deleteRoomById(@PathVariable("id") Integer id) {
         roomService.removeRoomById(id);
         return CommonResult.ok(ResultCode.SUCCESS);
     }
 
-    @PutMapping("/update")
+    @PutMapping("")
     public CommonResult updateRoomInfoById(@RequestBody(required = true) RoomInfoVo infoVo) {
         Room room = roomService.updateRoomInfoById(RoomInfoVo.convertToPo(infoVo));
         return CommonResult.ok(ResultCode.SUCCESS).data("roomInfo", RoomInfoVo.convertToVo(room));
@@ -53,7 +53,7 @@ public class RoomController {
      * @param id
      * @return
      */
-    @GetMapping("/get/{id}")
+    @GetMapping("/{id}")
     public CommonResult getRoomInfoById(@PathVariable("id") Integer id) {
         Room room = roomService.getRoomInfoById(id);
         return CommonResult.ok(ResultCode.SUCCESS).data("roomInfo", RoomInfoVo.convertToVo(room));
@@ -63,7 +63,7 @@ public class RoomController {
      * 查询所有房间
      * @return
      */
-    @GetMapping("/get/all")
+    @GetMapping("")
     public CommonResult getAllRoomList() {
         List<Room> list = roomService.getAllRoomList();
         List<RoomInfoVo> infoVos = new ArrayList<>();
@@ -80,7 +80,7 @@ public class RoomController {
      * @param limit
      * @return
      */
-    @GetMapping("/get/rooms/{current}/{limit}")
+    @GetMapping("/{current}/{limit}")
     public CommonResult getRoomPages(@PathVariable("current") int current, @PathVariable("limit") int limit) {
         // 构造分页对象
         Pageable pageable = PageRequest.of(current, limit);
@@ -100,13 +100,13 @@ public class RoomController {
         return CommonResult.ok(ResultCode.SUCCESS).data(map);
     }
 
-    @GetMapping("/get/name")
+    @GetMapping("/name")
     public CommonResult getRoomByName(@RequestParam("name")String name) {
         Room room = roomService.getRoomInfoByName(name);
         return CommonResult.ok(ResultCode.SUCCESS).data("roomInfo", RoomInfoVo.convertToVo(room));
     }
 
-    @GetMapping("/get/nameLike")
+    @GetMapping("/nameLike")
     public CommonResult getRoomByNameLike(@RequestParam("nameLike")String name) {
         List<Room> list = roomService.getRoomInfoByNameLike("%" + name + "%");
         List<RoomInfoVo> infoVos = new ArrayList<>();

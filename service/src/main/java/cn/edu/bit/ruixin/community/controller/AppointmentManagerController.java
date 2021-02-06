@@ -25,13 +25,13 @@ public class AppointmentManagerController {
     @Autowired
     private AppointmentService appointmentService;
 
-    @GetMapping("/lookup/appointment/{id}")
+    @GetMapping("/{id}")
     public CommonResult lookupAppointmentById(@PathVariable(name = "id")Integer id) {
         Appointment appointment = appointmentService.getAppointmentById(id);
         return CommonResult.ok(ResultCode.SUCCESS).data("appointment", AppointmentInfoVo.convertToVo(appointment));
     }
 
-    @GetMapping("/all")
+    @GetMapping("")
     public CommonResult getAllAppointment(@RequestParam(required = false, name = "status")String status) {
         List<Appointment> list = appointmentService.getAllAppointment(status);
         List<AppointmentInfoVo> infoVos = new ArrayList<>();
