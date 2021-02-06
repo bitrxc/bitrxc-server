@@ -2,9 +2,8 @@
 FROM maven AS build-env
 WORKDIR /usr/src/app
 
-COPY pom.xml .
-RUN mvn -B -e org.apache.maven.plugins:maven-dependency-plugin:go-offline
 COPY . .
+RUN mvn -B -e org.apache.maven.plugins:maven-dependency-plugin:go-offline
 RUN mvn -B -e clean package
 
 # Package
