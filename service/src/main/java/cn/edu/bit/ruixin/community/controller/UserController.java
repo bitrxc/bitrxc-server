@@ -29,14 +29,14 @@ public class UserController {
         return CommonResult.ok(ResultCode.SUCCESS).msg("注册成功!");
     }
 
-    @PostMapping("/modify")
+    @PostMapping("")
     public CommonResult modifyUser(@RequestBody(required = true)UserInfoVo infoVo) {
         User user = UserInfoVo.convertToPo(infoVo);
         userService.modifyUser(user);
         return CommonResult.ok(ResultCode.SUCCESS).msg("修改用户信息成功!");
     }
 
-    @GetMapping("/userInfo/{username}")
+    @GetMapping("{username}")
     public CommonResult getUserInfo(@PathVariable("username") String username) {
         User user = userService.getUserByUsername(username);
         return CommonResult.ok(ResultCode.SUCCESS).data("userInfo", UserInfoVo.convertToVo(user));

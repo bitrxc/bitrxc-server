@@ -26,7 +26,7 @@ public class AppointmentController {
     private AppointmentService appointmentService;
 
 
-    @GetMapping("/lookup/{username}")
+    @GetMapping("/username/{username}")
     public CommonResult lookupAllAppointment(@PathVariable(name = "username")String username) {
         List<Appointment> list = appointmentService.getAllAppointmentByUsername(username);
         List<AppointmentInfoVo> infoVos = new ArrayList<>();
@@ -34,10 +34,10 @@ public class AppointmentController {
              ) {
             infoVos.add(AppointmentInfoVo.convertToVo(appointment));
         }
-        return CommonResult.ok(ResultCode.SUCCESS).data("appointment", infoVos);
+        return CommonResult.ok(ResultCode.SUCCESS).data("appointments", infoVos);
     }
 
-    @GetMapping("/lookup/appointment/{id}")
+    @GetMapping("/id/{id}")
     public CommonResult lookupAppointmentById(@PathVariable(name = "id")Integer id) {
         Appointment appointment = appointmentService.getAppointmentById(id);
         return CommonResult.ok(ResultCode.SUCCESS).data("appointment", AppointmentInfoVo.convertToVo(appointment));
