@@ -1,7 +1,10 @@
 package cn.edu.bit.ruixin.community.service.impl;
 
 import cn.edu.bit.ruixin.community.domain.Room;
+import cn.edu.bit.ruixin.community.domain.Schedule;
+import cn.edu.bit.ruixin.community.repository.AppointmentRepository;
 import cn.edu.bit.ruixin.community.repository.RoomsRepository;
+import cn.edu.bit.ruixin.community.repository.ScheduleRepository;
 import cn.edu.bit.ruixin.community.service.RoomService;
 import cn.edu.bit.ruixin.community.exception.RoomDaoException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,6 +29,12 @@ public class RoomServiceImpl implements RoomService {
 //    Internal error occurred while executing "addNewRoom()" in class "RoomsManagerController".
     @Autowired
     private RoomsRepository roomsRepository;
+
+    @Autowired
+    private ScheduleRepository scheduleRepository;
+
+    @Autowired
+    private AppointmentRepository appointmentRepository;
 
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
@@ -94,5 +104,27 @@ public class RoomServiceImpl implements RoomService {
             throw new RoomDaoException("该房间不存在!");
         }
         return room;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Schedule> getRoomFreeTime(Integer roomId) {
+        List<Integer> busy = appointmentRepository.findLaunchTimeByRoomIdAndStatus(roomId, "receive");
+        System.out.println(busy);
+        List<Schedule> allTime = scheduleRepository.findAll();
+        List<Schedule> freeTime = new ArrayList<>();
+        for (int i=0; i<allTime.size(); i++) {
+            boolean flag = true;
+            for (int j=0; j<busy.size(); j++) {
+                if (allTime.get(i).getId() == busy.get(j)) {
+                    flag = false;
+                    break;
+                }
+            }
+            if (flag) {
+                freeTime.add(allTime.get(i));
+            }
+        }
+        return freeTime;
     }
 }

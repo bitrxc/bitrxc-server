@@ -1,6 +1,7 @@
 package cn.edu.bit.ruixin.community.service;
 
 import cn.edu.bit.ruixin.community.domain.Room;
+import cn.edu.bit.ruixin.community.domain.Schedule;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -28,4 +29,6 @@ public interface RoomService {
     void removeRoomById(Integer id);
 
     Room updateRoomInfoById(Room room);
+
+    List<Schedule> getRoomFreeTime(Integer roomId);
 }
