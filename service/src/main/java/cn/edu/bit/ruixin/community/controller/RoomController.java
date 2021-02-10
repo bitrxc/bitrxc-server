@@ -3,7 +3,9 @@ package cn.edu.bit.ruixin.community.controller;
 import cn.edu.bit.ruixin.base.common.CommonResult;
 import cn.edu.bit.ruixin.base.common.ResultCode;
 import cn.edu.bit.ruixin.community.domain.Room;
+import cn.edu.bit.ruixin.community.domain.Schedule;
 import cn.edu.bit.ruixin.community.service.RoomService;
+import cn.edu.bit.ruixin.community.service.ScheduleService;
 import cn.edu.bit.ruixin.community.vo.RoomInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -115,5 +117,11 @@ public class RoomController {
             infoVos.add(RoomInfoVo.convertToVo(room));
         }
         return CommonResult.ok(ResultCode.SUCCESS).data("rooms", infoVos);
+    }
+
+    @GetMapping("/free/time")
+    public CommonResult getFreeTimeByRoomId(@RequestParam("roomId") Integer roomId) {
+        List<Schedule> freeTime = roomService.getRoomFreeTime(roomId);
+        return CommonResult.ok(ResultCode.SUCCESS).data("freeTime", freeTime);
     }
 }
