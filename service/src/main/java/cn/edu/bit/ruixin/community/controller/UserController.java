@@ -2,11 +2,18 @@ package cn.edu.bit.ruixin.community.controller;
 
 import cn.edu.bit.ruixin.base.common.CommonResult;
 import cn.edu.bit.ruixin.base.common.ResultCode;
+import cn.edu.bit.ruixin.base.security.utils.TokenManager;
 import cn.edu.bit.ruixin.community.domain.User;
+import cn.edu.bit.ruixin.community.domain.WxAppProperties;
+import cn.edu.bit.ruixin.community.domain.WxAppVO;
 import cn.edu.bit.ruixin.community.service.UserService;
 import cn.edu.bit.ruixin.community.vo.UserInfoVo;
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+
+import javax.servlet.http.HttpSession;
 
 /**
  * TODO
@@ -20,7 +27,40 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     @Autowired
+    private WxAppProperties wxAppProperties;
+
+    @Autowired
     private UserService userService;
+
+    @Autowired
+    private TokenManager tokenManager;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @GetMapping("/login")
+    public CommonResult loginFromWeiXin(@RequestParam("code")String code, HttpSession session) {
+
+        String url = "https://api.weixin.qq.com/sns/jscode2session?appid="+ wxAppProperties.appId +"&secret="+wxAppProperties.secret+"&js_code="+code+"&grant_type=authorization_code";
+        String object = restTemplate.getForObject(url, String.class);
+        // JSON字符串处理工具
+        Gson gson = new Gson();
+
+        WxAppVO appVO = gson.fromJson(object, WxAppVO.class);
+
+        if (appVO.getOpenid() != null) { // 登录成功
+//            System.out.println(appVO);
+            // 将SessionKey和Openid放入session域
+            session.setAttribute("WeChatUserInfo", appVO);
+            // 生成Token
+            String token = tokenManager.createToken(appVO.getOpenid(), appVO.getSession_key());
+
+            return CommonResult.ok(ResultCode.SUCCESS).msg("登录成功！").data("token", token);
+
+        } else {
+            return CommonResult.error(ResultCode.WECHATAUTHENTICATIONERROR);
+        }
+    }
 
     @PostMapping("/register")
     public CommonResult registerUser(@RequestBody(required = true)UserInfoVo infoVo) {

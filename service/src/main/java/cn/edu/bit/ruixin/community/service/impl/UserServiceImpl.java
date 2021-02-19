@@ -1,12 +1,12 @@
 package cn.edu.bit.ruixin.community.service.impl;
 
+import cn.edu.bit.ruixin.base.security.utils.DefaultPasswordEncoder;
 import cn.edu.bit.ruixin.community.domain.User;
 import cn.edu.bit.ruixin.community.exception.UserDaoException;
 import cn.edu.bit.ruixin.community.repository.UserRepository;
 import cn.edu.bit.ruixin.community.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     @Qualifier("defaultPasswordEncoder")
-    private PasswordEncoder passwordEncoder;
+    private DefaultPasswordEncoder passwordEncoder;
 
     /**
      * 根据微信id查询用户
@@ -42,6 +42,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
     public void registerNewUser(User user) {
         String source = user.getPassword();
+
         String encode = passwordEncoder.encode(source);
         user.setPassword(encode);
         userRepository.save(user);
