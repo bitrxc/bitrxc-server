@@ -2,6 +2,7 @@ package cn.edu.bit.ruixin.base.security.utils;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -22,7 +23,7 @@ public class TokenManager {
     private String tokenSignKey = "123456";
 
     // 根据用户名生成token
-    public String createToken(String wxid) {
+    public String createToken(String openId, String sessionKey) {
         Date expirationTime = new Date(System.currentTimeMillis() + this.tokenExpiration);
 
         // 私钥及加密算法
@@ -35,13 +36,18 @@ public class TokenManager {
         return JWT.create()
                 .withHeader(header)
                 .withExpiresAt(expirationTime)
-                .withAudience(wxid) // 添加wxid负载信息
+                .withClaim("openid", openId)
+                .withClaim("session_key", sessionKey)
                 .sign(algorithm);
     }
 
 
     // 根据token字符串得到用户信息
-    public String getInfoFromToken(String token) {
-        return JWT.decode(token).getAudience().get(0);
+    public Map<String, String> getInfoFromToken(String token) {
+        DecodedJWT decode = JWT.decode(token);
+        Map<String, String> info = new HashMap<>();
+        info.put("openid", decode.getClaim("openid").asString());
+        info.put("session_key", decode.getClaim("session_key").asString());
+        return info;
     }
 }
