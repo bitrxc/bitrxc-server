@@ -8,9 +8,10 @@ package cn.edu.bit.ruixin.base.common;
  */
 public enum ResultCode {
 
-    SUCCESS(true, 20000, "操作成功"),
-    INTERNAL_SERVER_ERROR(false, 50001, "服务器内部异常!"),
-    UNAUTHENTICATION_ERROR(false, 50000, "未登录！");
+    SUCCESS(true, 200, "操作成功"),
+    INTERNAL_SERVER_ERROR(false, 500, "服务器内部异常!"),
+    WECHATAUTHENTICATIONERROR(false, 500, "微信后台认证失败！请重试！"),
+    UNAUTHENTICATION_ERROR(false, 500, "未登录！");
 
     private Boolean success;
     private Integer code;

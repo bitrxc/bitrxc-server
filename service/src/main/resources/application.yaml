@@ -12,3 +12,7 @@ spring:
 
 server:
   port: 8080
+
+wx:
+  appId: wx807f40cbd0449570
+  secret: 3849a95d2480f6425462a79db7b530da
