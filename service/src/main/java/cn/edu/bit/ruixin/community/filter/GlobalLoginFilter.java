@@ -21,7 +21,7 @@ import java.util.Map;
  * @author 78165
  * @date 2021/2/19
  */
-@Component
+//@Component
 public class GlobalLoginFilter implements Filter {
 
     @Autowired
