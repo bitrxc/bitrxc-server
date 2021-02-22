@@ -3,9 +3,11 @@ package cn.edu.bit.ruixin.community.controller;
 import cn.edu.bit.ruixin.base.common.CommonResult;
 import cn.edu.bit.ruixin.base.common.ResultCode;
 import cn.edu.bit.ruixin.base.security.utils.TokenManager;
+import cn.edu.bit.ruixin.community.domain.Admin;
 import cn.edu.bit.ruixin.community.domain.User;
 import cn.edu.bit.ruixin.community.domain.WxAppProperties;
 import cn.edu.bit.ruixin.community.domain.WxAppVO;
+import cn.edu.bit.ruixin.community.service.AdminService;
 import cn.edu.bit.ruixin.community.service.UserService;
 import cn.edu.bit.ruixin.community.vo.UserInfoVo;
 import com.google.gson.Gson;
@@ -33,13 +35,23 @@ public class UserController {
     private UserService userService;
 
     @Autowired
+    private AdminService adminService;
+
+    @Autowired
     private TokenManager tokenManager;
 
     @Autowired
     private RestTemplate restTemplate;
 
+    @PostMapping("/admin/register")
+    public CommonResult adminRegister(@RequestBody(required = true)Admin admin) {
+        adminService.registerAdmin(admin);
+        return CommonResult.ok(ResultCode.SUCCESS).msg("注册成功！");
+    }
+    
+
     @GetMapping("/login")
-    public CommonResult loginFromWeiXin(@RequestParam("code")String code, HttpSession session) {
+    public CommonResult loginFromWeiXin(@RequestParam("code")String code) {
 
         String url = "https://api.weixin.qq.com/sns/jscode2session?appid="+ wxAppProperties.appId +"&secret="+wxAppProperties.secret+"&js_code="+code+"&grant_type=authorization_code";
         String object = restTemplate.getForObject(url, String.class);
@@ -51,7 +63,7 @@ public class UserController {
         if (appVO.getOpenid() != null) { // 登录成功
 //            System.out.println(appVO);
             // 将SessionKey和Openid放入session域
-            session.setAttribute("WeChatUserInfo", appVO);
+//            session.setAttribute("WeChatUserInfo", appVO);
             // 生成Token
             String token = tokenManager.createToken(appVO.getOpenid(), appVO.getSession_key());
 
