@@ -43,8 +43,12 @@ public class UserServiceImpl implements UserService {
     public void registerNewUser(User user) {
         String source = user.getPassword();
 
-        String encode = passwordEncoder.encode(source);
-        user.setPassword(encode);
+        if (source != null && !source.equals("")) {
+
+            String encode = passwordEncoder.encode(source);
+            user.setPassword(encode);
+        }
+
         userRepository.save(user);
     }
 
