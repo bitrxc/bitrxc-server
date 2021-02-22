@@ -60,14 +60,24 @@ public class UserController {
 
         WxAppVO appVO = gson.fromJson(object, WxAppVO.class);
 
-        if (appVO.getOpenid() != null) { // 登录成功
+        if (appVO.getOpenid() != null) { // 微信后台认证成功，存入数据库，表示登录成功
 //            System.out.println(appVO);
             // 将SessionKey和Openid放入session域
 //            session.setAttribute("WeChatUserInfo", appVO);
+
+            // 将微信用户信息存入数据库
+            User user = userService.getUserByUsername(appVO.getOpenid());
+
+            if (user == null) {
+                user = new User();
+                user.setUsername(appVO.getOpenid());
+                userService.registerNewUser(user);
+            }
+
             // 生成Token
             String token = tokenManager.createToken(appVO.getOpenid(), appVO.getSession_key());
 
-            return CommonResult.ok(ResultCode.SUCCESS).msg("登录成功！").data("token", token);
+            return CommonResult.ok(ResultCode.SUCCESS).msg("登录成功！").data("token", token).data("openid", appVO.getOpenid());
 
         } else {
             return CommonResult.error(ResultCode.WECHATAUTHENTICATIONERROR);
