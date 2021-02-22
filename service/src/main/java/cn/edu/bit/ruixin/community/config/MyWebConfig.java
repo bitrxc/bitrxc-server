@@ -18,19 +18,19 @@ import javax.servlet.Filter;
 @Configuration
 public class MyWebConfig {
 
-    @Autowired
-    private GlobalLoginFilter loginFilter;
-
-    @Bean
-    public FilterRegistrationBean registerBean() {
-        System.out.println(loginFilter);
-        FilterRegistrationBean<Filter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(loginFilter);
-        registrationBean.addUrlPatterns("/*");
-        registrationBean.setName("globalAuthenticationFilter");
-        registrationBean.setOrder(1);
-        return registrationBean;
-    }
+//    @Autowired
+//    private GlobalLoginFilter loginFilter;
+//
+//    @Bean
+//    public FilterRegistrationBean registerBean() {
+//        System.out.println(loginFilter);
+//        FilterRegistrationBean<Filter> registrationBean = new FilterRegistrationBean<>();
+//        registrationBean.setFilter(loginFilter);
+//        registrationBean.addUrlPatterns("/*");
+//        registrationBean.setName("globalAuthenticationFilter");
+//        registrationBean.setOrder(1);
+//        return registrationBean;
+//    }
 
     @Bean
     public RestTemplate restTemplate() {
