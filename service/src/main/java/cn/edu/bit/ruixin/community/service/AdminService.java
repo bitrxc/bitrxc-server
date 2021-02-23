@@ -11,4 +11,6 @@ import cn.edu.bit.ruixin.community.domain.Admin;
 
 public interface AdminService {
     void registerAdmin(Admin admin);
+
+    Admin login(Admin admin);
 }
