@@ -35,19 +35,10 @@ public class UserController {
     private UserService userService;
 
     @Autowired
-    private AdminService adminService;
-
-    @Autowired
     private TokenManager tokenManager;
 
     @Autowired
     private RestTemplate restTemplate;
-
-    @PostMapping("/admin/register")
-    public CommonResult adminRegister(@RequestBody(required = true)Admin admin) {
-        adminService.registerAdmin(admin);
-        return CommonResult.ok(ResultCode.SUCCESS).msg("注册成功！");
-    }
     
 
     @GetMapping("/login")
