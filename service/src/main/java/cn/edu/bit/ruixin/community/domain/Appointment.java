@@ -3,6 +3,7 @@ package cn.edu.bit.ruixin.community.domain;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * TODO
@@ -35,4 +36,6 @@ public class Appointment {
     private String conductor;
     @Column(name = "note")
     private String note;
+    @Column(name = "deal_date")
+    private Date dealDate;
 }
