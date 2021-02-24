@@ -3,6 +3,7 @@ package cn.edu.bit.ruixin.community.vo;
 import cn.edu.bit.ruixin.community.domain.Appointment;
 
 import javax.persistence.Column;
+import java.util.Date;
 
 /**
  * TODO
@@ -21,6 +22,7 @@ public class AppointmentInfoVo {
     private String status;
     private String conductor;
     private String note;
+    private long dealDate;
 
     public static Appointment convertToPo(AppointmentInfoVo infoVo) {
         Appointment appointment = new Appointment();
@@ -34,6 +36,7 @@ public class AppointmentInfoVo {
         String status = infoVo.getStatus();
         String conductor = infoVo.getConductor();
         String note = infoVo.getNote();
+
 
         if (id!=null && id != 0) {
             appointment.setId(id);
@@ -62,6 +65,9 @@ public class AppointmentInfoVo {
         if (note != null && !note.equals("")) {
             appointment.setNote(note);
         }
+//        if (date != null) {
+//            appointment.setDealDate(date);
+//        }
 
         return appointment;
     }
@@ -78,6 +84,7 @@ public class AppointmentInfoVo {
         String status = appointment.getStatus();
         String conductor = appointment.getConductor();
         String note = appointment.getNote();
+        Date date = appointment.getDealDate();
 
         if (id!=null && id != 0) {
             appointmentInfoVo.setId(id);
@@ -105,6 +112,9 @@ public class AppointmentInfoVo {
         }
         if (note != null && !note.equals("")) {
             appointmentInfoVo.setNote(note);
+        }
+        if (date != null) {
+            appointmentInfoVo.setDealDate(date.getTime());
         }
 
         return appointmentInfoVo;
@@ -182,6 +192,14 @@ public class AppointmentInfoVo {
         this.note = note;
     }
 
+    public long getDealDate() {
+        return dealDate;
+    }
+
+    public void setDealDate(long dealDate) {
+        this.dealDate = dealDate;
+    }
+
     @Override
     public String toString() {
         return "AppointmentInfoVo{" +
@@ -189,11 +207,12 @@ public class AppointmentInfoVo {
                 ", begin=" + begin +
                 ", end=" + end +
                 ", roomId=" + roomId +
-                ", launchTime='" + launchTime + '\'' +
+                ", launchTime=" + launchTime +
                 ", launcher='" + launcher + '\'' +
                 ", status='" + status + '\'' +
                 ", conductor='" + conductor + '\'' +
                 ", note='" + note + '\'' +
+                ", dealDate=" + dealDate +
                 '}';
     }
 }
