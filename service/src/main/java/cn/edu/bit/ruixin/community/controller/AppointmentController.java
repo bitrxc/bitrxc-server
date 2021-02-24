@@ -44,7 +44,7 @@ public class AppointmentController {
     }
 
     @PostMapping("/appoint")
-    public CommonResult appoint(@RequestBody(required = true)AppointmentInfoVo infoVo) {
+    public CommonResult appoint(@RequestBody(required = true) AppointmentInfoVo infoVo) {
         Appointment appointment = AppointmentInfoVo.convertToPo(infoVo);
         appointmentService.addANewAppointment(appointment);
         return CommonResult.ok(ResultCode.SUCCESS).msg("预约成功!");
