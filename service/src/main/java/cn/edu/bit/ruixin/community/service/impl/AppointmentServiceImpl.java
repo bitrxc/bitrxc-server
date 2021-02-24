@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -46,6 +48,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new AppointmentDaoException("该房间此时间段已被预约!");
         } else {
             appointment.setStatus("new");
+            appointment.setDealDate(new Date());
             appointmentRepository.save(appointment);
         }
     }
