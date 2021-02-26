@@ -1,7 +1,10 @@
 package cn.edu.bit.ruixin.community.service.impl;
 
+import cn.edu.bit.ruixin.community.domain.Appointment;
 import cn.edu.bit.ruixin.community.domain.Room;
 import cn.edu.bit.ruixin.community.domain.Schedule;
+import cn.edu.bit.ruixin.community.exception.GlobalParamException;
+import cn.edu.bit.ruixin.community.myenum.AppointmentStatus;
 import cn.edu.bit.ruixin.community.repository.AppointmentRepository;
 import cn.edu.bit.ruixin.community.repository.RoomsRepository;
 import cn.edu.bit.ruixin.community.repository.ScheduleRepository;
@@ -14,8 +17,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.validation.constraints.Pattern;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * TODO
@@ -106,25 +112,116 @@ public class RoomServiceImpl implements RoomService {
         return room;
     }
 
+//    @Override
+//    @Transactional(readOnly = true)
+//    public List<Schedule> getRoomFreeTime(Integer roomId) {
+//        List<Integer> busy = appointmentRepository.findLaunchTimeByRoomIdAndStatus(roomId, "receive");
+//        System.out.println(busy);
+//        List<Schedule> allTime = scheduleRepository.findAll();
+//        List<Schedule> freeTime = new ArrayList<>();
+//        for (int i=0; i<allTime.size(); i++) {
+//            boolean flag = true;
+//            for (int j=0; j<busy.size(); j++) {
+//                if (allTime.get(i).getId() == busy.get(j)) {
+//                    flag = false;
+//                    break;
+//                }
+//            }
+//            if (flag) {
+//                freeTime.add(allTime.get(i));
+//            }
+//        }
+//        return freeTime;
+//    }
+
     @Override
     @Transactional(readOnly = true)
-    public List<Schedule> getRoomFreeTime(Integer roomId) {
-        List<Integer> busy = appointmentRepository.findLaunchTimeByRoomIdAndStatus(roomId, "receive");
-        System.out.println(busy);
+    public Map<String, List<Schedule>> getRoomFreeTime(Integer roomId, String username, @Pattern(regexp = "^\\d{4}-\\d{1,2}-\\d{1,2}") String date) {
+
+        Date nowDate = new Date();
+
+        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
         List<Schedule> allTime = scheduleRepository.findAll();
-        List<Schedule> freeTime = new ArrayList<>();
-        for (int i=0; i<allTime.size(); i++) {
-            boolean flag = true;
-            for (int j=0; j<busy.size(); j++) {
-                if (allTime.get(i).getId() == busy.get(j)) {
-                    flag = false;
-                    break;
-                }
+
+        List<Schedule> pastTime = new ArrayList<>(6);
+
+        List<Schedule> busyTime = new ArrayList<>(6);
+
+        List<Schedule> freeTime = new ArrayList<>(6);
+
+        List<Schedule> myTime = new ArrayList<>(6);
+
+        int i = 0;
+
+        for (i = 0; i < allTime.size(); i++) {
+            String dateTime = date + " " + allTime.get(i).getBegin();
+            Date execDateTime = null;
+            try {
+                execDateTime = dateTimeFormat.parse(dateTime);
+            } catch (ParseException e) {
+                throw new GlobalParamException("日期格式有误！");
             }
-            if (flag) {
-                freeTime.add(allTime.get(i));
+            if (execDateTime.before(nowDate)) {
+                pastTime.add(allTime.get(i));
+            } else {
+                break;
             }
         }
-        return freeTime;
+
+        Date execDate = null;
+        try {
+            execDate = dateFormat.parse(date);
+        } catch (ParseException e) {
+            throw new GlobalParamException("日期格式有误！");
+        }
+
+        List<Integer> busyTimeId = appointmentRepository.findLaunchTimeByRoomIdAndExecuteDateAndStatus(roomId, execDate, AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.EXECUTING.getStatus());
+        Collections.sort(busyTimeId);
+
+        for (int k = 0; k < busyTimeId.size() && i < allTime.size(); ) {
+            if (busyTimeId.get(k) == allTime.get(i).getId()) {
+                busyTime.add(allTime.get(i));
+                k++;
+                i++;
+            } else if (busyTimeId.get(k) < allTime.get(i).getId()) {
+                k++;
+            } else {
+                i++;
+            }
+        }
+
+
+        List<Integer> myTimeId = appointmentRepository.findLaunchTimeByRoomIdAndLauncherAndExecuteDateAndStatus(roomId, username, execDate, AppointmentStatus.NEW.getStatus());
+        for (Integer id :
+                myTimeId) {
+            for (Schedule schedule:
+                allTime) {
+                if (schedule.getId() == id) {
+                    myTime.add(schedule);
+                }
+            }
+        }
+
+        // 需保证同一时间段被审批后，其余所有申请都驳回
+        myTime = myTime.stream()
+                .filter(schedule -> (!pastTime.contains(schedule) && !busyTime.contains(schedule)))
+                .collect(Collectors.toList());
+
+
+        List<Schedule> finalMyTime = myTime;
+        freeTime = allTime.stream()
+                .filter(schedule -> (!pastTime.contains(schedule) && !busyTime.contains(schedule) && !finalMyTime.contains(schedule)))
+                .collect(Collectors.toList());
+
+
+        Map<String, List<Schedule>> map = new HashMap<>();
+        map.put("passTime", pastTime);
+        map.put("busyTime", busyTime);
+        map.put("myTime", myTime);
+        map.put("freeTime", freeTime);
+
+        return map;
     }
 }

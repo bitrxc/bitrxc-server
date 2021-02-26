@@ -1,14 +1,21 @@
 package cn.edu.bit.ruixin.community.service.impl;
 
 import cn.edu.bit.ruixin.community.domain.Appointment;
+import cn.edu.bit.ruixin.community.domain.Schedule;
 import cn.edu.bit.ruixin.community.exception.AppointmentDaoException;
+import cn.edu.bit.ruixin.community.myenum.AppointmentStatus;
 import cn.edu.bit.ruixin.community.repository.AppointmentRepository;
+import cn.edu.bit.ruixin.community.repository.ScheduleRepository;
 import cn.edu.bit.ruixin.community.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -25,10 +32,14 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Autowired
     private AppointmentRepository appointmentRepository;
 
+    @Autowired
+    private ScheduleRepository scheduleRepository;
+
     @Transactional(readOnly = true)
     @Override
     public List<Appointment> getAllAppointmentByUsername(String username) {
-        return appointmentRepository.findAllByLauncher(username);
+        // 根据用户wxid查询所有记录并根据发起时间排序
+        return appointmentRepository.findAllByLauncherEqualsOrderByLaunchDate(username);
     }
 
     @Transactional(readOnly = true)
@@ -40,16 +51,40 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
     @Override
     public void addANewAppointment(Appointment appointment) {
-        // 判断该房间所预约时间段是否空闲
+        // 判断该房间所预约时间段是否空闲，比较房间ID，预约的日期，预约的时间段，以及当前状态不为receive和executing
         Integer roomId = appointment.getRoomId();
         Integer launchTime = appointment.getLaunchTime();
-        Appointment getAppointment = appointmentRepository.findAppointmentByRoomIdEqualsAndLaunchTimeEqualsAndStatusEquals(roomId, launchTime, "receive");
+        Date execDate = appointment.getExecDate();
+        Appointment getAppointment = appointmentRepository.findReceivedAppointment(roomId, execDate, launchTime, AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.EXECUTING.getStatus());
         if (getAppointment != null) {
-            throw new AppointmentDaoException("该房间此时间段已被预约!");
+            throw new AppointmentDaoException("该房间此时间段已被占用!");
         } else {
-            appointment.setStatus("new");
-            appointment.setDealDate(new Date());
-            appointmentRepository.save(appointment);
+            String launcher = appointment.getLauncher();
+            getAppointment = appointmentRepository.findAppointmentByLauncherEqualsAndRoomIdEqualsAndExecDateEqualsAndLaunchTimeEqualsAndStatusEquals(launcher, roomId, execDate, launchTime, AppointmentStatus.NEW.getStatus());
+            if (getAppointment != null) {
+                throw new AppointmentDaoException("你已申请预约该房间的此时间段，请等待审批！");
+            } else {
+                appointment.setStatus(AppointmentStatus.NEW.getStatus());
+                Date launchDate = new Date();
+                // 还应该保证预约发起时间早于要预约的时间段的起始
+                Schedule schedule = scheduleRepository.getOne(launchTime);
+                String begin = schedule.getBegin();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                String date = dateFormat.format(execDate);
+                String dateTime = date + " " + begin;
+                Date executeDate = null;
+                try {
+                    executeDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(dateTime);
+                } catch (ParseException e) {
+                    throw new AppointmentDaoException("实际执行预约使用的时间格式有误！");
+                }
+                if (launchDate.before(executeDate)) {
+                    appointment.setLaunchDate(launchDate);
+                    appointmentRepository.save(appointment);
+                } else {
+                    throw new AppointmentDaoException("该时间段已过，不可预约！");
+                }
+            }
         }
     }
 
@@ -79,7 +114,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public List<Appointment> getAllAppointment(String status) {
         if (status != null && !status.equals("")) {
-            return appointmentRepository.findAllByStatusEquals(status);
+            return appointmentRepository.findAllByStatusEqualsOrderByExecDateAscLaunchTimeAscLaunchDateAsc(status);
         } else {
             return appointmentRepository.findAll();
         }
@@ -106,6 +141,18 @@ public class AppointmentServiceImpl implements AppointmentService {
             } else {
                 throw new AppointmentDaoException("审批人姓名不可为空!");
             }
+        }
+    }
+
+    @Override
+    public Page<Appointment> getAppointmentPages(Pageable pageable, String status) {
+        if (status != null && !"".equals(status)) {
+            Appointment appointment = new Appointment();
+            appointment.setStatus(status);
+            Example<Appointment> example = Example.of(appointment);
+            return appointmentRepository.findAll(example, pageable);
+        } else {
+            return appointmentRepository.findAll(pageable);
         }
     }
 }
