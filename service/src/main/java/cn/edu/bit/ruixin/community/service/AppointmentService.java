@@ -2,6 +2,8 @@ package cn.edu.bit.ruixin.community.service;
 
 
 import cn.edu.bit.ruixin.community.domain.Appointment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -23,4 +25,6 @@ public interface AppointmentService {
     List<Appointment> getAllAppointment(String status);
 
     void checkOutAppointment(Integer id, String status, String conductor);
+
+    Page<Appointment> getAppointmentPages(Pageable pageable, String status);
 }

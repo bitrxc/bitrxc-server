@@ -32,24 +32,6 @@ public class RoomController {
     @Autowired
     private RoomService roomService;
 
-    @PostMapping("")
-    public CommonResult addRoom(@RequestBody(required = true) RoomInfoVo infoVo) {
-        Room room = roomService.addNewRoom(RoomInfoVo.convertToPo(infoVo));
-        return CommonResult.ok(ResultCode.SUCCESS).data("roomInfo", RoomInfoVo.convertToVo(room));
-    }
-
-    @DeleteMapping("/{id}")
-    public CommonResult deleteRoomById(@PathVariable("id") Integer id) {
-        roomService.removeRoomById(id);
-        return CommonResult.ok(ResultCode.SUCCESS);
-    }
-
-    @PutMapping("")
-    public CommonResult updateRoomInfoById(@RequestBody(required = true) RoomInfoVo infoVo) {
-        Room room = roomService.updateRoomInfoById(RoomInfoVo.convertToPo(infoVo));
-        return CommonResult.ok(ResultCode.SUCCESS).data("roomInfo", RoomInfoVo.convertToVo(room));
-    }
-
     /**
      * 根据房间ID查询
      * @param id
@@ -120,8 +102,8 @@ public class RoomController {
     }
 
     @GetMapping("/free/time")
-    public CommonResult getFreeTimeByRoomId(@RequestParam("roomId") Integer roomId) {
-        List<Schedule> freeTime = roomService.getRoomFreeTime(roomId);
-        return CommonResult.ok(ResultCode.SUCCESS).data("freeTime", freeTime);
+    public CommonResult getFreeTimeByRoomId(@RequestParam("roomId") Integer roomId, @RequestParam("username") String username, @RequestParam("date") String date) {
+        Map map = roomService.getRoomFreeTime(roomId, username, date);
+        return CommonResult.ok(ResultCode.SUCCESS).data(map);
     }
 }

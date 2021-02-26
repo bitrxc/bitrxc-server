@@ -75,12 +75,6 @@ public class UserController {
         }
     }
 
-    @PostMapping("/register")
-    public CommonResult registerUser(@RequestBody(required = true)UserInfoVo infoVo) {
-        User user = UserInfoVo.convertToPo(infoVo);
-        userService.registerNewUser(user);
-        return CommonResult.ok(ResultCode.SUCCESS).msg("注册成功!");
-    }
 
     @PostMapping("")
     public CommonResult modifyUser(@RequestBody(required = true)UserInfoVo infoVo) {

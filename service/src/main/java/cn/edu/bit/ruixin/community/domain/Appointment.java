@@ -34,8 +34,14 @@ public class Appointment {
     private String status;
     @Column(name = "conductor")
     private String conductor;
-    @Column(name = "note")
-    private String note;
-    @Column(name = "deal_date")
-    private Date dealDate;
+    @Column(name = "user_note")
+    private String userNote;
+    @Column(name = "check_note")
+    private String checkNote;
+    @Column(name = "launch_date")
+    private Date launchDate;
+    @Column(name = "check_date")
+    private Date checkDate;
+    @Column(name = "exec_date")
+    private Date execDate;
 }
