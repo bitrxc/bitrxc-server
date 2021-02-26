@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.constraints.Pattern;
+//import javax.validation.constraints.Pattern;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -136,7 +136,7 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     @Transactional(readOnly = true)
-    public Map<String, List<Schedule>> getRoomFreeTime(Integer roomId, String username, @Pattern(regexp = "^\\d{4}-\\d{1,2}-\\d{1,2}") String date) {
+    public Map<String, List<Schedule>> getRoomFreeTime(Integer roomId, String username, String date) {
 
         Date nowDate = new Date();
 

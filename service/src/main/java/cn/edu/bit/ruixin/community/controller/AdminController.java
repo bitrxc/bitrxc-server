@@ -29,6 +29,7 @@ public class AdminController {
     @RequestMapping("/login")
     public CommonResult login(@RequestBody(required = true)Admin admin) {
         Admin loginAdmin = adminService.login(admin);
+        // 添加用户角色信息
         return CommonResult.ok(ResultCode.SUCCESS).msg("管理员登录成功!").data("userInfo", loginAdmin);
     }
 

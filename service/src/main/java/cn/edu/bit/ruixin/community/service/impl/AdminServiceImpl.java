@@ -26,7 +26,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Admin login(Admin admin) {
-        if (admin == null) {
+        if (admin == null || admin.getUsername() == null || "".equals(admin.getUsername()) || admin.getPassword() == null || "".equals(admin.getPassword())) {
             throw new UserDaoException("用户名密码不能为空!");
         }
         else {
