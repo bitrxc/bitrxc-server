@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * TODO
@@ -30,5 +31,6 @@ public interface RoomService {
 
     Room updateRoomInfoById(Room room);
 
-    List<Schedule> getRoomFreeTime(Integer roomId);
+//    List<Schedule> getRoomFreeTime(Integer roomId);
+    Map<String , List<Schedule>> getRoomFreeTime(Integer roomId, String username, String date);
 }

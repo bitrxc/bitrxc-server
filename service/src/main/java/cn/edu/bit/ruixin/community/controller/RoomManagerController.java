@@ -3,9 +3,7 @@ package cn.edu.bit.ruixin.community.controller;
 import cn.edu.bit.ruixin.base.common.CommonResult;
 import cn.edu.bit.ruixin.base.common.ResultCode;
 import cn.edu.bit.ruixin.community.domain.Room;
-import cn.edu.bit.ruixin.community.domain.Schedule;
 import cn.edu.bit.ruixin.community.service.RoomService;
-import cn.edu.bit.ruixin.community.service.ScheduleService;
 import cn.edu.bit.ruixin.community.vo.RoomInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,15 +20,34 @@ import java.util.Map;
  * TODO
  *
  * @author 78165
- * @date 2021/1/29
+ * @date 2021/2/26
  */
-@RestController
-@RequestMapping("/room")
 @CrossOrigin
-public class RoomController {
+@RestController
+@RequestMapping("/admin/room")
+public class RoomManagerController {
+
 
     @Autowired
     private RoomService roomService;
+
+    @PostMapping("")
+    public CommonResult addRoom(@RequestBody(required = true) RoomInfoVo infoVo) {
+        Room room = roomService.addNewRoom(RoomInfoVo.convertToPo(infoVo));
+        return CommonResult.ok(ResultCode.SUCCESS).data("roomInfo", RoomInfoVo.convertToVo(room));
+    }
+
+    @DeleteMapping("/{id}")
+    public CommonResult deleteRoomById(@PathVariable("id") Integer id) {
+        roomService.removeRoomById(id);
+        return CommonResult.ok(ResultCode.SUCCESS);
+    }
+
+    @PutMapping("")
+    public CommonResult updateRoomInfoById(@RequestBody(required = true) RoomInfoVo infoVo) {
+        Room room = roomService.updateRoomInfoById(RoomInfoVo.convertToPo(infoVo));
+        return CommonResult.ok(ResultCode.SUCCESS).data("roomInfo", RoomInfoVo.convertToVo(room));
+    }
 
     /**
      * 根据房间ID查询
@@ -106,4 +123,5 @@ public class RoomController {
         Map map = roomService.getRoomFreeTime(roomId, username, date);
         return CommonResult.ok(ResultCode.SUCCESS).data(map);
     }
+
 }

@@ -1,8 +1,12 @@
 package cn.edu.bit.ruixin.community.vo;
 
 import cn.edu.bit.ruixin.community.domain.Appointment;
+import cn.edu.bit.ruixin.community.exception.GlobalParamException;
+import lombok.Data;
 
-import javax.persistence.Column;
+//import javax.validation.constraints.Pattern;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -11,6 +15,7 @@ import java.util.Date;
  * @author 78165
  * @date 2021/2/6
  */
+@Data
 public class AppointmentInfoVo {
 
     private Integer id;
@@ -21,8 +26,12 @@ public class AppointmentInfoVo {
     private String launcher;
     private String status;
     private String conductor;
-    private String note;
-    private long dealDate;
+    private String checkNote;
+    private String userNote;
+    private long checkDate;
+    private long launchDate;
+//    @Pattern(regexp = "^\\d{4}-\\d{1,2}-\\d{1,2}", message = "日期格式：yyyy-MM-dd")
+    private String execDate;
 
     public static Appointment convertToPo(AppointmentInfoVo infoVo) {
         Appointment appointment = new Appointment();
@@ -35,8 +44,10 @@ public class AppointmentInfoVo {
         String launcher = infoVo.getLauncher();
         String status = infoVo.getStatus();
         String conductor = infoVo.getConductor();
-        String note = infoVo.getNote();
-
+        String userNote = infoVo.getUserNote();
+        String checkNote = infoVo.getCheckNote();
+//        @Pattern(regexp = "^\\d{4}-\\d{1,2}-\\d{1,2}", message = "日期格式：yyyy-MM-dd")
+        String execDate = infoVo.getExecDate();
 
         if (id!=null && id != 0) {
             appointment.setId(id);
@@ -62,12 +73,22 @@ public class AppointmentInfoVo {
         if (conductor != null && !conductor.equals("")) {
             appointment.setConductor(conductor);
         }
-        if (note != null && !note.equals("")) {
-            appointment.setNote(note);
+        if (userNote != null && !userNote.equals("")) {
+            appointment.setUserNote(userNote);
         }
-//        if (date != null) {
-//            appointment.setDealDate(date);
-//        }
+        if (checkNote != null && !checkNote.equals("")) {
+            appointment.setCheckNote(checkNote);
+        }
+        if (execDate != null && !execDate.equals("")) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date date = null;
+            try {
+                date = dateFormat.parse(execDate);
+            } catch (ParseException e) {
+                throw new GlobalParamException("格式日期有误，请重新预约！");
+            }
+            appointment.setExecDate(date);
+        }
 
         return appointment;
     }
@@ -83,8 +104,11 @@ public class AppointmentInfoVo {
         String launcher = appointment.getLauncher();
         String status = appointment.getStatus();
         String conductor = appointment.getConductor();
-        String note = appointment.getNote();
-        Date date = appointment.getDealDate();
+        String checkNote = appointment.getCheckNote();
+        String userNote = appointment.getUserNote();
+        Date execDate = appointment.getExecDate();
+        Date checkDate = appointment.getCheckDate();
+        Date launchDate = appointment.getLaunchDate();
 
         if (id!=null && id != 0) {
             appointmentInfoVo.setId(id);
@@ -110,109 +134,25 @@ public class AppointmentInfoVo {
         if (conductor != null && !conductor.equals("")) {
             appointmentInfoVo.setConductor(conductor);
         }
-        if (note != null && !note.equals("")) {
-            appointmentInfoVo.setNote(note);
+        if (userNote != null && !userNote.equals("")) {
+            appointmentInfoVo.setUserNote(userNote);
         }
-        if (date != null) {
-            appointmentInfoVo.setDealDate(date.getTime());
+        if (checkNote != null && !checkNote.equals("")) {
+            appointmentInfoVo.setCheckNote(checkNote);
+        }
+        if (checkDate != null) {
+            appointmentInfoVo.setCheckDate(checkDate.getTime());
+        }
+        if (launchDate != null) {
+            appointmentInfoVo.setLaunchDate(launchDate.getTime());
+        }
+        if (execDate != null) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String date = dateFormat.format(execDate);
+            appointmentInfoVo.setExecDate(date);
         }
 
         return appointmentInfoVo;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getBegin() {
-        return begin;
-    }
-
-    public void setBegin(Integer begin) {
-        this.begin = begin;
-    }
-
-    public Integer getEnd() {
-        return end;
-    }
-
-    public void setEnd(Integer end) {
-        this.end = end;
-    }
-
-    public Integer getRoomId() {
-        return roomId;
-    }
-
-    public void setRoomId(Integer roomId) {
-        this.roomId = roomId;
-    }
-
-    public Integer getLaunchTime() {
-        return launchTime;
-    }
-
-    public void setLaunchTime(Integer launchTime) {
-        this.launchTime = launchTime;
-    }
-
-    public String getLauncher() {
-        return launcher;
-    }
-
-    public void setLauncher(String launcher) {
-        this.launcher = launcher;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getConductor() {
-        return conductor;
-    }
-
-    public void setConductor(String conductor) {
-        this.conductor = conductor;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-    }
-
-    public long getDealDate() {
-        return dealDate;
-    }
-
-    public void setDealDate(long dealDate) {
-        this.dealDate = dealDate;
-    }
-
-    @Override
-    public String toString() {
-        return "AppointmentInfoVo{" +
-                "id=" + id +
-                ", begin=" + begin +
-                ", end=" + end +
-                ", roomId=" + roomId +
-                ", launchTime=" + launchTime +
-                ", launcher='" + launcher + '\'' +
-                ", status='" + status + '\'' +
-                ", conductor='" + conductor + '\'' +
-                ", note='" + note + '\'' +
-                ", dealDate=" + dealDate +
-                '}';
-    }
 }

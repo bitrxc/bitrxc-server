@@ -3,11 +3,9 @@ package cn.edu.bit.ruixin.community.controller;
 import cn.edu.bit.ruixin.base.common.CommonResult;
 import cn.edu.bit.ruixin.base.common.ResultCode;
 import cn.edu.bit.ruixin.base.security.utils.TokenManager;
-import cn.edu.bit.ruixin.community.domain.Admin;
 import cn.edu.bit.ruixin.community.domain.User;
 import cn.edu.bit.ruixin.community.domain.WxAppProperties;
 import cn.edu.bit.ruixin.community.domain.WxAppVO;
-import cn.edu.bit.ruixin.community.service.AdminService;
 import cn.edu.bit.ruixin.community.service.UserService;
 import cn.edu.bit.ruixin.community.vo.UserInfoVo;
 import com.google.gson.Gson;
@@ -15,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import javax.servlet.http.HttpSession;
 
 /**
  * TODO
@@ -75,12 +72,6 @@ public class UserController {
         }
     }
 
-    @PostMapping("/register")
-    public CommonResult registerUser(@RequestBody(required = true)UserInfoVo infoVo) {
-        User user = UserInfoVo.convertToPo(infoVo);
-        userService.registerNewUser(user);
-        return CommonResult.ok(ResultCode.SUCCESS).msg("注册成功!");
-    }
 
     @PostMapping("")
     public CommonResult modifyUser(@RequestBody(required = true)UserInfoVo infoVo) {
