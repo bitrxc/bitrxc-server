@@ -39,7 +39,7 @@ public class AppointmentManagerController {
         return CommonResult.ok(ResultCode.SUCCESS).data("appointment", AppointmentInfoVo.convertToVo(appointment));
     }
 
-    @GetMapping("")
+    @GetMapping("all")
     public CommonResult getAllAppointment(@RequestParam(required = false, name = "status")String status) {
         List<Appointment> list = appointmentService.getAllAppointment(status);
         List<AppointmentInfoVo> infoVos = new ArrayList<>();

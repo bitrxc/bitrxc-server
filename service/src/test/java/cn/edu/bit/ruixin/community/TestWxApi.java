@@ -6,10 +6,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * TODO
@@ -67,5 +64,16 @@ public class TestWxApi {
                 list) {
             System.out.println(i);
         }
+    }
+
+    @Test
+    public void testString() {
+//        String s1 = "Hello";
+//        String s2 = new String(s1);
+//        System.out.println((s1 == s2));
+
+        HashMap<String, String> map = new HashMap<>(32);
+        map.put("a", "A");
+        map.put("b", "B");
     }
 }
