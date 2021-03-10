@@ -80,7 +80,7 @@ public class RoomController {
         map.put("totalPages", page.getTotalPages());
         map.put("hasNext", page.hasNext());
         map.put("hasPrevious", page.hasPrevious());
-        map.put("items", infoVos);
+        map.put("rooms", infoVos);
         return CommonResult.ok(ResultCode.SUCCESS).data(map);
     }
 
