@@ -85,7 +85,7 @@ public class AppointmentManagerController {
                                @RequestParam(required = true, name = "status")String status,
                                @RequestParam(required = true, name = "conductor")String conductor,
                               @RequestParam("checkNote") String checkNote) {
-        appointmentService.checkOutAppointment(id, status, conductor);
+        appointmentService.checkOutAppointment(id, status, conductor, checkNote);
         return CommonResult.ok(ResultCode.SUCCESS).msg("审批操作成功!");
     }
 }
