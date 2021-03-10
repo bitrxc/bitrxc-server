@@ -122,21 +122,22 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
     @Override
-    public void checkOutAppointment(Integer id, String status, String conductor) {
+    public void checkOutAppointment(Integer id, String status, String conductor, String checkNote) {
         Appointment appointment = appointmentRepository.findAppointmentById(id);
         if (appointment != null) {
-            if (appointment.getStatus().equals("cancel")) {
+            if (appointment.getStatus().equals(AppointmentStatus.CANCEL.getStatus())) {
                 throw new AppointmentDaoException("该预约已经取消，无法审批!");
             }
-            if (appointment.getStatus().equals("receive")) {
+            if (appointment.getStatus().equals(AppointmentStatus.RECEIVE.getStatus())) {
                 throw new AppointmentDaoException("该预约已审批通过，不可重复审批!");
             }
-            if (appointment.getStatus().equals("reject")) {
+            if (appointment.getStatus().equals(AppointmentStatus.REJECT.getStatus())) {
                 throw new AppointmentDaoException("该预约已审批驳回，不可重复审批!");
             }
             if (conductor != null && !conductor.equals("")) {
                 appointment.setStatus(status);
                 appointment.setConductor(conductor);
+                appointment.setCheckNote(checkNote);
                 appointmentRepository.save(appointment);
             } else {
                 throw new AppointmentDaoException("审批人姓名不可为空!");

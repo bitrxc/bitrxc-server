@@ -59,6 +59,7 @@ public class AdminController {
         // 添加用户角色信息
         List<Role> roles = roleService.getRolesByAdminId(loginAdmin.getId());
         adminInfoVo.setRoleList(roles);
+        adminInfoVo.setPassword(null);
         return CommonResult.ok(ResultCode.SUCCESS).msg("管理员登录成功!").data("userInfo", adminInfoVo);
     }
 
