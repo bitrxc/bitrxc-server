@@ -6,12 +6,19 @@ import cn.edu.bit.ruixin.base.security.utils.TokenManager;
 import cn.edu.bit.ruixin.community.domain.User;
 import cn.edu.bit.ruixin.community.domain.WxAppProperties;
 import cn.edu.bit.ruixin.community.domain.WxAppVO;
+import cn.edu.bit.ruixin.community.service.RedisService;
 import cn.edu.bit.ruixin.community.service.UserService;
 import cn.edu.bit.ruixin.community.vo.UserInfoVo;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -36,6 +43,9 @@ public class UserController {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private RedisService redisService;
     
 
     @GetMapping("/login")
@@ -49,24 +59,26 @@ public class UserController {
         WxAppVO appVO = gson.fromJson(object, WxAppVO.class);
 
         if (appVO.getOpenid() != null) { // 微信后台认证成功，存入数据库，表示登录成功
-//            System.out.println(appVO);
-            // 将SessionKey和Openid放入session域
-//            session.setAttribute("WeChatUserInfo", appVO);
-
-            // 将微信用户信息存入数据库
             User user = userService.getUserByUsername(appVO.getOpenid());
-
+            // 如果是第一次登陆，将微信用户信息存入数据库
             if (user == null) {
                 user = new User();
                 user.setUsername(appVO.getOpenid());
                 userService.registerNewUser(user);
             }
 
-            // 生成Token
+            // 生成Token，用户系统身份凭证
             String token = tokenManager.createToken(appVO.getOpenid(), appVO.getSession_key());
+            // 将Token及微信用户信息存入redis
+            try {
+                redisService.opsForValueSetWithExpire(token, appVO, 30, TimeUnit.MINUTES);
 
-            return CommonResult.ok(ResultCode.SUCCESS).msg("登录成功！").data("token", token).data("openid", appVO.getOpenid());
+                return CommonResult.ok(ResultCode.SUCCESS).msg("登录成功！").data("token", token).data("openid", appVO.getOpenid());
 
+            } catch (JsonProcessingException e) {
+                // 抛出异常
+                return CommonResult.error(ResultCode.INTERNAL_SERVER_ERROR).msg("登录失败，请重试！");
+            }
         } else {
             return CommonResult.error(ResultCode.WECHATAUTHENTICATIONERROR);
         }

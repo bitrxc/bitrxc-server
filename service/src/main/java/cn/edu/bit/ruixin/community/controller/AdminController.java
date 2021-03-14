@@ -2,14 +2,17 @@ package cn.edu.bit.ruixin.community.controller;
 
 import cn.edu.bit.ruixin.base.common.CommonResult;
 import cn.edu.bit.ruixin.base.common.ResultCode;
+import cn.edu.bit.ruixin.base.security.utils.TokenManager;
 import cn.edu.bit.ruixin.community.domain.Admin;
 import cn.edu.bit.ruixin.community.domain.Role;
 import cn.edu.bit.ruixin.community.domain.User;
 import cn.edu.bit.ruixin.community.service.AdminService;
+import cn.edu.bit.ruixin.community.service.RedisService;
 import cn.edu.bit.ruixin.community.service.RoleService;
 import cn.edu.bit.ruixin.community.service.UserService;
 import cn.edu.bit.ruixin.community.vo.AdminInfoVo;
 import cn.edu.bit.ruixin.community.vo.UserInfoVo;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * TODO
@@ -37,10 +41,13 @@ public class AdminController {
     private AdminService adminService;
 
     @Autowired
-    private UserService userService;
+    private TokenManager tokenManager;
 
     @Autowired
     private RoleService  roleService;
+
+    @Autowired
+    private RedisService redisService;
 
     /**
      * 管理员登录接口
@@ -50,7 +57,7 @@ public class AdminController {
      * }
      * @return
      */
-    @RequestMapping("/login")
+    @PostMapping("/login")
     public CommonResult login(@RequestBody(required = true) AdminInfoVo infoVo) {
         Admin admin = AdminInfoVo.convertToPo(infoVo);
         Admin loginAdmin = adminService.login(admin);
@@ -60,7 +67,15 @@ public class AdminController {
         List<Role> roles = roleService.getRolesByAdminId(loginAdmin.getId());
         adminInfoVo.setRoleList(roles);
         adminInfoVo.setPassword(null);
-        return CommonResult.ok(ResultCode.SUCCESS).msg("管理员登录成功!").data("userInfo", adminInfoVo);
+        // 生成token，放置Redis中
+        String token = tokenManager.createTokenForAdmin(adminInfoVo.getMobile());
+        try {
+            redisService.opsForValueSetWithExpire(token, adminInfoVo, 30, TimeUnit.MINUTES);
+
+            return CommonResult.ok(ResultCode.SUCCESS).msg("管理员登录成功!").data("userInfo", adminInfoVo).data("token", token);
+        } catch (JsonProcessingException e) {
+            return CommonResult.error(ResultCode.INTERNAL_SERVER_ERROR).msg("登录失败，请重试！");
+        }
     }
 
     /**
