@@ -1,5 +1,6 @@
 package cn.edu.bit.ruixin.community.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.persistence.*;

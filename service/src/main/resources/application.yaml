@@ -9,6 +9,10 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  redis:
+    host: bitrxc.jingkaimori.top
+    port: 6379
+
 
 server:
   port: 8080

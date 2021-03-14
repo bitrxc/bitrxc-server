@@ -50,6 +50,11 @@
             <version>${mysql.connector.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
 <!--        &lt;!&ndash; JSR303 数据校验 &ndash;&gt;-->
 <!--        <dependency>-->
 <!--            <groupId>org.springframework.boot</groupId>-->
