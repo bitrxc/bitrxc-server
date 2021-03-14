@@ -3,6 +3,7 @@ package cn.edu.bit.ruixin.community.controller;
 import cn.edu.bit.ruixin.base.common.CommonResult;
 import cn.edu.bit.ruixin.base.common.ResultCode;
 import cn.edu.bit.ruixin.community.domain.Room;
+import cn.edu.bit.ruixin.community.service.ImagesService;
 import cn.edu.bit.ruixin.community.service.RoomService;
 import cn.edu.bit.ruixin.community.vo.RoomInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class RoomManagerController {
     @Autowired
     private RoomService roomService;
 
+    @Autowired
+    private ImagesService imagesService;
+
     @PostMapping("")
     public CommonResult addRoom(@RequestBody(required = true) RoomInfoVo infoVo) {
         Room room = roomService.addNewRoom(RoomInfoVo.convertToPo(infoVo));
@@ -57,7 +61,13 @@ public class RoomManagerController {
     @GetMapping("/{id}")
     public CommonResult getRoomInfoById(@PathVariable("id") Integer id) {
         Room room = roomService.getRoomInfoById(id);
-        return CommonResult.ok(ResultCode.SUCCESS).data("roomInfo", RoomInfoVo.convertToVo(room));
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", room.getId());
+        map.put("name", room.getName());
+        map.put("description", room.getDescription());
+        List<String> images = imagesService.getAllImagesByGalleryId(room.getGallery());
+        map.put("images", images);
+        return CommonResult.ok(ResultCode.SUCCESS).data("roomInfo", map);
     }
 
     /**

@@ -1,13 +1,17 @@
 package cn.edu.bit.ruixin.community.service.impl;
 
+import cn.edu.bit.ruixin.base.security.utils.MapToBean;
 import cn.edu.bit.ruixin.community.domain.Appointment;
+import cn.edu.bit.ruixin.community.domain.Gallery;
 import cn.edu.bit.ruixin.community.domain.Room;
 import cn.edu.bit.ruixin.community.domain.Schedule;
 import cn.edu.bit.ruixin.community.exception.GlobalParamException;
 import cn.edu.bit.ruixin.community.myenum.AppointmentStatus;
 import cn.edu.bit.ruixin.community.repository.AppointmentRepository;
+import cn.edu.bit.ruixin.community.repository.GalleryRepository;
 import cn.edu.bit.ruixin.community.repository.RoomsRepository;
 import cn.edu.bit.ruixin.community.repository.ScheduleRepository;
+import cn.edu.bit.ruixin.community.service.RedisService;
 import cn.edu.bit.ruixin.community.service.RoomService;
 import cn.edu.bit.ruixin.community.exception.RoomDaoException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -42,23 +47,51 @@ public class RoomServiceImpl implements RoomService {
     @Autowired
     private AppointmentRepository appointmentRepository;
 
+    @Autowired
+    private RedisService redisService;
+
+    @Autowired
+    private GalleryRepository galleryRepository;
+
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
     public Room addNewRoom(Room room) {
         if (roomsRepository.findRoomByName(room.getName()) != null) {
             throw new RoomDaoException("Room already exist!");
         }
+        // 新增房间前新增图片集
+        Gallery gallery = galleryRepository.save(new Gallery());
+        room.setGallery(gallery.getId());
         return roomsRepository.save(room);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Room getRoomInfoById(Integer id) {
-        if (roomsRepository.findById(id).isPresent()) {
-            return roomsRepository.findById(id).get();
-        } else {
-            throw new RoomDaoException("该房间不存在!");
+        // 先从redis缓存中查
+        String name = Room.class.getName();
+        String key = name+":"+id;
+        try {
+            Room room = redisService.opsForHashGetAll(key, Room.class);
+
+            if (room != null) {
+                return room;
+            }
+            // 从数据库中查询并放入redis
+            if (roomsRepository.findById(id).isPresent()) {
+                room = roomsRepository.findById(id).get();
+                redisService.opsForHashSetAll(key, MapToBean.beanToMap(room), 30, TimeUnit.DAYS);
+                return room;
+
+            } else {
+                throw new RoomDaoException("该房间不存在!");
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
         }
+        return null;
     }
 
     @Override
@@ -93,7 +126,10 @@ public class RoomServiceImpl implements RoomService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
     public void removeRoomById(Integer id) {
-        if (roomsRepository.findById(id).isPresent()) {
+        Room room = roomsRepository.findById(id).get();
+        if (room != null) {
+            // 先删除图片集
+            galleryRepository.deleteById(room.getGallery());
             roomsRepository.deleteById(id);
         } else {
             throw new RoomDaoException("该房间不存在!");

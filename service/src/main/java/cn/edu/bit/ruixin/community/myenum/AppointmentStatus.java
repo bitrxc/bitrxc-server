@@ -14,7 +14,10 @@ public enum AppointmentStatus {
     RECEIVE("receive"),
     REJECT("reject"),
     CANCEL("cancel"),
+    SIGNED("signed"),
     EXECUTING("executing"),
+    ILLEGAL("illegal"),
+    MISSED("missed"),
     FINISH("finish");
 
     private String status;
