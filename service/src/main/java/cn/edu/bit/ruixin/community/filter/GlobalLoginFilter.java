@@ -50,7 +50,7 @@ public class GlobalLoginFilter implements Filter {
                         boolean hasAuthority = true;
                         if (hasAuthority) {
                             // 更新活动状态
-                            redisService.opsForValueSetWithExpire(token, adminInfoVo, 30, TimeUnit.MINUTES);
+                            redisService.updateExpire(token, 30, TimeUnit.MINUTES);
                             filterChain.doFilter(servletRequest, servletResponse);
                         } else {
                             ResponseUtils.out((HttpServletResponse) servletResponse, CommonResult.error(ResultCode.NOAHTHORITY));

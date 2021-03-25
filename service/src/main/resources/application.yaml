@@ -20,3 +20,8 @@ server:
 wx:
   appId: wx807f40cbd0449570
   secret: 3849a95d2480f6425462a79db7b530da
+
+IdWorker:
+  workerId: 1
+  datacenterId: 1
+  sequence: 1

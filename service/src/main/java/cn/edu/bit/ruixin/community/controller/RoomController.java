@@ -4,6 +4,7 @@ import cn.edu.bit.ruixin.base.common.CommonResult;
 import cn.edu.bit.ruixin.base.common.ResultCode;
 import cn.edu.bit.ruixin.community.domain.Room;
 import cn.edu.bit.ruixin.community.domain.Schedule;
+import cn.edu.bit.ruixin.community.service.RedisService;
 import cn.edu.bit.ruixin.community.service.RoomService;
 import cn.edu.bit.ruixin.community.service.ScheduleService;
 import cn.edu.bit.ruixin.community.vo.RoomInfoVo;
