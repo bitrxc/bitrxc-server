@@ -35,8 +35,16 @@ public class GlobalLoginFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
 
+//        filterChain.doFilter(servletRequest, servletResponse);
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         String servletPath = request.getServletPath();
+
+        // 允许跨域
+        HttpServletResponse response = (HttpServletResponse) servletResponse;
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Headers", "X-Requested-With,content-type,token");
+        response.setHeader("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH");
+        
         if (servletPath.startsWith("/admin")) {
             if (servletPath.equals("/admin/login")) {
                 filterChain.doFilter(servletRequest, servletResponse);
