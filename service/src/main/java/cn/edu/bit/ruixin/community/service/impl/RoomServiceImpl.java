@@ -2,11 +2,13 @@ package cn.edu.bit.ruixin.community.service.impl;
 
 import cn.edu.bit.ruixin.base.security.utils.MapToBean;
 import cn.edu.bit.ruixin.community.domain.Appointment;
+import cn.edu.bit.ruixin.community.domain.Gallery;
 import cn.edu.bit.ruixin.community.domain.Room;
 import cn.edu.bit.ruixin.community.domain.Schedule;
 import cn.edu.bit.ruixin.community.exception.GlobalParamException;
 import cn.edu.bit.ruixin.community.myenum.AppointmentStatus;
 import cn.edu.bit.ruixin.community.repository.AppointmentRepository;
+import cn.edu.bit.ruixin.community.repository.GalleryRepository;
 import cn.edu.bit.ruixin.community.repository.RoomsRepository;
 import cn.edu.bit.ruixin.community.repository.ScheduleRepository;
 import cn.edu.bit.ruixin.community.service.RedisService;
@@ -48,12 +50,18 @@ public class RoomServiceImpl implements RoomService {
     @Autowired
     private RedisService redisService;
 
+    @Autowired
+    private GalleryRepository galleryRepository;
+
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
     public Room addNewRoom(Room room) {
         if (roomsRepository.findRoomByName(room.getName()) != null) {
             throw new RoomDaoException("Room already exist!");
         }
+        // 新增房间前新增图片集
+        Gallery gallery = galleryRepository.save(new Gallery());
+        room.setGallery(gallery.getId());
         return roomsRepository.save(room);
     }
 
@@ -118,7 +126,10 @@ public class RoomServiceImpl implements RoomService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
     public void removeRoomById(Integer id) {
-        if (roomsRepository.findById(id).isPresent()) {
+        Room room = roomsRepository.findById(id).get();
+        if (room != null) {
+            // 先删除图片集
+            galleryRepository.deleteById(room.getGallery());
             roomsRepository.deleteById(id);
         } else {
             throw new RoomDaoException("该房间不存在!");

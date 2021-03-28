@@ -18,4 +18,5 @@ import java.util.List;
 public interface RoomsRepository extends JpaRepository<Room, Integer>, JpaSpecificationExecutor<Room> {
     Room findRoomByName(String name);
     List<Room> findAllByNameLike(String name);
+    void addOne(Room room);
 }

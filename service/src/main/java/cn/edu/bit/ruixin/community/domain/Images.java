@@ -8,22 +8,19 @@ import javax.persistence.*;
  * TODO
  *
  * @author 78165
- * @date 2021/1/29
+ * @date 2021/3/25
  */
-@SuppressWarnings("all")
 @Entity
-@Table(name = "room")
 @Data
-public class Room {
-
+@Table(name = "images")
+public class Images {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
     @Column(name = "gallery")
     private Integer gallery;
-    @Column(name = "name")
-    private String name;
-    @Column(name = "description")
-    private String description;
+    @Column(name = "image_hash")
+    private String imageHash;
+
 }

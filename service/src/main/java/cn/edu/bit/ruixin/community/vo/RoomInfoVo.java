@@ -12,7 +12,7 @@ public class RoomInfoVo {
 
     private Integer id;
     private String name;
-    private String image;
+    private Integer gallery;
     private String description;
 
     public static Room convertToPo(RoomInfoVo infoVo) {
@@ -20,7 +20,7 @@ public class RoomInfoVo {
         room.setId(infoVo.getId());
         room.setName(infoVo.getName());
         room.setDescription(infoVo.getDescription());
-        room.setImage(infoVo.getImage());
+        room.setGallery(infoVo.getGallery());
         return room;
     }
 
@@ -29,7 +29,7 @@ public class RoomInfoVo {
         infoVo.setId(room.getId());
         infoVo.setName(room.getName());
         infoVo.setDescription(room.getDescription());
-        infoVo.setImage(room.getImage());
+        infoVo.setGallery(room.getGallery());
         return infoVo;
     }
 
@@ -49,12 +49,12 @@ public class RoomInfoVo {
         this.name = name;
     }
 
-    public String getImage() {
-        return image;
+    public Integer getGallery() {
+        return gallery;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setGallery(Integer gallery) {
+        this.gallery = gallery;
     }
 
     public String getDescription() {
@@ -70,7 +70,7 @@ public class RoomInfoVo {
         return "RoomInfoVo{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", image='" + image + '\'' +
+                ", gallery='" + gallery + '\'' +
                 ", description='" + description + '\'' +
                 '}';
     }
