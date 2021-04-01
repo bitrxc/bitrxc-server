@@ -1,10 +1,15 @@
 package cn.edu.bit.ruixin.community.service.impl;
 
 import cn.edu.bit.ruixin.base.security.utils.IdWorker;
+import cn.edu.bit.ruixin.community.domain.Images;
+import cn.edu.bit.ruixin.community.exception.FileUploadDownloadException;
 import cn.edu.bit.ruixin.community.myenum.ImageType;
 import cn.edu.bit.ruixin.community.service.FileUpDownloadService;
+import cn.edu.bit.ruixin.community.service.ImagesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,9 +28,13 @@ public class FileUpDownloadServiceImpl implements FileUpDownloadService {
 
     @Autowired
     private IdWorker idWorker;
+    
+    @Autowired
+    private ImagesService imagesService;
 
+    @Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = Exception.class)
     @Override
-    public String uploadImage(MultipartFile file) {
+    public String uploadRoomImage(MultipartFile file, Integer room) {
         // 获取文件类型
         String type = file.getContentType();
         if (type.equals(ImageType.JPG.getType()) || type.equals(ImageType.PNG.getType())) {
@@ -43,21 +52,30 @@ public class FileUpDownloadServiceImpl implements FileUpDownloadService {
                 // 生成文件名，使用雪花算法生成全局ID
                 Long id = idWorker.nextId();
                 String filename = id.toString() + ((type.equals(ImageType.JPG.getType()))?".jpeg":"png");
-                String filepath = absolutePath + File.separator + filename;
-                inputStream = (ByteArrayInputStream) file.getInputStream();
-                outputStream = new FileOutputStream(filepath);
-                // 使用NIO写文件
-                outChannel = outputStream.getChannel();
 
-                byte[] bytes = new byte[16*1024];
+                // 存入数据库
+                Images images = new Images();
+                images.setRoom(room);
+                images.setImageHash(filename);
 
-                ByteBuffer buffer = ByteBuffer.allocate(16 * 1024);
+                if (imagesService.addImages(images) > 0) {
 
-                while (inputStream.read(bytes) > 0) {
-                    buffer.put(bytes);
-                    buffer.flip();
-                    outChannel.write(buffer);
-                    buffer.clear();
+                    String filepath = absolutePath + File.separator + filename;
+                    inputStream = (ByteArrayInputStream) file.getInputStream();
+                    outputStream = new FileOutputStream(filepath);
+                    // 使用NIO写文件
+                    outChannel = outputStream.getChannel();
+
+                    byte[] bytes = new byte[16*1024];
+
+                    ByteBuffer buffer = ByteBuffer.allocate(16 * 1024);
+
+                    while (inputStream.read(bytes) > 0) {
+                        buffer.put(bytes);
+                        buffer.flip();
+                        outChannel.write(buffer);
+                        buffer.clear();
+                    }
                 }
                 // 返回url
                 return filename;
@@ -65,6 +83,7 @@ public class FileUpDownloadServiceImpl implements FileUpDownloadService {
             } catch (IOException e) {
 //                System.out.println("读写文件异常");
                 e.printStackTrace();
+                throw new FileUploadDownloadException("文件上传失败");
             } finally {
                 if (outChannel != null) {
                     try {
@@ -90,9 +109,8 @@ public class FileUpDownloadServiceImpl implements FileUpDownloadService {
             }
         } else {
             // 抛出文件格式异常
-            return null;
+            throw new FileUploadDownloadException("上传文件格式不正确");
         }
-        return null;
     }
 
 

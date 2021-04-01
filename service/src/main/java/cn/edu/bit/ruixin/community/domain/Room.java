@@ -20,8 +20,8 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
-    @Column(name = "gallery")
-    private Integer gallery;
+    @Column(name = "image")
+    private String image;
     @Column(name = "name")
     private String name;
     @Column(name = "description")

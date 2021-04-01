@@ -1,5 +1,7 @@
 package cn.edu.bit.ruixin.community.service;
 
+import cn.edu.bit.ruixin.community.domain.Images;
+
 import java.util.List;
 
 /**
@@ -10,4 +12,5 @@ import java.util.List;
  */
 public interface ImagesService {
     List<String> getAllImagesByGalleryId(Integer gallery);
+    Integer addImages(Images images);
 }

@@ -5,17 +5,13 @@ import cn.edu.bit.ruixin.base.common.ResultCode;
 import cn.edu.bit.ruixin.base.security.utils.TokenManager;
 import cn.edu.bit.ruixin.community.domain.Admin;
 import cn.edu.bit.ruixin.community.domain.Role;
-import cn.edu.bit.ruixin.community.domain.User;
 import cn.edu.bit.ruixin.community.service.AdminService;
 import cn.edu.bit.ruixin.community.service.RedisService;
 import cn.edu.bit.ruixin.community.service.RoleService;
-import cn.edu.bit.ruixin.community.service.UserService;
 import cn.edu.bit.ruixin.community.vo.AdminInfoVo;
-import cn.edu.bit.ruixin.community.vo.UserInfoVo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
 
 /**
  * TODO
@@ -48,6 +46,7 @@ public class AdminController {
 
     @Autowired
     private RedisService redisService;
+
 
     /**
      * 管理员登录接口

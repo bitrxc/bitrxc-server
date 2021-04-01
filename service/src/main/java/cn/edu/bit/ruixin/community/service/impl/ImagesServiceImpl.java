@@ -1,5 +1,6 @@
 package cn.edu.bit.ruixin.community.service.impl;
 
+import cn.edu.bit.ruixin.community.domain.Images;
 import cn.edu.bit.ruixin.community.repository.ImagesRepository;
 import cn.edu.bit.ruixin.community.service.ImagesService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +22,16 @@ public class ImagesServiceImpl implements ImagesService {
     @Autowired
     private ImagesRepository imagesRepository;
 
-    @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
+    @Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = Exception.class)
     @Override
     public List<String> getAllImagesByGalleryId(Integer gallery) {
         List<String> images = imagesRepository.getAllImageHash(gallery);
         return null;
+    }
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = Exception.class)
+    @Override
+    public Integer addImages(Images images) {
+        return imagesRepository.addImage(images.getRoom(), images.getImageHash());
     }
 }

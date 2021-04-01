@@ -12,6 +12,8 @@ import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.servlet.Filter;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * TODO
@@ -52,5 +54,11 @@ public class MyWebConfig {
         multipartResolver.setMaxInMemorySize(128*1024);
         multipartResolver.setMaxUploadSize(10*1024*1024);
         return multipartResolver;
+    }
+
+    // 管理员修改和用户读锁，维护缓存一致性
+    @Bean
+    public ReadWriteLock readWriteLock() {
+        return new ReentrantReadWriteLock();
     }
 }

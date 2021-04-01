@@ -3,6 +3,7 @@ package cn.edu.bit.ruixin.community.handler;
 import cn.edu.bit.ruixin.base.common.CommonResult;
 import cn.edu.bit.ruixin.base.common.ResultCode;
 import cn.edu.bit.ruixin.community.exception.AppointmentDaoException;
+import cn.edu.bit.ruixin.community.exception.FileUploadDownloadException;
 import cn.edu.bit.ruixin.community.exception.RoomDaoException;
 import cn.edu.bit.ruixin.community.exception.UserDaoException;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class GlobalExceptionHandler {
 
     private Logger logger = LogManager.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(FileUploadDownloadException.class)
+    @ResponseBody
+    public CommonResult error(FileUploadDownloadException e) {
+        logger.error(e.getMessage());
+        return CommonResult.error(ResultCode.INTERNAL_SERVER_ERROR).msg(e.getMessage());
+    }
 
     @ExceptionHandler(AppointmentDaoException.class)
     @ResponseBody
