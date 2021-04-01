@@ -14,6 +14,9 @@ import java.util.List;
  * @date 2021/3/25
  */
 public interface ImagesRepository extends JpaRepository<Images, Integer>, JpaSpecificationExecutor<Images> {
-    @Query(nativeQuery = true, value = "SELECT `image_hash` FROM `images` WHERE `gallery` = ?")
-    List<String> getAllImageHash(Integer gallery);
+    @Query(nativeQuery = true, value = "SELECT `image_hash` FROM `images` WHERE `room` = ?")
+    List<String> getAllImageHash(Integer room);
+
+    @Query(nativeQuery = true, value = "INSERT INTO `images` (`room`, `image_hash`) VALUES(?, ?)")
+    Integer addImage(Integer room, String imageHash);
 }

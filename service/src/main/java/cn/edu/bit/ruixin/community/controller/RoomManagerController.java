@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
 
 /**
  * TODO
@@ -35,39 +37,78 @@ public class RoomManagerController {
     @Autowired
     private ImagesService imagesService;
 
+    private final ReadWriteLock readWriteLock;
+
+    private final Lock writeLock;
+
+    private final Lock readLock;
+
+    @Autowired
+    public RoomManagerController(ReadWriteLock readWriteLock) {
+        this.readWriteLock = readWriteLock;
+        this.readLock = readWriteLock.readLock();
+        this.writeLock = readWriteLock.writeLock();
+    }
+
     @PostMapping("")
     public CommonResult addRoom(@RequestBody(required = true) RoomInfoVo infoVo) {
         Room room = roomService.addNewRoom(RoomInfoVo.convertToPo(infoVo));
         return CommonResult.ok(ResultCode.SUCCESS).data("roomInfo", RoomInfoVo.convertToVo(room));
     }
 
+    /**
+     * 先删除缓存中数据，后删除数据库，加写锁
+     * @param id
+     * @return
+     */
     @DeleteMapping("/{id}")
     public CommonResult deleteRoomById(@PathVariable("id") Integer id) {
-        roomService.removeRoomById(id);
-        return CommonResult.ok(ResultCode.SUCCESS);
-    }
-
-    @PutMapping("")
-    public CommonResult updateRoomInfoById(@RequestBody(required = true) RoomInfoVo infoVo) {
-        Room room = roomService.updateRoomInfoById(RoomInfoVo.convertToPo(infoVo));
-        return CommonResult.ok(ResultCode.SUCCESS).data("roomInfo", RoomInfoVo.convertToVo(room));
+        // 保证缓存中数据一致性，使用写锁，防止在写操作完成前，读操作更新了缓存
+        writeLock.lock();
+        try {
+            roomService.removeRoomById(id);
+            return CommonResult.ok(ResultCode.SUCCESS);
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     /**
+     * 修改数据要加写锁，保证缓存中数据一致性
+     * @param infoVo
+     * @return
+     */
+    @PutMapping("")
+    public CommonResult updateRoomInfoById(@RequestBody(required = true) RoomInfoVo infoVo) {
+        writeLock.lock();
+        try {
+            Room room = roomService.updateRoomInfoById(RoomInfoVo.convertToPo(infoVo));
+            return CommonResult.ok(ResultCode.SUCCESS).data("roomInfo", RoomInfoVo.convertToVo(room));
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    /**
+     * 读操作加读锁
      * 根据房间ID查询
      * @param id
      * @return
      */
     @GetMapping("/{id}")
     public CommonResult getRoomInfoById(@PathVariable("id") Integer id) {
-        Room room = roomService.getRoomInfoById(id);
-        Map<String, Object> map = new HashMap<>();
-        map.put("id", room.getId());
-        map.put("name", room.getName());
-        map.put("description", room.getDescription());
-        List<String> images = imagesService.getAllImagesByGalleryId(room.getGallery());
-        map.put("images", images);
-        return CommonResult.ok(ResultCode.SUCCESS).data("roomInfo", map);
+        readLock.lock();
+        try {
+            Room room = roomService.getRoomInfoById(id);
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", room.getId());
+            map.put("name", room.getName());
+            map.put("description", room.getDescription());
+            map.put("images", room.getImage());
+            return CommonResult.ok(ResultCode.SUCCESS).data("roomInfo", map);
+        } finally {
+            readLock.unlock();
+        }
     }
 
     /**
@@ -76,13 +117,18 @@ public class RoomManagerController {
      */
     @GetMapping("")
     public CommonResult getAllRoomList() {
-        List<Room> list = roomService.getAllRoomList();
-        List<RoomInfoVo> infoVos = new ArrayList<>();
-        for (Room room :
-                list) {
-            infoVos.add(RoomInfoVo.convertToVo(room));
+        readLock.lock();
+        try {
+            List<Room> list = roomService.getAllRoomList();
+            List<RoomInfoVo> infoVos = new ArrayList<>();
+            for (Room room :
+                    list) {
+                infoVos.add(RoomInfoVo.convertToVo(room));
+            }
+            return CommonResult.ok(ResultCode.SUCCESS).data("rooms", infoVos);
+        } finally {
+            readLock.unlock();
         }
-        return CommonResult.ok(ResultCode.SUCCESS).data("rooms", infoVos);
     }
 
     /**
@@ -93,41 +139,63 @@ public class RoomManagerController {
      */
     @GetMapping("/{current}/{limit}")
     public CommonResult getRoomPages(@PathVariable("current") int current, @PathVariable("limit") int limit) {
-        // 构造分页对象
-        Pageable pageable = PageRequest.of(current, limit);
-        Page<Room> page = roomService.getRoomPages(pageable);
-        List<Room> list = page.getContent();
-        List<RoomInfoVo> infoVos = new ArrayList<>();
-        for (Room room :
-                list) {
-            infoVos.add(RoomInfoVo.convertToVo(room));
+        readLock.lock();
+        try {
+            // 构造分页对象
+            Pageable pageable = PageRequest.of(current, limit);
+            Page<Room> page = roomService.getRoomPages(pageable);
+            List<Room> list = page.getContent();
+            List<RoomInfoVo> infoVos = new ArrayList<>();
+            for (Room room :
+                    list) {
+                infoVos.add(RoomInfoVo.convertToVo(room));
+            }
+            Map<String, Object> map = new HashMap<>();
+            map.put("totalElements", page.getTotalElements());
+            map.put("totalPages", page.getTotalPages());
+            map.put("hasNext", page.hasNext());
+            map.put("hasPrevious", page.hasPrevious());
+            map.put("rooms", infoVos);
+            return CommonResult.ok(ResultCode.SUCCESS).data(map);
+        } finally {
+            readLock.unlock();
         }
-        Map<String, Object> map = new HashMap<>();
-        map.put("totalElements", page.getTotalElements());
-        map.put("totalPages", page.getTotalPages());
-        map.put("hasNext", page.hasNext());
-        map.put("hasPrevious", page.hasPrevious());
-        map.put("rooms", infoVos);
-        return CommonResult.ok(ResultCode.SUCCESS).data(map);
     }
 
     @GetMapping("/name")
     public CommonResult getRoomByName(@RequestParam("name")String name) {
-        Room room = roomService.getRoomInfoByName(name);
-        return CommonResult.ok(ResultCode.SUCCESS).data("roomInfo", RoomInfoVo.convertToVo(room));
+        readLock.lock();
+        try {
+            Room room = roomService.getRoomInfoByName(name);
+            return CommonResult.ok(ResultCode.SUCCESS).data("roomInfo", RoomInfoVo.convertToVo(room));
+        } finally {
+            readLock.unlock();
+        }
     }
 
     @GetMapping("/nameLike")
     public CommonResult getRoomByNameLike(@RequestParam("nameLike")String name) {
-        List<Room> list = roomService.getRoomInfoByNameLike("%" + name + "%");
-        List<RoomInfoVo> infoVos = new ArrayList<>();
-        for (Room room :
-                list) {
-            infoVos.add(RoomInfoVo.convertToVo(room));
+        readLock.lock();
+        try {
+            List<Room> list = roomService.getRoomInfoByNameLike("%" + name + "%");
+            List<RoomInfoVo> infoVos = new ArrayList<>();
+            for (Room room :
+                    list) {
+                infoVos.add(RoomInfoVo.convertToVo(room));
+            }
+            return CommonResult.ok(ResultCode.SUCCESS).data("rooms", infoVos);
+        } finally {
+            readLock.unlock();
         }
-        return CommonResult.ok(ResultCode.SUCCESS).data("rooms", infoVos);
     }
 
+    /**
+     * 不涉及缓存不用加锁
+     * @param roomId
+     * @param username
+     * @param date
+     * @return
+     */
     @GetMapping("/free/time")
     public CommonResult getFreeTimeByRoomId(@RequestParam("roomId") Integer roomId, @RequestParam("username") String username, @RequestParam("date") String date) {
         Map map = roomService.getRoomFreeTime(roomId, username, date);

@@ -18,8 +18,8 @@ public class Images {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
-    @Column(name = "gallery")
-    private Integer gallery;
+    @Column(name = "room")
+    private Integer room;
     @Column(name = "image_hash")
     private String imageHash;
 

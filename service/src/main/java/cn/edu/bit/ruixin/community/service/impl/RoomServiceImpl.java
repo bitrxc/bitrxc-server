@@ -54,14 +54,11 @@ public class RoomServiceImpl implements RoomService {
     private GalleryRepository galleryRepository;
 
     @Override
-    @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
+    @Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = Exception.class)
     public Room addNewRoom(Room room) {
         if (roomsRepository.findRoomByName(room.getName()) != null) {
             throw new RoomDaoException("Room already exist!");
         }
-        // 新增房间前新增图片集
-        Gallery gallery = galleryRepository.save(new Gallery());
-        room.setGallery(gallery.getId());
         return roomsRepository.save(room);
     }
 
@@ -126,10 +123,7 @@ public class RoomServiceImpl implements RoomService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
     public void removeRoomById(Integer id) {
-        Room room = roomsRepository.findById(id).get();
-        if (room != null) {
-            // 先删除图片集
-            galleryRepository.deleteById(room.getGallery());
+        if (roomsRepository.findById(id).isPresent()) {
             roomsRepository.deleteById(id);
         } else {
             throw new RoomDaoException("该房间不存在!");
