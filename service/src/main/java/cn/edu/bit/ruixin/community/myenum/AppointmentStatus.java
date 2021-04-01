@@ -15,7 +15,6 @@ public enum AppointmentStatus {
     REJECT("reject"),
     CANCEL("cancel"),
     SIGNED("signed"),
-    EXECUTING("executing"),
     ILLEGAL("illegal"),
     MISSED("missed"),
     FINISH("finish");
