@@ -9,5 +9,5 @@ import org.springframework.web.multipart.MultipartFile;
  * @date 2021/3/15
  */
 public interface FileUpDownloadService {
-    String uploadImage(MultipartFile file);
+    String uploadRoomImage(MultipartFile file, Integer room);
 }

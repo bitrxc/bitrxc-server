@@ -31,9 +31,10 @@ public class FileUpDownloadController {
     @Autowired
     private FileUpDownloadService fileUpDownloadService;
 
-    @PostMapping("/upload/image/room")
-    public CommonResult uploadRoomImage(@RequestParam(value = "file", required = true) MultipartFile file) {
-        String url = fileUpDownloadService.uploadImage(file);
+    @PostMapping("/upload/image/room/{id}")
+    public CommonResult uploadRoomImage(@RequestParam(value = "file", required = true) MultipartFile file,
+                                        @PathVariable(name = "id") Integer room) {
+        String url = fileUpDownloadService.uploadRoomImage(file, room);
         if (url != null && !url.equals("")) {
             return CommonResult.ok(ResultCode.SUCCESS).msg("图片上传成功！").data("url", url);
         } else {
@@ -48,8 +49,8 @@ public class FileUpDownloadController {
      * @param response
      * @throws IOException
      */
-    @GetMapping("/download/image/room/{filename}")
-    public void getRoomImage(@PathVariable(name = "filename")String filename, HttpServletResponse response) throws IOException {
+    @GetMapping("/download/image/room/{url}")
+    public void getRoomImage(@PathVariable(name = "url")String filename, HttpServletResponse response) throws IOException {
         File path = new File(ResourceUtils.getURL("classpath:").getPath());
         String absolutePath = path.getAbsolutePath() + File.separator + "static" + File.separator + "image" + File.separator + "room";
         String filepath = absolutePath + File.separator + filename;

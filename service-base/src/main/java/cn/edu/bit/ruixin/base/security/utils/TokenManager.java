@@ -33,6 +33,7 @@ public class TokenManager {
         Map<String, Object> header = new HashMap<>();
         header.put("typ", "JWT");
         header.put("alg", "HS256");
+
         return JWT.create()
                 .withHeader(header)
                 .withExpiresAt(expirationTime)

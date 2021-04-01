@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
 
 /**
  * TODO
@@ -32,6 +34,16 @@ public class RoomController {
 
     @Autowired
     private RoomService roomService;
+
+    private final ReadWriteLock readWriteLock;
+
+    private final Lock readLock;
+
+    @Autowired
+    public RoomController(ReadWriteLock readWriteLock) {
+        this.readWriteLock = readWriteLock;
+        this.readLock = readWriteLock.readLock();
+    }
 
     /**
      * 根据房间ID查询
