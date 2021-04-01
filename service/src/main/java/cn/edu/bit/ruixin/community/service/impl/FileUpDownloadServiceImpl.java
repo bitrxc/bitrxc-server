@@ -38,7 +38,7 @@ public class FileUpDownloadServiceImpl implements FileUpDownloadService {
         // 获取文件类型
         String type = file.getContentType();
         if (type.equals(ImageType.JPG.getType()) || type.equals(ImageType.PNG.getType())) {
-            ByteArrayInputStream inputStream = null;
+            InputStream inputStream = null;
             FileOutputStream outputStream = null;
             FileChannel outChannel = null;
             try {
@@ -51,31 +51,30 @@ public class FileUpDownloadServiceImpl implements FileUpDownloadService {
                 }
                 // 生成文件名，使用雪花算法生成全局ID
                 Long id = idWorker.nextId();
-                String filename = id.toString() + ((type.equals(ImageType.JPG.getType()))?".jpeg":"png");
+                String filename = id.toString() + ((type.equals(ImageType.JPG.getType()))?".jpeg":".png");
 
                 // 存入数据库
                 Images images = new Images();
                 images.setRoom(room);
                 images.setImageHash(filename);
 
-                if (imagesService.addImages(images) > 0) {
+                String filepath = absolutePath + File.separator + filename;
+                inputStream = file.getInputStream();
+//                stream
+//                inputStream = (ByteArrayInputStream) file.getInputStream();
+                outputStream = new FileOutputStream(filepath);
+                // 使用NIO写文件
+                outChannel = outputStream.getChannel();
 
-                    String filepath = absolutePath + File.separator + filename;
-                    inputStream = (ByteArrayInputStream) file.getInputStream();
-                    outputStream = new FileOutputStream(filepath);
-                    // 使用NIO写文件
-                    outChannel = outputStream.getChannel();
+                byte[] bytes = new byte[16*1024];
 
-                    byte[] bytes = new byte[16*1024];
+                ByteBuffer buffer = ByteBuffer.allocate(16 * 1024);
 
-                    ByteBuffer buffer = ByteBuffer.allocate(16 * 1024);
-
-                    while (inputStream.read(bytes) > 0) {
-                        buffer.put(bytes);
-                        buffer.flip();
-                        outChannel.write(buffer);
-                        buffer.clear();
-                    }
+                while (inputStream.read(bytes) > 0) {
+                    buffer.put(bytes);
+                    buffer.flip();
+                    outChannel.write(buffer);
+                    buffer.clear();
                 }
                 // 返回url
                 return filename;
