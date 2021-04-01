@@ -51,11 +51,11 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
     @Override
     public void addANewAppointment(Appointment appointment) {
-        // 判断该房间所预约时间段是否空闲，比较房间ID，预约的日期，预约的时间段，以及当前状态不为receive和executing
+        // 判断该房间所预约时间段是否空闲，比较房间ID，预约的日期，预约的时间段，不能对含有预约记录状态为receive、Signed
         Integer roomId = appointment.getRoomId();
         Integer launchTime = appointment.getLaunchTime();
         Date execDate = appointment.getExecDate();
-        Appointment getAppointment = appointmentRepository.findReceivedAppointment(roomId, execDate, launchTime, AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.EXECUTING.getStatus());
+        Appointment getAppointment = appointmentRepository.findReceivedAppointment(roomId, execDate, launchTime, AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.SIGNED.getStatus());
         if (getAppointment != null) {
             throw new AppointmentDaoException("该房间此时间段已被占用!");
         } else {
@@ -120,7 +120,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
     }
 
-    @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
+    @Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = Exception.class)
     @Override
     public void checkOutAppointment(Integer id, String status, String conductor, String checkNote) {
         Appointment appointment = appointmentRepository.findAppointmentById(id);
@@ -129,10 +129,22 @@ public class AppointmentServiceImpl implements AppointmentService {
                 throw new AppointmentDaoException("该预约已经取消，无法审批!");
             }
             if (appointment.getStatus().equals(AppointmentStatus.RECEIVE.getStatus())) {
-                throw new AppointmentDaoException("该预约已审批通过，不可重复审批!");
+                if (!AppointmentStatus.SIGNED.getStatus().equals(status) && !AppointmentStatus.MISSED.getStatus().equals(status)) {
+                    throw new AppointmentDaoException("该预约已审批通过，不可执行该操作!");
+                }
             }
             if (appointment.getStatus().equals(AppointmentStatus.REJECT.getStatus())) {
-                throw new AppointmentDaoException("该预约已审批驳回，不可重复审批!");
+                throw new AppointmentDaoException("该预约已审批驳回，不可重复操作!");
+            }
+            if (appointment.getStatus().equals(AppointmentStatus.MISSED.getStatus())) {
+                if (!AppointmentStatus.SIGNED.getStatus().equals(status)) {
+                    throw new AppointmentDaoException("该预约已爽约，只能重新签到!");
+                }
+            }
+            if (appointment.getStatus().equals(AppointmentStatus.ILLEGAL.getStatus())) {
+                if (!AppointmentStatus.FINISH.getStatus().equals(status)) {
+                    throw new AppointmentDaoException("该预约未签退，只能修改为签退！");
+                }
             }
             if (conductor != null && !conductor.equals("")) {
                 appointment.setStatus(status);
