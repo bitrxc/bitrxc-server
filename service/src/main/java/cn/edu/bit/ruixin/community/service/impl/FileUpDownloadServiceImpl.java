@@ -58,24 +58,21 @@ public class FileUpDownloadServiceImpl implements FileUpDownloadService {
                 images.setRoom(room);
                 images.setImageHash(filename);
 
-                if (imagesService.addImages(images) > 0) {
+                String filepath = absolutePath + File.separator + filename;
+                inputStream = (ByteArrayInputStream) file.getInputStream();
+                outputStream = new FileOutputStream(filepath);
+                // 使用NIO写文件
+                outChannel = outputStream.getChannel();
 
-                    String filepath = absolutePath + File.separator + filename;
-                    inputStream = (ByteArrayInputStream) file.getInputStream();
-                    outputStream = new FileOutputStream(filepath);
-                    // 使用NIO写文件
-                    outChannel = outputStream.getChannel();
+                byte[] bytes = new byte[16*1024];
 
-                    byte[] bytes = new byte[16*1024];
+                ByteBuffer buffer = ByteBuffer.allocate(16 * 1024);
 
-                    ByteBuffer buffer = ByteBuffer.allocate(16 * 1024);
-
-                    while (inputStream.read(bytes) > 0) {
-                        buffer.put(bytes);
-                        buffer.flip();
-                        outChannel.write(buffer);
-                        buffer.clear();
-                    }
+                while (inputStream.read(bytes) > 0) {
+                    buffer.put(bytes);
+                    buffer.flip();
+                    outChannel.write(buffer);
+                    buffer.clear();
                 }
                 // 返回url
                 return filename;
