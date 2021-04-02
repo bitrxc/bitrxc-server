@@ -102,6 +102,7 @@ public class GlobalLoginFilter implements Filter {
                 } else {
                     ResponseUtils.out((HttpServletResponse) servletResponse, CommonResult.error(ResultCode.UNAUTHENTICATION_ERROR).msg("请先登录！"));
                 }
+//                filterChain.doFilter(servletRequest, servletResponse  );
             }
         }
     }
