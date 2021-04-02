@@ -102,6 +102,12 @@ public class AppointmentServiceImpl implements AppointmentService {
             if (appointment.getStatus().equals("cancel")) {
                 throw new AppointmentDaoException("该预约已被撤销，不可重复撤销!");
             }
+            if (appointment.getStatus().equals(AppointmentStatus.SIGNED.getStatus())) {
+                throw new AppointmentDaoException("该预约已被签到，不可重复撤销!");
+            }
+            if (appointment.getStatus().equals(AppointmentStatus.ILLEGAL.getStatus()) || appointment.getStatus().equals(AppointmentStatus.FINISH.getStatus()) || appointment.getStatus().equals(AppointmentStatus.MISSED.getStatus())) {
+                throw new AppointmentDaoException("该预约已不可撤销!");
+            }
             // 撤销预约
             appointment.setStatus("cancel");
             appointmentRepository.save(appointment);

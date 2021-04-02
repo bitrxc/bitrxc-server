@@ -207,7 +207,7 @@ public class RoomServiceImpl implements RoomService {
             throw new GlobalParamException("日期格式有误！");
         }
 
-        List<Integer> busyTimeId = appointmentRepository.findLaunchTimeByRoomIdAndExecuteDateAndStatus(roomId, execDate, AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.EXECUTING.getStatus());
+        List<Integer> busyTimeId = appointmentRepository.findLaunchTimeByRoomIdAndExecuteDateAndStatus(roomId, execDate, AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.SIGNED.getStatus());
         Collections.sort(busyTimeId);
 
         for (int k = 0; k < busyTimeId.size() && i < allTime.size(); ) {
