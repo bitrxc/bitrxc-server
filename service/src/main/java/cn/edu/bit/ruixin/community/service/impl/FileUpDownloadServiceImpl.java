@@ -38,7 +38,7 @@ public class FileUpDownloadServiceImpl implements FileUpDownloadService {
         // 获取文件类型
         String type = file.getContentType();
         if (type.equals(ImageType.JPG.getType()) || type.equals(ImageType.PNG.getType())) {
-            ByteArrayInputStream inputStream = null;
+            InputStream inputStream = null;
             FileOutputStream outputStream = null;
             FileChannel outChannel = null;
             try {
@@ -59,7 +59,9 @@ public class FileUpDownloadServiceImpl implements FileUpDownloadService {
                 images.setImageHash(filename);
 
                 String filepath = absolutePath + File.separator + filename;
-                inputStream = (ByteArrayInputStream) file.getInputStream();
+                inputStream = file.getInputStream();
+//                stream
+//                inputStream = (ByteArrayInputStream) file.getInputStream();
                 outputStream = new FileOutputStream(filepath);
                 // 使用NIO写文件
                 outChannel = outputStream.getChannel();
