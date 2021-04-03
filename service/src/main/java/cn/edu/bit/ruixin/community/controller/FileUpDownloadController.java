@@ -51,7 +51,7 @@ public class FileUpDownloadController {
     @GetMapping("/download/image/room/{url}")
     public void getRoomImage(@PathVariable(name = "url")String filename, HttpServletResponse response) throws IOException {
         File path = new File(ResourceUtils.getURL("classpath:").getPath());
-        String absolutePath = path.getAbsolutePath() + File.separator + "static" + File.separator + "image" + File.separator + "room";
+        String absolutePath = "static" + File.separator + "image" + File.separator + "room";
         String filepath = absolutePath + File.separator + filename;
         FileInputStream inputStream = new FileInputStream(filepath);
         byte[] buf = new byte[4*1024];
