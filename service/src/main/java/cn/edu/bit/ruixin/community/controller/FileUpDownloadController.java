@@ -14,8 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
+
 
 /**
  * TODO
@@ -54,18 +53,17 @@ public class FileUpDownloadController {
         File path = new File(ResourceUtils.getURL("classpath:").getPath());
         String absolutePath = path.getAbsolutePath() + File.separator + "static" + File.separator + "image" + File.separator + "room";
         String filepath = absolutePath + File.separator + filename;
-        FileChannel channel = new FileInputStream(filepath).getChannel();
-        ByteBuffer buffer = ByteBuffer.allocate(16 * 1024);
+        FileInputStream inputStream = new FileInputStream(filepath);
+        byte[] buf = new byte[4*1024];
+        int len = 0;
         response.setContentType("image/jpeg");
         response.setStatus(HttpStatus.OK.value());
         response.setCharacterEncoding("UTF-8");
         ServletOutputStream outputStream = response.getOutputStream();
-        while (channel.read(buffer) > 0) {
-            byte[] bytes = buffer.array();
-            outputStream.write(bytes);
-            buffer.clear();
+        while ((len = inputStream.read(buf)) != -1) {
+            outputStream.write(buf, 0, len);
         }
 
-        channel.close();
+        inputStream.close();
     }
 }
