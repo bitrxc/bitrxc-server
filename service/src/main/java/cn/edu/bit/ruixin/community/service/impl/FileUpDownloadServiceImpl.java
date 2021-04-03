@@ -40,11 +40,14 @@ public class FileUpDownloadServiceImpl implements FileUpDownloadService {
         if (type.equals(ImageType.JPG.getType()) || type.equals(ImageType.PNG.getType())) {
             InputStream inputStream = null;
             FileOutputStream outputStream = null;
-            FileChannel outChannel = null;
+
+//            FileChannel outChannel = null;
+
             try {
                 // 获取jar包路径
                 File path = new File(ResourceUtils.getURL("classpath:").getPath());
-                String absolutePath = path.getAbsolutePath() + File.separator + "static" + File.separator + "image" + File.separator + "room";
+
+                String absolutePath = "static" + File.separator + "image" + File.separator + "room";
                 File absFile = new File(absolutePath);
                 if (!absFile.exists()) {
                     absFile.mkdirs();
@@ -59,23 +62,38 @@ public class FileUpDownloadServiceImpl implements FileUpDownloadService {
                 images.setImageHash(filename);
 
                 String filepath = absolutePath + File.separator + filename;
+
                 inputStream = file.getInputStream();
-//                stream
-//                inputStream = (ByteArrayInputStream) file.getInputStream();
                 outputStream = new FileOutputStream(filepath);
-                // 使用NIO写文件
-                outChannel = outputStream.getChannel();
 
                 byte[] bytes = new byte[16*1024];
+                int len = 0;
 
-                ByteBuffer buffer = ByteBuffer.allocate(16 * 1024);
-
-                while (inputStream.read(bytes) > 0) {
-                    buffer.put(bytes);
-                    buffer.flip();
-                    outChannel.write(buffer);
-                    buffer.clear();
+                while ((len = inputStream.read(bytes)) != -1) {
+                    outputStream.write(bytes, 0, len);
                 }
+
+                // openJDK的NIO类库不同于ORACLEJDK
+
+//                inputStream = file.getInputStream();
+////                stream
+////                inputStream = (ByteArrayInputStream) file.getInputStream();
+//                outputStream = new FileOutputStream(filepath);
+//                // 使用NIO写文件
+//                outChannel = outputStream.getChannel();
+//
+//                byte[] bytes = new byte[16*1024];
+//
+//                ByteBuffer buffer = ByteBuffer.allocate(16 * 1024);
+//
+//                while (inputStream.read(bytes) > 0) {
+//                    buffer.put(bytes);
+//                    buffer.flip();
+//                    outChannel.write(buffer);
+//                    buffer.clear();
+//                }
+
+
                 // 返回url
                 return filename;
 
@@ -84,13 +102,13 @@ public class FileUpDownloadServiceImpl implements FileUpDownloadService {
                 e.printStackTrace();
                 throw new FileUploadDownloadException("文件上传失败");
             } finally {
-                if (outChannel != null) {
-                    try {
-                        outChannel.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+//                if (outChannel != null) {
+//                    try {
+//                        outChannel.close();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
                 if (inputStream != null) {
                     try {
                         inputStream.close();

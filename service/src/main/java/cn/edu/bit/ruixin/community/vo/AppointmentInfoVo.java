@@ -149,6 +149,7 @@ public class AppointmentInfoVo {
         if (execDate != null) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             String date = dateFormat.format(execDate);
+            System.out.printf(date);
             appointmentInfoVo.setExecDate(date);
         }
 

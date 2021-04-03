@@ -45,7 +45,9 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Transactional(readOnly = true)
     @Override
     public Appointment getAppointmentById(Integer id) {
-        return appointmentRepository.findAppointmentById(id);
+        Appointment appointment = appointmentRepository.findAppointmentById(id);
+        System.out.println(appointment);
+        return appointment;
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
