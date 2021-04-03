@@ -46,7 +46,8 @@ public class FileUpDownloadServiceImpl implements FileUpDownloadService {
             try {
                 // 获取jar包路径
                 File path = new File(ResourceUtils.getURL("classpath:").getPath());
-                String absolutePath = path.getAbsolutePath() + File.separator + "static" + File.separator + "image" + File.separator + "room";
+
+                String absolutePath = "static" + File.separator + "image" + File.separator + "room";
                 File absFile = new File(absolutePath);
                 if (!absFile.exists()) {
                     absFile.mkdirs();

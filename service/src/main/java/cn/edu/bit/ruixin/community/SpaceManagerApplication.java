@@ -14,5 +14,4 @@ public class SpaceManagerApplication {
         System.setProperty("user.timezone", "Asia/Shanghai");
         SpringApplication.run(SpaceManagerApplication.class, args);
     }
-
 }
