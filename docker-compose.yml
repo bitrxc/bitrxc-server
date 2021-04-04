@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  server:
+    build: ""
+    container_name: server
+    ports:
+      - "7200:8080"
+    volumes:
+      - $PWD/app/static:/app/static
+    depends_on:
+      - mariadb
+      - redis
+    command: ["/app/wait-for-it.sh", "mariadb:3306", "-s", "--",
+                 "/app/wait-for-it.sh", "redis:6379", "-s", "--",
+                 "sh", "-c", "java ${JAVA_OPTS} -jar /app/app.jar"]
+
+  mariadb:
+    image: "mariadb:10.5"
+    container_name: mariadb
+    volumes:
+    - $PWD/app/mariadb/data:/var/lib/mysql
+
+  redis:
+    image: "redis:6.2"
+    container_name: redis
+    volumes:
+    - $PWD/app/redis/conf:/etc/redis
+    - $PWD/app/redis/data:/data
+    entrypoint: ["redis-server", "/etc/redis/redis.conf"]
