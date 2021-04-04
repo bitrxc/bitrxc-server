@@ -56,7 +56,8 @@ public class FileUpDownloadController {
         FileInputStream inputStream = new FileInputStream(filepath);
         byte[] buf = new byte[4*1024];
         int len = 0;
-        response.setContentType("image/jpeg");
+        String suffix = filename.substring(filename.charAt('.') + 1);
+        response.setContentType("image/" + suffix);
         response.setStatus(HttpStatus.OK.value());
         response.setCharacterEncoding("UTF-8");
         ServletOutputStream outputStream = response.getOutputStream();
