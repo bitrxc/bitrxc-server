@@ -133,6 +133,12 @@ public class RoomServiceImpl implements RoomService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
     public Room updateRoomInfoById(Room room) {
+        if (redisService.opsForCheckKeyExist(Room.class.getName()+":"+room.getId())) {
+            // 若缓存存在先清理缓存
+            if (!redisService.opsForDeleteKey(Room.class.getName()+":"+room.getId())) {
+                throw new RoomDaoException("修改房间失败！");
+            }
+        }
         if (roomsRepository.findById(room.getId()).isPresent()) {
             roomsRepository.findById(room.getId()).get();
             roomsRepository.save(room);

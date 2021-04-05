@@ -24,4 +24,8 @@ public interface RedisService {
     boolean updateExpire(String key, long timeout, TimeUnit unit);
 
     boolean opsForHashSetAll(String key, Map<String, Object> map, long timeout, TimeUnit unit);
+
+    boolean opsForDeleteKey(String key);
+
+    boolean opsForCheckKeyExist(String key);
 }

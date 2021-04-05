@@ -75,6 +75,16 @@ public class RedisServiceImpl implements RedisService {
         return true;
     }
 
+    @Override
+    public boolean opsForDeleteKey(String key) {
+        return redisTemplate.delete(key);
+    }
+
+    @Override
+    public boolean opsForCheckKeyExist(String key) {
+        return redisTemplate.hasKey(key);
+    }
+
     public void opsForHashSet(String key, Object object) throws JsonProcessingException {
         String valueAsString = objectMapper.writeValueAsString(object);
     }
