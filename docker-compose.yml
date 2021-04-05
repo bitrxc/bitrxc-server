@@ -2,29 +2,38 @@ version: "3.9"
 
 services:
   server:
-    build: ""
+    build: .
     container_name: server
     ports:
-      - "7200:8080"
+      - target: ${SERVER_TARGET_PORT}
+        published: ${SERVER_PUBLISHED_PORT}
     volumes:
-      - $PWD/app/static:/app/static
+      - type: bind
+        source: ${SERVER_STATIC_MOUNTPOINT}
+        target: /app/static
     depends_on:
       - mariadb
       - redis
-    command: ["/app/wait-for-it.sh", "mariadb:3306", "-s", "--",
-                 "/app/wait-for-it.sh", "redis:6379", "-s", "--",
-                 "sh", "-c", "java ${JAVA_OPTS} -jar /app/app.jar"]
+    entrypoint: [ "/app/wait-for-it.sh", "mariadb:3306", "-s", "--",
+               "/app/wait-for-it.sh", "redis:6379", "-s", "--",
+               "sh", "-c", "java ${JAVA_OPTS} -jar /app/app.jar" ]
 
   mariadb:
     image: "mariadb:10.5"
     container_name: mariadb
     volumes:
-    - $PWD/app/mariadb/data:/var/lib/mysql
+      - type: bind
+        source: ${MARIADB_DATA_MOUNTPOINT}
+        target: /var/lib/mysql
 
   redis:
     image: "redis:6.2"
     container_name: redis
     volumes:
-    - $PWD/app/redis/conf:/etc/redis
-    - $PWD/app/redis/data:/data
-    entrypoint: ["redis-server", "/etc/redis/redis.conf"]
+      - type: bind
+        source: ${REDIS_CONF_MOUNTPOINT}
+        target: /etc/redis
+      - type: bind
+        source: ${REDIS_DATA_MOUNTPOINT}
+        target: /data
+    entrypoint: [ "redis-server", "/etc/redis/redis.conf" ]

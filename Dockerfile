@@ -14,6 +14,7 @@ FROM openjdk:8u282 AS serve-env
 WORKDIR /app
 
 COPY deploy/wait-for-it.sh /app/wait-for-it.sh
+RUN chmod +x /app/wait-for-it.sh
 COPY --from=build-env /usr/src/app/service/target/*.jar /app/app.jar
 
 # -Djava.security.egd=file:/dev/urandom
