@@ -1,5 +1,6 @@
 package cn.edu.bit.ruixin.community.vo;
 
+import cn.edu.bit.ruixin.community.annotation.FieldNeedCheck;
 import cn.edu.bit.ruixin.community.domain.Admin;
 import cn.edu.bit.ruixin.community.domain.Role;
 import lombok.Data;
@@ -18,7 +19,9 @@ import java.util.List;
 public class AdminInfoVo {
 
     private Integer id;
+    @FieldNeedCheck
     private String username;
+    @FieldNeedCheck
     private String email;
     private String mobile;
     private String password;

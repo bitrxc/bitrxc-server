@@ -2,6 +2,7 @@ package cn.edu.bit.ruixin.community.controller;
 
 import cn.edu.bit.ruixin.base.common.CommonResult;
 import cn.edu.bit.ruixin.base.common.ResultCode;
+import cn.edu.bit.ruixin.community.annotation.MsgSecCheck;
 import cn.edu.bit.ruixin.community.domain.Appointment;
 import cn.edu.bit.ruixin.community.domain.Room;
 import cn.edu.bit.ruixin.community.service.AppointmentService;
@@ -80,6 +81,7 @@ public class AppointmentManagerController {
         return CommonResult.ok(ResultCode.SUCCESS).data(map);
     }
 
+    @MsgSecCheck({"conductor", "checkNote"})
     @PutMapping("/check/{appointmentId}")
     public CommonResult check(@PathVariable(name = "appointmentId")Integer id,
                                @RequestParam(required = true, name = "status")String status,

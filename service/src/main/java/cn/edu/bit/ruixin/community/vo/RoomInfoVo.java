@@ -1,5 +1,6 @@
 package cn.edu.bit.ruixin.community.vo;
 
+import cn.edu.bit.ruixin.community.annotation.FieldNeedCheck;
 import cn.edu.bit.ruixin.community.domain.Room;
 
 /**
@@ -11,8 +12,10 @@ import cn.edu.bit.ruixin.community.domain.Room;
 public class RoomInfoVo {
 
     private Integer id;
+    @FieldNeedCheck
     private String name;
     private String image;
+    @FieldNeedCheck
     private String description;
 
     public static Room convertToPo(RoomInfoVo infoVo) {

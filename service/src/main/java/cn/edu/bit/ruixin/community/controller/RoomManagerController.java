@@ -2,6 +2,7 @@ package cn.edu.bit.ruixin.community.controller;
 
 import cn.edu.bit.ruixin.base.common.CommonResult;
 import cn.edu.bit.ruixin.base.common.ResultCode;
+import cn.edu.bit.ruixin.community.annotation.MsgSecCheck;
 import cn.edu.bit.ruixin.community.domain.Room;
 import cn.edu.bit.ruixin.community.service.ImagesService;
 import cn.edu.bit.ruixin.community.service.RoomService;
@@ -50,6 +51,7 @@ public class RoomManagerController {
         this.writeLock = readWriteLock.writeLock();
     }
 
+    @MsgSecCheck("infoVo")
     @PostMapping("")
     public CommonResult addRoom(@RequestBody(required = true) RoomInfoVo infoVo) {
         Room room = roomService.addNewRoom(RoomInfoVo.convertToPo(infoVo));
@@ -78,6 +80,7 @@ public class RoomManagerController {
      * @param infoVo
      * @return
      */
+    @MsgSecCheck("infoVo")
     @PutMapping("")
     public CommonResult updateRoomInfoById(@RequestBody(required = true) RoomInfoVo infoVo) {
         writeLock.lock();

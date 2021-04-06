@@ -3,6 +3,7 @@ package cn.edu.bit.ruixin.community.controller;
 import cn.edu.bit.ruixin.base.common.CommonResult;
 import cn.edu.bit.ruixin.base.common.ResultCode;
 import cn.edu.bit.ruixin.base.security.utils.TokenManager;
+import cn.edu.bit.ruixin.community.annotation.MsgSecCheck;
 import cn.edu.bit.ruixin.community.domain.Admin;
 import cn.edu.bit.ruixin.community.domain.Role;
 import cn.edu.bit.ruixin.community.service.AdminService;
@@ -120,6 +121,7 @@ public class AdminController {
      * @param adminInfoVo
      * @return
      */
+    @MsgSecCheck("adminInfoVo")
     @PostMapping("/users")
     public CommonResult addAdmin(@RequestBody AdminInfoVo adminInfoVo) {
         Admin admin = AdminInfoVo.convertToPo(adminInfoVo);
@@ -130,6 +132,7 @@ public class AdminController {
     }
 
 
+    @MsgSecCheck({"email"})
     @PutMapping("/users/{id}")
     public CommonResult modifyAdmin(@PathVariable(name = "id") int id,
                                     @RequestParam(name = "email", required = false) String email,

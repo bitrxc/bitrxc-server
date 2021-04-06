@@ -1,5 +1,6 @@
 package cn.edu.bit.ruixin.community.vo;
 
+import cn.edu.bit.ruixin.community.annotation.FieldNeedCheck;
 import cn.edu.bit.ruixin.community.domain.Appointment;
 import cn.edu.bit.ruixin.community.exception.GlobalParamException;
 import lombok.Data;
@@ -25,8 +26,11 @@ public class AppointmentInfoVo {
     private Integer launchTime;
     private String launcher;
     private String status;
+    @FieldNeedCheck
     private String conductor;
+    @FieldNeedCheck
     private String checkNote;
+    @FieldNeedCheck
     private String userNote;
     private long checkDate;
     private long launchDate;

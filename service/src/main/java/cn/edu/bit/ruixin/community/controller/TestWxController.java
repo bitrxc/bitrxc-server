@@ -2,10 +2,10 @@ package cn.edu.bit.ruixin.community.controller;
 
 import cn.edu.bit.ruixin.base.common.CommonResult;
 import cn.edu.bit.ruixin.base.common.ResultCode;
+import cn.edu.bit.ruixin.community.annotation.MsgSecCheck;
+import cn.edu.bit.ruixin.community.domain.WxAppResultVo;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * TODO
@@ -16,6 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/test")
 public class TestWxController {
+
+    @MsgSecCheck({"vo", "name"})
+    @PostMapping("/msgCheck")
+    public CommonResult checkDemo(@RequestBody String vo) {
+        System.out.println(vo);
+        return CommonResult.ok(ResultCode.SUCCESS);
+    }
 
     @RequestMapping("/code")
     public CommonResult getWx(@RequestParam("code") String code) {

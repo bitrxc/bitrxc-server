@@ -1,5 +1,6 @@
 package cn.edu.bit.ruixin.community.vo;
 
+import cn.edu.bit.ruixin.community.annotation.FieldNeedCheck;
 import cn.edu.bit.ruixin.community.domain.User;
 
 /**
@@ -13,12 +14,15 @@ public class UserInfoVo {
     // wxid
     private String username;
 
+    // 标记注解，需要敏感词过滤
+    @FieldNeedCheck
     private String name;
 
     private String phone;
 
     private String password;
 
+    @FieldNeedCheck
     private String organization;
 
     public String getUsername() {
