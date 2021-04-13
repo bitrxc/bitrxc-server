@@ -21,8 +21,10 @@ public class AppointmentInfoVo {
 
     private Integer id;
     private Integer begin;
+    private String username;
     private Integer end;
     private Integer roomId;
+    private String roomName;
     private Integer launchTime;
     private String launcher;
     private String status;

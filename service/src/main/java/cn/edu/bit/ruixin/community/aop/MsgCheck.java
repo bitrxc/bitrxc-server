@@ -27,7 +27,8 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 /**
- * TODO
+ * 使用AOP进行敏感词检查，使用前置通知，使用注解定义切入点，
+ * 根据注解传递需要进行检测的参数，对类上要检查的字段加注解标记
  *
  * @author 78165
  * @date 2021/4/5
