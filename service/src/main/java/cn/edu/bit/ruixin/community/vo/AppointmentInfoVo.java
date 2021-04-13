@@ -20,10 +20,12 @@ import java.util.Date;
 public class AppointmentInfoVo {
 
     private Integer id;
-    private Integer begin;
-    private Integer end;
+    private Integer begin; // 起始时间段
+    private String username;
+    private Integer end; // 结束时间段
     private Integer roomId;
-    private Integer launchTime;
+    private String roomName;
+    private Integer launchTime; // 废弃
     private String launcher;
     private String status;
     @FieldNeedCheck

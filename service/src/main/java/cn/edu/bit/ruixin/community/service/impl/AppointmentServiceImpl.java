@@ -53,39 +53,47 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
     @Override
     public void addANewAppointment(Appointment appointment) {
+        // 基于起始时间段和结束时间段
+
+        String launcher = appointment.getLauncher();
+//            getAppointment = appointmentRepository.findAppointmentByLauncherEqualsAndRoomIdEqualsAndExecDateEqualsAndLaunchTimeEqualsAndStatusEquals(launcher, roomId, execDate, launchTime, AppointmentStatus.NEW.getStatus());
+        Appointment myAppointment = appointmentRepository.findAppointmentByLauncherWithStatus(launcher, AppointmentStatus.NEW.getStatus());
+        if (myAppointment != null) {
+            throw new AppointmentDaoException("你有待审批的预约，请等待审批！");
+        }
+
         // 判断该房间所预约时间段是否空闲，比较房间ID，预约的日期，预约的时间段，不能对含有预约记录状态为receive、Signed
         Integer roomId = appointment.getRoomId();
-        Integer launchTime = appointment.getLaunchTime();
+//        Integer launchTime = appointment.getLaunchTime();
+        Integer appointmentBegin = appointment.getBegin();
+        Integer appointmentEnd = appointment.getEnd();
+
         Date execDate = appointment.getExecDate();
-        Appointment getAppointment = appointmentRepository.findReceivedAppointment(roomId, execDate, launchTime, AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.SIGNED.getStatus());
+//        Appointment getAppointment = appointmentRepository.findReceivedAppointment(roomId, execDate, launchTime, AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.SIGNED.getStatus());
+        Appointment getAppointment = appointmentRepository.findReceivedAppointment(roomId, execDate, appointmentBegin, appointmentEnd, AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.SIGNED.getStatus());
+
         if (getAppointment != null) {
             throw new AppointmentDaoException("该房间此时间段已被占用!");
         } else {
-            String launcher = appointment.getLauncher();
-            getAppointment = appointmentRepository.findAppointmentByLauncherEqualsAndRoomIdEqualsAndExecDateEqualsAndLaunchTimeEqualsAndStatusEquals(launcher, roomId, execDate, launchTime, AppointmentStatus.NEW.getStatus());
-            if (getAppointment != null) {
-                throw new AppointmentDaoException("你已申请预约该房间的此时间段，请等待审批！");
+            appointment.setStatus(AppointmentStatus.NEW.getStatus());
+            Date launchDate = new Date();
+            // 还应该保证预约发起时间早于要预约的时间段的起始
+            Schedule schedule = scheduleRepository.getOne(appointmentBegin);
+            String begin = schedule.getBegin();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String date = dateFormat.format(execDate);
+            String dateTime = date + " " + begin;
+            Date executeDate = null;
+            try {
+                executeDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(dateTime);
+            } catch (ParseException e) {
+                throw new AppointmentDaoException("实际执行预约使用的时间格式有误！");
+            }
+            if (launchDate.before(executeDate)) {
+                appointment.setLaunchDate(launchDate);
+                appointmentRepository.save(appointment);
             } else {
-                appointment.setStatus(AppointmentStatus.NEW.getStatus());
-                Date launchDate = new Date();
-                // 还应该保证预约发起时间早于要预约的时间段的起始
-                Schedule schedule = scheduleRepository.getOne(launchTime);
-                String begin = schedule.getBegin();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                String date = dateFormat.format(execDate);
-                String dateTime = date + " " + begin;
-                Date executeDate = null;
-                try {
-                    executeDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(dateTime);
-                } catch (ParseException e) {
-                    throw new AppointmentDaoException("实际执行预约使用的时间格式有误！");
-                }
-                if (launchDate.before(executeDate)) {
-                    appointment.setLaunchDate(launchDate);
-                    appointmentRepository.save(appointment);
-                } else {
-                    throw new AppointmentDaoException("该时间段已过，不可预约！");
-                }
+                throw new AppointmentDaoException("该时间段已过，不可预约！");
             }
         }
     }

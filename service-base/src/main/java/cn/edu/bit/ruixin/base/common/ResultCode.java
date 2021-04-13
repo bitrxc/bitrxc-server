@@ -12,7 +12,7 @@ public enum ResultCode {
     NOAHTHORITY(false, 400, "没有权限！"),
     INTERNAL_SERVER_ERROR(false, 500, "服务器内部异常!"),
     WECHATAUTHENTICATIONERROR(false, 500, "微信后台认证失败！请重试！"),
-    UNAUTHENTICATION_ERROR(false, 500, "未登录！");
+    UNAUTHENTICATION_ERROR(false, 401, "未登录！");
 
     private Boolean success;
     private Integer code;
