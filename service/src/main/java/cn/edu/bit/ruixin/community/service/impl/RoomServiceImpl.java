@@ -213,12 +213,15 @@ public class RoomServiceImpl implements RoomService {
             throw new GlobalParamException("日期格式有误！");
         }
 
-        List<Integer> busyTimePeriod = appointmentRepository.findLaunchTimeByRoomIdAndExecuteDateAndStatus(roomId, execDate, AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.SIGNED.getStatus());
-        System.out.println(busyTimePeriod);
+        List<Appointment> appointments = appointmentRepository.findLaunchTimeByRoomIdAndExecuteDateAndStatus(roomId, execDate, AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.SIGNED.getStatus());
 
-        List<Integer> busyTimeId = new ArrayList<>(busyTimePeriod.get(1) - busyTimePeriod.get(0) + 1);
-        for (int j = busyTimePeriod.get(0); j <= busyTimePeriod.get(1); j++) {
-            busyTimeId.add(j);
+        // 获取所有占用时间段
+        List<Integer> busyTimeId = new ArrayList<>();
+        for (Appointment appointment :
+                appointments) {
+            for (int j = appointment.getBegin(); j <= appointment.getEnd(); j++) {
+                busyTimeId.add(j);
+            }
         }
 
         Collections.sort(busyTimeId);
