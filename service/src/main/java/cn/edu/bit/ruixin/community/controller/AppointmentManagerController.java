@@ -65,8 +65,8 @@ public class AppointmentManagerController {
             Room room = roomService.getRoomInfoById(infoVo.getRoomId());
             infoVo.setUsername(user.getName());
             infoVo.setRoomName(room.getName());
+            infoVo.setSchoolId(user.getSchoolId());
             infoVos.add(infoVo);
-
         }
         Map<String, Object> map = new HashMap<>();
         map.put("totalElements", page.getTotalElements());
@@ -87,6 +87,7 @@ public class AppointmentManagerController {
             AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
             User user = userService.getUserByUsername(infoVo.getLauncher());
             Room room = roomService.getRoomInfoById(infoVo.getRoomId());
+            infoVo.setSchoolId(user.getSchoolId());
             infoVo.setUsername(user.getName());
             infoVo.setRoomName(room.getName());
             infoVos.add(infoVo);
@@ -115,6 +116,7 @@ public class AppointmentManagerController {
             AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
             User user = userService.getUserByUsername(infoVo.getLauncher());
             Room room = roomService.getRoomInfoById(infoVo.getRoomId());
+            infoVo.setSchoolId(user.getSchoolId());
             infoVo.setUsername(user.getName());
             infoVo.setRoomName(room.getName());
             infoVos.add(infoVo);
