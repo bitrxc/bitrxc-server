@@ -35,6 +35,8 @@ public class User {
     private String organization;
     @Column(name = "password")
     private String password;
+    @Column(name = "school_id")
+    private String schoolId;
     @Transient
     private List<String> permissionValueList = new ArrayList<>();
 

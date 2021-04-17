@@ -2,10 +2,12 @@ package cn.edu.bit.ruixin.community.service.impl;
 
 import cn.edu.bit.ruixin.community.domain.Appointment;
 import cn.edu.bit.ruixin.community.domain.Schedule;
+import cn.edu.bit.ruixin.community.domain.User;
 import cn.edu.bit.ruixin.community.exception.AppointmentDaoException;
 import cn.edu.bit.ruixin.community.myenum.AppointmentStatus;
 import cn.edu.bit.ruixin.community.repository.AppointmentRepository;
 import cn.edu.bit.ruixin.community.repository.ScheduleRepository;
+import cn.edu.bit.ruixin.community.repository.UserRepository;
 import cn.edu.bit.ruixin.community.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -34,6 +36,9 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Autowired
     private ScheduleRepository scheduleRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Transactional(readOnly = true)
     @Override
@@ -183,5 +188,17 @@ public class AppointmentServiceImpl implements AppointmentService {
         } else {
             return appointmentRepository.findAll(pageable);
         }
+    }
+
+    @Override
+    public Page<Appointment> getAppointmentsBySchoolId(Pageable pageable, String schoolId) {
+        User user = userRepository.findUserBySchoolId(schoolId);
+        if (user!=null) {
+            Appointment appointment = new Appointment();
+            appointment.setLauncher(user.getUsername());
+            Example<Appointment> example = Example.of(appointment);
+            return appointmentRepository.findAll(example, pageable);
+        }
+        throw new AppointmentDaoException("不存在该学号用户！");
     }
 }
