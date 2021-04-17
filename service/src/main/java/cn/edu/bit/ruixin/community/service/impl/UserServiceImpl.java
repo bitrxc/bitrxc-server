@@ -62,6 +62,7 @@ public class UserServiceImpl implements UserService {
             String organization = user.getOrganization();
             String password = user.getPassword();
             String phone = user.getPhone();
+            String schoolId = user.getSchoolId();
 
             if (username!=null && !username.equals("")) {
                 userByUsername.setUsername(username);
@@ -77,6 +78,9 @@ public class UserServiceImpl implements UserService {
             }
             if (phone!= null && !phone.equals("")) {
                 userByUsername.setPhone(phone);
+            }
+            if (schoolId != null && !schoolId.equals("")) {
+                userByUsername.setSchoolId(schoolId);
             }
 
             userRepository.save(userByUsername);

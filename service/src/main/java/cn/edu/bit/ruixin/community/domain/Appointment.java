@@ -44,4 +44,6 @@ public class Appointment {
     private Date checkDate;
     @Column(name = "exec_date")
     private Date execDate;
+    @Column(name = "attendance")
+    private int attendance;
 }
