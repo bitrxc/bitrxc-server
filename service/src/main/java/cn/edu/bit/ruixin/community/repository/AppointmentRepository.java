@@ -35,7 +35,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
     List<Integer> findLaunchTimeByRoomIdAndStatus(Integer roomId, String status);
 
     @Query(nativeQuery = true, value = "SELECT `begin`, `end` FROM `deal` WHERE `room` = :roomId AND `exec_date` = :execDate AND (`status` = :receive OR `status` = :executing)")
-    List<Integer> findLaunchTimeByRoomIdAndExecuteDateAndStatus(@Param("roomId") Integer roomId, @Param("execDate") Date execDate, @Param("receive") String receive, @Param("executing") String executing);
+    List<Appointment> findLaunchTimeByRoomIdAndExecuteDateAndStatus(@Param("roomId") Integer roomId, @Param("execDate") Date execDate, @Param("receive") String receive, @Param("executing") String executing);
 
 //    @Query(nativeQuery = true, value = "SELECT `launch_time` FROM `deal` WHERE `room` = :roomId AND `exec_date` = :execDate AND (`status` = :receive OR `status` = :executing)")
 //    List<Integer> findLaunchTimeByRoomIdAndExecuteDateAndStatus(@Param("roomId") Integer roomId, @Param("execDate") Date execDate, @Param("receive") String receive, @Param("executing") String executing);
