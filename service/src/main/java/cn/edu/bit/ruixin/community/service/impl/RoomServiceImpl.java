@@ -239,7 +239,11 @@ public class RoomServiceImpl implements RoomService {
         }
 
 
-        List<Integer> myTimeId = appointmentRepository.findLaunchTimeByRoomIdAndLauncherAndExecuteDateAndStatus(roomId, username, execDate, AppointmentStatus.NEW.getStatus());
+        Appointment appointment = appointmentRepository.findLaunchTimeByRoomIdAndLauncherAndExecuteDateAndStatus(roomId, username, execDate, AppointmentStatus.NEW.getStatus());
+        ArrayList<Integer> myTimeId = new ArrayList<>();
+        for (int j = appointment.getBegin(); j <= appointment.getEnd() ; j++) {
+            myTimeId.add(j);
+        }
         for (Integer id :
                 myTimeId) {
             for (Schedule schedule:
