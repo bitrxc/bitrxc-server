@@ -50,6 +50,33 @@ public class AppointmentManagerController {
         return CommonResult.ok(ResultCode.SUCCESS).data("appointment", AppointmentInfoVo.convertToVo(appointment));
     }
 
+    @GetMapping("/{current}/{limit}/{schoolId}")
+    public CommonResult lookupAppointmentBySchoolId(@PathVariable("current")int current,@PathVariable("limit") int limit, @PathVariable("schoolId") String schoolId) {
+        // 构造分页对象
+        Pageable pageable = PageRequest.of(current, limit);
+        Page<Appointment> page = appointmentService.getAppointmentsBySchoolId(pageable, schoolId);
+        List<Appointment> list = page.getContent();
+
+        List<AppointmentInfoVo> infoVos = new ArrayList<>();
+        for (Appointment appointment :
+                list) {
+            AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
+            User user = userService.getUserByUsername(infoVo.getLauncher());
+            Room room = roomService.getRoomInfoById(infoVo.getRoomId());
+            infoVo.setUsername(user.getName());
+            infoVo.setRoomName(room.getName());
+            infoVos.add(infoVo);
+
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("totalElements", page.getTotalElements());
+        map.put("totalPages", page.getTotalPages());
+        map.put("hasNext", page.hasNext());
+        map.put("hasPrevious", page.hasPrevious());
+        map.put("items", infoVos);
+        return CommonResult.ok(ResultCode.SUCCESS).data(map);
+    }
+
     @GetMapping("all")
     public CommonResult getAllAppointment(@RequestParam(required = false, name = "status")String status) {
         List<Appointment> list = appointmentService.getAllAppointment(status);
@@ -93,6 +120,7 @@ public class AppointmentManagerController {
             infoVos.add(infoVo);
 
         }
+
         Map<String, Object> map = new HashMap<>();
         map.put("totalElements", page.getTotalElements());
         map.put("totalPages", page.getTotalPages());
