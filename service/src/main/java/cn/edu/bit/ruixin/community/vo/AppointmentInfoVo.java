@@ -22,6 +22,7 @@ public class AppointmentInfoVo {
     private Integer id;
     private Integer begin; // 起始时间段
     private String username;
+    private String schoolId;
     private Integer end; // 结束时间段
     private Integer roomId;
     private String roomName;
