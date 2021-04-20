@@ -5,7 +5,10 @@ import cn.edu.bit.ruixin.base.common.ResultCode;
 import cn.edu.bit.ruixin.community.annotation.MsgSecCheck;
 import cn.edu.bit.ruixin.community.domain.Appointment;
 import cn.edu.bit.ruixin.community.domain.Room;
+import cn.edu.bit.ruixin.community.domain.User;
 import cn.edu.bit.ruixin.community.service.AppointmentService;
+import cn.edu.bit.ruixin.community.service.RoomService;
+import cn.edu.bit.ruixin.community.service.UserService;
 import cn.edu.bit.ruixin.community.vo.AppointmentInfoVo;
 import cn.edu.bit.ruixin.community.vo.RoomInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +37,44 @@ public class AppointmentManagerController {
     @Autowired
     private AppointmentService appointmentService;
 
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private RoomService roomService;
+
+
     @GetMapping("")
     public CommonResult lookupAppointmentById(@RequestParam("id")Integer id) {
         Appointment appointment = appointmentService.getAppointmentById(id);
         return CommonResult.ok(ResultCode.SUCCESS).data("appointment", AppointmentInfoVo.convertToVo(appointment));
+    }
+
+    @GetMapping("/{current}/{limit}/{schoolId}")
+    public CommonResult lookupAppointmentBySchoolId(@PathVariable("current")int current,@PathVariable("limit") int limit, @PathVariable("schoolId") String schoolId) {
+        // 构造分页对象
+        Pageable pageable = PageRequest.of(current, limit);
+        Page<Appointment> page = appointmentService.getAppointmentsBySchoolId(pageable, schoolId);
+        List<Appointment> list = page.getContent();
+
+        List<AppointmentInfoVo> infoVos = new ArrayList<>();
+        for (Appointment appointment :
+                list) {
+            AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
+            User user = userService.getUserByUsername(infoVo.getLauncher());
+            Room room = roomService.getRoomInfoById(infoVo.getRoomId());
+            infoVo.setUsername(user.getName());
+            infoVo.setRoomName(room.getName());
+            infoVo.setSchoolId(user.getSchoolId());
+            infoVos.add(infoVo);
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("totalElements", page.getTotalElements());
+        map.put("totalPages", page.getTotalPages());
+        map.put("hasNext", page.hasNext());
+        map.put("hasPrevious", page.hasPrevious());
+        map.put("items", infoVos);
+        return CommonResult.ok(ResultCode.SUCCESS).data(map);
     }
 
     @GetMapping("all")
@@ -47,7 +84,13 @@ public class AppointmentManagerController {
 
         for (Appointment appointment:list
              ) {
-            infoVos.add(AppointmentInfoVo.convertToVo(appointment));
+            AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
+            User user = userService.getUserByUsername(infoVo.getLauncher());
+            Room room = roomService.getRoomInfoById(infoVo.getRoomId());
+            infoVo.setSchoolId(user.getSchoolId());
+            infoVo.setUsername(user.getName());
+            infoVo.setRoomName(room.getName());
+            infoVos.add(infoVo);
         }
         return CommonResult.ok(ResultCode.SUCCESS).data("appointments", infoVos);
     }
@@ -61,7 +104,7 @@ public class AppointmentManagerController {
     @GetMapping("/{current}/{limit}")
     public CommonResult getAppointmentPages(@PathVariable("current") int current, @PathVariable("limit") int limit, @RequestParam(required = false, name = "status")String status) {
         // 构造排序对象
-        Sort sort = Sort.by(Sort.Direction.ASC, "execDate", "launchTime", "launchDate");
+        Sort sort = Sort.by(Sort.Direction.DESC, "execDate", "launchTime", "launchDate");
         // 构造分页对象
         Pageable pageable = PageRequest.of(current, limit, sort);
         Page<Appointment> page = appointmentService.getAppointmentPages(pageable, status);
@@ -70,8 +113,16 @@ public class AppointmentManagerController {
         List<AppointmentInfoVo> infoVos = new ArrayList<>();
         for (Appointment appointment :
                 list) {
-            infoVos.add(AppointmentInfoVo.convertToVo(appointment));
+            AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
+            User user = userService.getUserByUsername(infoVo.getLauncher());
+            Room room = roomService.getRoomInfoById(infoVo.getRoomId());
+            infoVo.setSchoolId(user.getSchoolId());
+            infoVo.setUsername(user.getName());
+            infoVo.setRoomName(room.getName());
+            infoVos.add(infoVo);
+
         }
+
         Map<String, Object> map = new HashMap<>();
         map.put("totalElements", page.getTotalElements());
         map.put("totalPages", page.getTotalPages());

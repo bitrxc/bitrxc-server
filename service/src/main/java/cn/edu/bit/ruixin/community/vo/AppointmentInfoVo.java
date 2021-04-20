@@ -20,12 +20,16 @@ import java.util.Date;
 public class AppointmentInfoVo {
 
     private Integer id;
-    private Integer begin;
-    private Integer end;
+    private Integer begin; // 起始时间段
+    private String username;
+    private String schoolId;
+    private Integer end; // 结束时间段
     private Integer roomId;
-    private Integer launchTime;
+    private String roomName;
+    private Integer launchTime; // 废弃
     private String launcher;
     private String status;
+    private int attendance;
     @FieldNeedCheck
     private String conductor;
     @FieldNeedCheck
@@ -52,6 +56,7 @@ public class AppointmentInfoVo {
         String checkNote = infoVo.getCheckNote();
 //        @Pattern(regexp = "^\\d{4}-\\d{1,2}-\\d{1,2}", message = "日期格式：yyyy-MM-dd")
         String execDate = infoVo.getExecDate();
+        int attendance = infoVo.getAttendance();
 
         if (id!=null && id != 0) {
             appointment.setId(id);
@@ -93,6 +98,9 @@ public class AppointmentInfoVo {
             }
             appointment.setExecDate(date);
         }
+        if (attendance != 0) {
+            appointment.setAttendance(attendance);
+        }
 
         return appointment;
     }
@@ -103,6 +111,7 @@ public class AppointmentInfoVo {
         Integer id = appointment.getId();
         Integer begin = appointment.getBegin();
         Integer end = appointment.getEnd();
+        int attendance = appointment.getAttendance();
         Integer roomId = appointment.getRoomId();
         Integer launchTime = appointment.getLaunchTime();
         String launcher = appointment.getLauncher();
@@ -149,6 +158,9 @@ public class AppointmentInfoVo {
         }
         if (launchDate != null) {
             appointmentInfoVo.setLaunchDate(launchDate.getTime());
+        }
+        if (attendance != 0) {
+            appointmentInfoVo.setAttendance(attendance);
         }
         if (execDate != null) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");

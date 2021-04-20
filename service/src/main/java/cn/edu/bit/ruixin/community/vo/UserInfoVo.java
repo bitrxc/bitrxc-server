@@ -22,8 +22,18 @@ public class UserInfoVo {
 
     private String password;
 
+    private String schoolId;
+
     @FieldNeedCheck
     private String organization;
+
+    public String getSchoolId() {
+        return schoolId;
+    }
+
+    public void setSchoolId(String schoolId) {
+        this.schoolId = schoolId;
+    }
 
     public String getUsername() {
         return username;
@@ -72,6 +82,7 @@ public class UserInfoVo {
         user.setPhone(infoVo.getPhone());
         user.setOrganization(infoVo.getOrganization());
         user.setPassword(infoVo.getPassword());
+        user.setSchoolId(infoVo.schoolId);
         return user;
     }
 
@@ -81,6 +92,7 @@ public class UserInfoVo {
         infoVo.setOrganization(user.getOrganization());
         infoVo.setPhone(user.getPhone());
         infoVo.setUsername(user.getUsername());
+        infoVo.setSchoolId(user.getSchoolId());
         return infoVo;
     }
 
@@ -91,6 +103,7 @@ public class UserInfoVo {
                 ", name='" + name + '\'' +
                 ", phone='" + phone + '\'' +
                 ", password='" + password + '\'' +
+                ", schoolId='" + schoolId + '\'' +
                 ", organization='" + organization + '\'' +
                 '}';
     }

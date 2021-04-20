@@ -27,4 +27,6 @@ public interface AppointmentService {
     void checkOutAppointment(Integer id, String status, String conductor, String checkNote);
 
     Page<Appointment> getAppointmentPages(Pageable pageable, String status);
+
+    Page<Appointment> getAppointmentsBySchoolId(Pageable pageable, String schoolId);
 }

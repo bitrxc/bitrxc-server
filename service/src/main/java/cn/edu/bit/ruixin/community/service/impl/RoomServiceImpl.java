@@ -213,8 +213,19 @@ public class RoomServiceImpl implements RoomService {
             throw new GlobalParamException("日期格式有误！");
         }
 
-        List<Integer> busyTimeId = appointmentRepository.findLaunchTimeByRoomIdAndExecuteDateAndStatus(roomId, execDate, AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.SIGNED.getStatus());
-        Collections.sort(busyTimeId);
+        List<Appointment> appointments = appointmentRepository.findLaunchTimeByRoomIdAndExecuteDateAndStatus(roomId, execDate, AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.SIGNED.getStatus());
+
+        // 获取所有占用时间段
+        List<Integer> busyTimeId = new ArrayList<>();
+        if (appointments!=null) {
+            for (Appointment appointment :
+                    appointments) {
+                for (int j = appointment.getBegin(); j <= appointment.getEnd(); j++) {
+                    busyTimeId.add(j);
+                }
+            }
+            Collections.sort(busyTimeId);
+        }
 
         for (int k = 0; k < busyTimeId.size() && i < allTime.size(); ) {
             if (busyTimeId.get(k) == allTime.get(i).getId()) {
@@ -229,22 +240,28 @@ public class RoomServiceImpl implements RoomService {
         }
 
 
-        List<Integer> myTimeId = appointmentRepository.findLaunchTimeByRoomIdAndLauncherAndExecuteDateAndStatus(roomId, username, execDate, AppointmentStatus.NEW.getStatus());
-        for (Integer id :
-                myTimeId) {
-            for (Schedule schedule:
-                allTime) {
-                if (schedule.getId() == id) {
-                    myTime.add(schedule);
+        Appointment appointment = appointmentRepository.findLaunchTimeByRoomIdAndLauncherAndExecuteDateAndStatus(roomId, username, execDate, AppointmentStatus.NEW.getStatus());
+        ArrayList<Integer> myTimeId = new ArrayList<>();
+
+        if (appointment != null) {
+            for (int j = appointment.getBegin(); j <= appointment.getEnd() ; j++) {
+                myTimeId.add(j);
+            }
+            for (Integer id :
+                    myTimeId) {
+                for (Schedule schedule:
+                        allTime) {
+                    if (schedule.getId() == id) {
+                        myTime.add(schedule);
+                    }
                 }
             }
+
+            // 需保证同一时间段被审批后，其余所有申请都驳回
+            myTime = myTime.stream()
+                    .filter(schedule -> (!pastTime.contains(schedule) && !busyTime.contains(schedule)))
+                    .collect(Collectors.toList());
         }
-
-        // 需保证同一时间段被审批后，其余所有申请都驳回
-        myTime = myTime.stream()
-                .filter(schedule -> (!pastTime.contains(schedule) && !busyTime.contains(schedule)))
-                .collect(Collectors.toList());
-
 
         List<Schedule> finalMyTime = myTime;
         freeTime = allTime.stream()

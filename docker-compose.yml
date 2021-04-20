@@ -3,7 +3,7 @@ version: "3.9"
 services:
   server:
     build: .
-    container_name: server
+    container_name: ${SERVER_CONTAINER_NAME}
     ports:
       - target: ${SERVER_TARGET_PORT}
         published: ${SERVER_PUBLISHED_PORT}
@@ -20,7 +20,7 @@ services:
 
   mariadb:
     image: "mariadb:10.5"
-    container_name: mariadb
+    container_name: ${MARIADB_CONTAINER_NAME}
     volumes:
       - type: bind
         source: ${MARIADB_DATA_MOUNTPOINT}
@@ -28,7 +28,7 @@ services:
 
   redis:
     image: "redis:6.2"
-    container_name: redis
+    container_name: ${REDIS_CONTAINER_NAME}
     volumes:
       - type: bind
         source: ${REDIS_CONF_MOUNTPOINT}

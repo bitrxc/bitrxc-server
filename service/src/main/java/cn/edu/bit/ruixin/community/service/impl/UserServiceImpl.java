@@ -62,23 +62,16 @@ public class UserServiceImpl implements UserService {
             String organization = user.getOrganization();
             String password = user.getPassword();
             String phone = user.getPhone();
+            String schoolId = user.getSchoolId();
 
-            if (username!=null && !username.equals("")) {
-                userByUsername.setUsername(username);
-            }
-            if (name!=null && !name.equals("")) {
-                userByUsername.setName(name);
-            }
-            if (organization!=null && !organization.equals("")) {
-                userByUsername.setOrganization(organization);
-            }
-            if (password!=null && !password.equals("")) {
-                userByUsername.setPassword(password);
-            }
-            if (phone!= null && !phone.equals("")) {
-                userByUsername.setPhone(phone);
-            }
+            userByUsername.setUsername(username);
+            userByUsername.setName(name);
+            userByUsername.setOrganization(organization);
+            userByUsername.setPassword(password);
+            userByUsername.setPhone(phone);
+            userByUsername.setSchoolId(schoolId);
 
+            
             userRepository.save(userByUsername);
 
         } else {
