@@ -71,7 +71,6 @@ public class UserServiceImpl implements UserService {
             userByUsername.setPhone(phone);
             userByUsername.setSchoolId(schoolId);
 
-            
             userRepository.save(userByUsername);
 
         } else {
