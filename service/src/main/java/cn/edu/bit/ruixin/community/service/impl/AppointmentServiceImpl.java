@@ -62,6 +62,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         String launcher = appointment.getLauncher();
 //            getAppointment = appointmentRepository.findAppointmentByLauncherEqualsAndRoomIdEqualsAndExecDateEqualsAndLaunchTimeEqualsAndStatusEquals(launcher, roomId, execDate, launchTime, AppointmentStatus.NEW.getStatus());
+        // 用户有新发起待批准、已批准通过、已签到的预约时不可再预约
         Appointment myAppointment = appointmentRepository.findAppointmentByLauncherWithStatus(launcher, AppointmentStatus.NEW.getStatus());
         if (myAppointment != null) {
             throw new AppointmentDaoException("你有待审批的预约，请等待审批！");
