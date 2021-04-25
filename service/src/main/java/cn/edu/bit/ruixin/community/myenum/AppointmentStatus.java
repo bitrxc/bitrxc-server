@@ -17,7 +17,7 @@ public enum AppointmentStatus {
     SIGNED("signed"),
     ILLEGAL("illegal"),
     MISSED("missed"),
-    FINISH("finish");
+    FINISH("finished");
 
     private String status;
 
