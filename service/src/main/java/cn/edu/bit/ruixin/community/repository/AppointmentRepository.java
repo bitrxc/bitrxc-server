@@ -44,6 +44,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
     @Query(nativeQuery = true, value = "SELECT * FROM `deal` WHERE `room` = ? AND `launcher` = ? AND `exec_date` = ? AND `status` = ?")
     Appointment findLaunchTimeByRoomIdAndLauncherAndExecuteDateAndStatus(Integer roomId, String username, Date execDate, String status);
 
-    @Query(nativeQuery = true, value = "SELECT * FROM `deal` WHERE `launcher` = ? AND `status` = ?")
-    Appointment findAppointmentByLauncherWithStatus(String launcher, String status);
+    @Query(nativeQuery = true, value = "SELECT * FROM `deal` WHERE `launcher` = ? AND (`status` = ? OR `status` = ? OR `status` = ?)")
+    Appointment findAppointmentByLauncherWithStatus(String launcher, String status1, String status2, String status3);
 }
