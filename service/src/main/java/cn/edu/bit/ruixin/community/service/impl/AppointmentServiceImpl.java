@@ -198,7 +198,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 //            Appointment appointment = new Appointment();
 //            appointment.setLauncher(user.getUsername());
 //            Example<Appointment> example = Example.of(appointment);
-            return appointmentRepository.findAllPagesBySchoolId(schoolId, pageable);
+            return appointmentRepository.findAllPagesByUsername(user.getUsername(), pageable);
         }
         throw new AppointmentDaoException("不存在该学号用户！");
     }
