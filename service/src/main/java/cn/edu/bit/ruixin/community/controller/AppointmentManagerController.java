@@ -47,7 +47,15 @@ public class AppointmentManagerController {
     @GetMapping("")
     public CommonResult lookupAppointmentById(@RequestParam("id")Integer id) {
         Appointment appointment = appointmentService.getAppointmentById(id);
-        return CommonResult.ok(ResultCode.SUCCESS).data("appointment", AppointmentInfoVo.convertToVo(appointment));
+
+        AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
+        User user = userService.getUserByUsername(infoVo.getLauncher());
+        Room room = roomService.getRoomInfoById(infoVo.getRoomId());
+        infoVo.setUsername(user.getName());
+        infoVo.setRoomName(room.getName());
+        infoVo.setSchoolId(user.getSchoolId());
+
+        return CommonResult.ok(ResultCode.SUCCESS).data("appointment", infoVo);
     }
 
     @GetMapping("/{current}/{limit}/{schoolId}")
