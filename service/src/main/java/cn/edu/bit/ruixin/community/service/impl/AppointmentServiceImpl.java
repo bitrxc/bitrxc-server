@@ -182,10 +182,10 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public Page<Appointment> getAppointmentPages(Pageable pageable, String status) {
         if (status != null && !"".equals(status)) {
-            Appointment appointment = new Appointment();
-            appointment.setStatus(status);
-            Example<Appointment> example = Example.of(appointment);
-            return appointmentRepository.findAll(example, pageable);
+//            Appointment appointment = new Appointment();
+//            appointment.setStatus(status);
+//            Example<Appointment> example = Example.of(appointment);
+            return appointmentRepository.findAllPagesByStatus(status, pageable);
         } else {
             return appointmentRepository.findAll(pageable);
         }
@@ -195,10 +195,10 @@ public class AppointmentServiceImpl implements AppointmentService {
     public Page<Appointment> getAppointmentsBySchoolId(Pageable pageable, String schoolId) {
         User user = userRepository.findUserBySchoolId(schoolId);
         if (user!=null) {
-            Appointment appointment = new Appointment();
-            appointment.setLauncher(user.getUsername());
-            Example<Appointment> example = Example.of(appointment);
-            return appointmentRepository.findAll(example, pageable);
+//            Appointment appointment = new Appointment();
+//            appointment.setLauncher(user.getUsername());
+//            Example<Appointment> example = Example.of(appointment);
+            return appointmentRepository.findAllPagesBySchoolId(schoolId, pageable);
         }
         throw new AppointmentDaoException("不存在该学号用户！");
     }
