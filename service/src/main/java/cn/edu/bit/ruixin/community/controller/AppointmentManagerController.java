@@ -47,7 +47,15 @@ public class AppointmentManagerController {
     @GetMapping("")
     public CommonResult lookupAppointmentById(@RequestParam("id")Integer id) {
         Appointment appointment = appointmentService.getAppointmentById(id);
-        return CommonResult.ok(ResultCode.SUCCESS).data("appointment", AppointmentInfoVo.convertToVo(appointment));
+
+        AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
+        User user = userService.getUserByUsername(infoVo.getLauncher());
+        Room room = roomService.getRoomInfoById(infoVo.getRoomId());
+        infoVo.setUsername(user.getName());
+        infoVo.setRoomName(room.getName());
+        infoVo.setSchoolId(user.getSchoolId());
+
+        return CommonResult.ok(ResultCode.SUCCESS).data("appointment", infoVo);
     }
 
     @GetMapping("/{current}/{limit}/{schoolId}")
@@ -104,7 +112,7 @@ public class AppointmentManagerController {
     @GetMapping("/{current}/{limit}")
     public CommonResult getAppointmentPages(@PathVariable("current") int current, @PathVariable("limit") int limit, @RequestParam(required = false, name = "status")String status) {
         // 构造排序对象
-        Sort sort = Sort.by(Sort.Direction.DESC, "execDate", "launchTime", "launchDate");
+        Sort sort = Sort.by(Sort.Direction.DESC, "launchDate", "execDate", "launchTime");
         // 构造分页对象
         Pageable pageable = PageRequest.of(current, limit, sort);
         Page<Appointment> page = appointmentService.getAppointmentPages(pageable, status);

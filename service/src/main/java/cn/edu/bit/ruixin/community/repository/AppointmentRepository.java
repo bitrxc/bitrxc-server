@@ -1,6 +1,8 @@
 package cn.edu.bit.ruixin.community.repository;
 
 import cn.edu.bit.ruixin.community.domain.Appointment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -44,6 +46,12 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
     @Query(nativeQuery = true, value = "SELECT * FROM `deal` WHERE `room` = ? AND `launcher` = ? AND `exec_date` = ? AND `status` = ?")
     Appointment findLaunchTimeByRoomIdAndLauncherAndExecuteDateAndStatus(Integer roomId, String username, Date execDate, String status);
 
-    @Query(nativeQuery = true, value = "SELECT * FROM `deal` WHERE `launcher` = ? AND `status` = ?")
-    Appointment findAppointmentByLauncherWithStatus(String launcher, String status);
+    @Query(nativeQuery = true, value = "SELECT * FROM `deal` WHERE `launcher` = ? AND (`status` = ? OR `status` = ? OR `status` = ?)")
+    Appointment findAppointmentByLauncherWithStatus(String launcher, String status1, String status2, String status3);
+
+    @Query(nativeQuery = true, value = "SELECT * FROM `deal` WHERE `status` = :status ORDER BY `launch_date` DESC ")
+    Page<Appointment> findAllPagesByStatus(@Param("status") String status, Pageable pageable);
+
+    @Query(nativeQuery = true, value = "SELECT * FROM `deal` WHERE `launcher` = :username ORDER BY `launch_date` DESC ")
+    Page<Appointment> findAllPagesByUsername(@Param("username") String username, Pageable pageable);
 }
