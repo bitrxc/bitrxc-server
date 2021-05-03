@@ -39,7 +39,7 @@ There may be more components designed and added before long.
 
 <p align="center">
   <a href="https://tsc.bitrxc.com/">
-  	<img src="https://github.com/Hyperzsb/Hyperzsb/raw/master/images/tsc-logo-transparent.png" alt="LOGO of Technical Support Center of Ruixin Community" width="350" />
+  	<img src="https://github.com/Hyperzsb/Hyperzsb/raw/master/images/github/bitrxc/tsc-logo-transparent.png" alt="LOGO of Technical Support Center of Ruixin Community" width="350" />
   </a>
 </p>
 
