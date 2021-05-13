@@ -50,7 +50,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
     Appointment findAppointmentByLauncherWithStatus(String launcher, String status1, String status2, String status3);
 
 //    @Query(nativeQuery = true, value = "SELECT * FROM `deal` WHERE `status` = :status ORDER BY `launch_date` DESC ")
-    @Query(nativeQuery = true, value = "SELECT * FROM `deal` WHERE `status` = :status")
+    @Query(nativeQuery = true, value = "SELECT * FROM `deal` WHERE `status` = :status ORDER BY `launch_date` DESC, `exec_date` DESC, `launch_time` DESC ")
     Page<Appointment> findAllPagesByStatus(@Param("status") String status, Pageable pageable);
 
     @Query(nativeQuery = true, value = "SELECT * FROM `deal` WHERE `launcher` = :username ORDER BY `launch_date` DESC ")
