@@ -127,6 +127,9 @@ public class AppointmentManagerController {
             infoVo.setSchoolId(user.getSchoolId());
             infoVo.setUsername(user.getName());
             infoVo.setRoomName(room.getName());
+            if (status == null || "".equals(status)) {
+                infoVo.setStatus(null);
+            }
             infoVos.add(infoVo);
 
         }
