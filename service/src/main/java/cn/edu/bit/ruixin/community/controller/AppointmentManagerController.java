@@ -112,7 +112,7 @@ public class AppointmentManagerController {
     @GetMapping("/{current}/{limit}")
     public CommonResult getAppointmentPages(@PathVariable("current") int current, @PathVariable("limit") int limit, @RequestParam(required = false, name = "status")String status) {
         // 构造排序对象
-        Sort sort = Sort.by(Sort.Direction.DESC, "launchDate", "execDate", "launchTime");
+        Sort sort = Sort.by(Sort.Direction.DESC, "launch_date", "exec_date", "launch_time");
         // 构造分页对象
         Pageable pageable = PageRequest.of(current, limit, sort);
         Page<Appointment> page = appointmentService.getAppointmentPages(pageable, status);
