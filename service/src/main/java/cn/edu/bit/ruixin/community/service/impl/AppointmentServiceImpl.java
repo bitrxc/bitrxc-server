@@ -187,7 +187,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 //            Example<Appointment> example = Example.of(appointment);
             return appointmentRepository.findAllPagesByStatus(status, pageable);
         } else {
-            return appointmentRepository.findAll(pageable);
+            return appointmentRepository.findAllPages(pageable);
         }
     }
 
