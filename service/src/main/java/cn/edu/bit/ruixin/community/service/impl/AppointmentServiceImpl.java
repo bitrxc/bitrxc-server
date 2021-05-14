@@ -109,9 +109,9 @@ public class AppointmentServiceImpl implements AppointmentService {
     public void cancelAppointmentById(Integer id) {
         Appointment appointment = appointmentRepository.findAppointmentById(id);
         if (appointment != null) {
-            if (appointment.getStatus().equals("receive")) {
-                throw new AppointmentDaoException("该预约已审批通过，不可撤销!");
-            }
+//            if (appointment.getStatus().equals("receive")) {
+//                throw new AppointmentDaoException("该预约已审批通过，不可撤销!");
+//            }
             if (appointment.getStatus().equals("reject")) {
                 throw new AppointmentDaoException("该预约已被审批驳回，不可撤销!");
             }
@@ -187,7 +187,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 //            Example<Appointment> example = Example.of(appointment);
             return appointmentRepository.findAllPagesByStatus(status, pageable);
         } else {
-            return appointmentRepository.findAll(pageable);
+            return appointmentRepository.findAllPages(AppointmentStatus.CANCEL.getStatus(), AppointmentStatus.REJECT.getStatus() , pageable);
         }
     }
 

@@ -4,6 +4,7 @@ import cn.edu.bit.ruixin.base.common.CommonResult;
 import cn.edu.bit.ruixin.base.common.ResultCode;
 import cn.edu.bit.ruixin.base.security.utils.ResponseUtils;
 import cn.edu.bit.ruixin.base.security.utils.TokenManager;
+import cn.edu.bit.ruixin.community.domain.Role;
 import cn.edu.bit.ruixin.community.domain.WxAppVO;
 import cn.edu.bit.ruixin.community.service.RedisService;
 import cn.edu.bit.ruixin.community.vo.AdminInfoVo;
@@ -14,6 +15,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -54,8 +56,18 @@ public class GlobalLoginFilter implements Filter {
                     // 获取登录状态
                     AdminInfoVo adminInfoVo = redisService.opsForValueGet(token, AdminInfoVo.class);
                     if (adminInfoVo != null) {
+                        List<Role> roles = adminInfoVo.getRoleList();
                         // 鉴权过程
                         boolean hasAuthority = true;
+                        if (servletPath.startsWith("/admin/room") && !roles.contains("")) {
+
+                        } else if (servletPath.startsWith("/admin/appointment")) {
+
+                        } else if (servletPath.startsWith("/admin/managers")) {
+
+                        } else if (servletPath.startsWith("/admin/news")) {
+
+                        }
                         if (hasAuthority) {
                             // 更新活动状态
                             redisService.updateExpire(token, 30, TimeUnit.MINUTES);

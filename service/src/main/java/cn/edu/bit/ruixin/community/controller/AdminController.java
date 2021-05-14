@@ -83,7 +83,7 @@ public class AdminController {
      *
      * @return
      */
-    @GetMapping("/users")
+    @GetMapping("/managers")
     public CommonResult getUserInfo(@RequestParam(value = "query", required = false) String nameLike, @RequestParam("pagenum") int current, @RequestParam("pagesize") int limit) {
         Pageable pageable = PageRequest.of(current, limit);
         if (nameLike != null && !nameLike.equals("")) {
@@ -122,7 +122,7 @@ public class AdminController {
      * @return
      */
     @MsgSecCheck("adminInfoVo")
-    @PostMapping("/users")
+    @PostMapping("/managers")
     public CommonResult addAdmin(@RequestBody AdminInfoVo adminInfoVo) {
         Admin admin = AdminInfoVo.convertToPo(adminInfoVo);
         Admin registerAdmin = adminService.registerAdmin(admin);
@@ -133,7 +133,7 @@ public class AdminController {
 
 
     @MsgSecCheck({"email"})
-    @PutMapping("/users/{id}")
+    @PutMapping("/managers/{id}")
     public CommonResult modifyAdmin(@PathVariable(name = "id") int id,
                                     @RequestParam(name = "email", required = false) String email,
                                     @RequestParam(name = "mobile", required = false) String mobile) {
@@ -144,13 +144,13 @@ public class AdminController {
         return CommonResult.ok(ResultCode.SUCCESS).data("adminInfo", infoVo);
     }
 
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/managers/{id}")
     public CommonResult deleteAdminById(@PathVariable("id") int id) {
         adminService.deleteAdminById(id);
         return CommonResult.ok(ResultCode.SUCCESS).msg("删除成功！");
     }
 
-    @PostMapping("/users/{id}/role")
+    @PostMapping("/managers/{id}/role")
     public CommonResult assignRoleToAdmin(@PathVariable("id") int id, @RequestParam("rid") int role_id) {
         adminService.assignRoleToAdmin(id, role_id);
         return CommonResult.ok(ResultCode.SUCCESS).msg("分配角色成功！");

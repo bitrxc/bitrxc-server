@@ -6,6 +6,7 @@ import cn.edu.bit.ruixin.community.annotation.MsgSecCheck;
 import cn.edu.bit.ruixin.community.domain.Appointment;
 import cn.edu.bit.ruixin.community.domain.Room;
 import cn.edu.bit.ruixin.community.domain.User;
+import cn.edu.bit.ruixin.community.myenum.AppointmentStatus;
 import cn.edu.bit.ruixin.community.service.AppointmentService;
 import cn.edu.bit.ruixin.community.service.RoomService;
 import cn.edu.bit.ruixin.community.service.UserService;
@@ -112,9 +113,9 @@ public class AppointmentManagerController {
     @GetMapping("/{current}/{limit}")
     public CommonResult getAppointmentPages(@PathVariable("current") int current, @PathVariable("limit") int limit, @RequestParam(required = false, name = "status")String status) {
         // 构造排序对象
-        Sort sort = Sort.by(Sort.Direction.DESC, "launchDate", "execDate", "launchTime");
+//        Sort sort = Sort.by(Sort.Direction.DESC, "launchDate", "execDate", "launchTime");
         // 构造分页对象
-        Pageable pageable = PageRequest.of(current, limit, sort);
+        Pageable pageable = PageRequest.of(current, limit);
         Page<Appointment> page = appointmentService.getAppointmentPages(pageable, status);
         List<Appointment> list = page.getContent();
 
@@ -127,8 +128,12 @@ public class AppointmentManagerController {
             infoVo.setSchoolId(user.getSchoolId());
             infoVo.setUsername(user.getName());
             infoVo.setRoomName(room.getName());
+//            if (status == null || "".equals(status)) {
+//                if (AppointmentStatus.CANCEL.getStatus().equals(infoVo.getStatus()) || AppointmentStatus.REJECT.getStatus().equals(infoVo.getStatus())) {
+//                    continue;
+//                }
+//            }
             infoVos.add(infoVo);
-
         }
 
         Map<String, Object> map = new HashMap<>();
