@@ -6,6 +6,7 @@ import cn.edu.bit.ruixin.community.annotation.MsgSecCheck;
 import cn.edu.bit.ruixin.community.domain.Appointment;
 import cn.edu.bit.ruixin.community.domain.Room;
 import cn.edu.bit.ruixin.community.domain.User;
+import cn.edu.bit.ruixin.community.myenum.AppointmentStatus;
 import cn.edu.bit.ruixin.community.service.AppointmentService;
 import cn.edu.bit.ruixin.community.service.RoomService;
 import cn.edu.bit.ruixin.community.service.UserService;
@@ -128,10 +129,11 @@ public class AppointmentManagerController {
             infoVo.setUsername(user.getName());
             infoVo.setRoomName(room.getName());
             if (status == null || "".equals(status)) {
-                infoVo.setStatus(null);
+                if (AppointmentStatus.CANCEL.getStatus().equals(infoVo.getStatus()) || AppointmentStatus.REJECT.getStatus().equals(infoVo.getStatus())) {
+                    continue;
+                }
             }
             infoVos.add(infoVo);
-
         }
 
         Map<String, Object> map = new HashMap<>();
