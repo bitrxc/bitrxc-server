@@ -57,6 +57,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
 //    @Query(nativeQuery = true, value = "SELECT * FROM `deal` WHERE `launcher` = :username")
     Page<Appointment> findAllPagesByUsername(@Param("username") String username, Pageable pageable);
 
-    @Query(nativeQuery = true, value = "SELECT * FROM `deal` ORDER BY `launch_date` DESC, `exec_date` DESC, `launch_time` DESC ")
-    Page<Appointment> findAllPages(Pageable pageable);
+    @Query(nativeQuery = true, value = "SELECT * FROM `deal` WHERE NOT (`status` = :no1 OR `status` = :no2) ORDER BY `launch_date` DESC, `exec_date` DESC, `launch_time` DESC ")
+    Page<Appointment> findAllPages(String no1, String no2, Pageable pageable);
 }

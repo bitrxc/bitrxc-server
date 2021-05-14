@@ -128,11 +128,11 @@ public class AppointmentManagerController {
             infoVo.setSchoolId(user.getSchoolId());
             infoVo.setUsername(user.getName());
             infoVo.setRoomName(room.getName());
-            if (status == null || "".equals(status)) {
-                if (AppointmentStatus.CANCEL.getStatus().equals(infoVo.getStatus()) || AppointmentStatus.REJECT.getStatus().equals(infoVo.getStatus())) {
-                    continue;
-                }
-            }
+//            if (status == null || "".equals(status)) {
+//                if (AppointmentStatus.CANCEL.getStatus().equals(infoVo.getStatus()) || AppointmentStatus.REJECT.getStatus().equals(infoVo.getStatus())) {
+//                    continue;
+//                }
+//            }
             infoVos.add(infoVo);
         }
 
