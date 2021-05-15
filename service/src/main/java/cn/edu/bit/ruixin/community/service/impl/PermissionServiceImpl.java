@@ -18,4 +18,8 @@ public class PermissionServiceImpl implements PermissionService {
     private PermissionRepository permissionRepository;
 
 
+    @Override
+    public boolean addPermission() {
+        return false;
+    }
 }
