@@ -67,6 +67,7 @@ public class AdminController {
         List<Role> roles = roleService.getRolesByAdminId(loginAdmin.getId());
         adminInfoVo.setRoleList(roles);
         adminInfoVo.setPassword(null);
+
         // 生成token，放置Redis中
         String token = tokenManager.createTokenForAdmin(adminInfoVo.getMobile());
         try {
@@ -130,7 +131,6 @@ public class AdminController {
         BeanUtils.copyProperties(registerAdmin, infoVo);
         return CommonResult.ok(ResultCode.SUCCESS).msg("添加成功！").data("adminInfo", infoVo);
     }
-
 
     @MsgSecCheck({"email"})
     @PutMapping("/managers/{id}")

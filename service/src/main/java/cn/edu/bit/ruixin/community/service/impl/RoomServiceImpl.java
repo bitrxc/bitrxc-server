@@ -181,13 +181,13 @@ public class RoomServiceImpl implements RoomService {
 
         List<Schedule> allTime = scheduleRepository.findAll();
 
-        List<Schedule> pastTime = new ArrayList<>(6);
+        List<Schedule> pastTime = new ArrayList<>();
 
-        List<Schedule> busyTime = new ArrayList<>(6);
+        List<Schedule> busyTime = new ArrayList<>();
 
-        List<Schedule> freeTime = new ArrayList<>(6);
+        List<Schedule> freeTime = new ArrayList<>();
 
-        List<Schedule> myTime = new ArrayList<>(6);
+        List<Schedule> myTime = new ArrayList<>();
 
         int i = 0;
 

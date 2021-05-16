@@ -169,6 +169,17 @@ public class AppointmentServiceImpl implements AppointmentService {
                 }
             }
             if (conductor != null && !conductor.equals("")) {
+                if (appointment.getStatus().equals(AppointmentStatus.NEW.getStatus()) && AppointmentStatus.RECEIVE.getStatus().equals(status)) {
+                    // 审批通过某一个预约，取消对该房间该时间段的其他预约，查询条件：roomId,时间段范围，状态：new
+                    List<Appointment> list = appointmentRepository.getAppointmentsByRoomIdAndTimesAndStatus(appointment.getRoomId(), appointment.getBegin(), appointment.getEnd(), AppointmentStatus.NEW.getStatus());
+                    for (Appointment app :
+                            list) {
+                        if (!app.getId().equals(appointment.getId())) {
+                            app.setStatus(AppointmentStatus.REJECT.getStatus());
+                            appointmentRepository.save(app);
+                        }
+                    }
+                }
                 appointment.setStatus(status);
                 appointment.setConductor(conductor);
                 appointment.setCheckNote(checkNote);
