@@ -52,6 +52,7 @@ public class AppointmentManagerController {
         AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
         User user = userService.getUserByUsername(infoVo.getLauncher());
         Room room = roomService.getRoomInfoById(infoVo.getRoomId());
+        infoVo.setPhone(user.getPhone());
         infoVo.setUsername(user.getName());
         infoVo.setRoomName(room.getName());
         infoVo.setSchoolId(user.getSchoolId());
@@ -72,6 +73,7 @@ public class AppointmentManagerController {
             AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
             User user = userService.getUserByUsername(infoVo.getLauncher());
             Room room = roomService.getRoomInfoById(infoVo.getRoomId());
+            infoVo.setPhone(user.getPhone());
             infoVo.setUsername(user.getName());
             infoVo.setRoomName(room.getName());
             infoVo.setSchoolId(user.getSchoolId());
@@ -96,6 +98,7 @@ public class AppointmentManagerController {
             AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
             User user = userService.getUserByUsername(infoVo.getLauncher());
             Room room = roomService.getRoomInfoById(infoVo.getRoomId());
+            infoVo.setPhone(user.getPhone());
             infoVo.setSchoolId(user.getSchoolId());
             infoVo.setUsername(user.getName());
             infoVo.setRoomName(room.getName());
@@ -125,6 +128,7 @@ public class AppointmentManagerController {
             AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
             User user = userService.getUserByUsername(infoVo.getLauncher());
             Room room = roomService.getRoomInfoById(infoVo.getRoomId());
+            infoVo.setPhone(user.getPhone());
             infoVo.setSchoolId(user.getSchoolId());
             infoVo.setUsername(user.getName());
             infoVo.setRoomName(room.getName());
