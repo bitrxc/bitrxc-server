@@ -7,8 +7,15 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 /**
  * TODO
  *
+ * This repo give the relationship between permission and role.If given tuple 
+ *   <permission,role> can be found in this repo, the permission is granted to
+ *   the role.
+ * 
  * @author 78165
- * @date 2021/5/7
+ * @author jingkaimori
+ * @date 2021/7/8
  */
-public interface RolePermissionRepository extends JpaRepository<RolePermission, Integer>, JpaSpecificationExecutor<RolePermission> {
+public interface RolePermissionRepository extends 
+    JpaRepository<RolePermission, Integer>, 
+    JpaSpecificationExecutor<RolePermission> {
 }

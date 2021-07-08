@@ -7,8 +7,12 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 /**
  * TODO
  *
+ * This repo give the relationship between URL and permission.
+ *
  * @author 78165
- * @date 2021/5/7
+ * @author jingkaimori
+ * @date 2021/7/8
  */
-public interface PermissionRepository extends JpaRepository<Permission, Integer>, JpaSpecificationExecutor<Permission> {
+public interface PermissionRepository extends 
+    JpaRepository<Permission, Integer>, JpaSpecificationExecutor<Permission> {
 }
