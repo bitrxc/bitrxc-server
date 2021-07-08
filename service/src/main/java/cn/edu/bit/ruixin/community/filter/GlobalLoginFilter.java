@@ -4,9 +4,13 @@ import cn.edu.bit.ruixin.base.common.CommonResult;
 import cn.edu.bit.ruixin.base.common.ResultCode;
 import cn.edu.bit.ruixin.base.security.utils.ResponseUtils;
 import cn.edu.bit.ruixin.base.security.utils.TokenManager;
+import cn.edu.bit.ruixin.community.domain.Permission;
 import cn.edu.bit.ruixin.community.domain.Role;
 import cn.edu.bit.ruixin.community.domain.WxAppVO;
+import cn.edu.bit.ruixin.community.service.AdminService;
+import cn.edu.bit.ruixin.community.service.PermissionService;
 import cn.edu.bit.ruixin.community.service.RedisService;
+import cn.edu.bit.ruixin.community.service.RoleService;
 import cn.edu.bit.ruixin.community.vo.AdminInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,6 +19,8 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -33,6 +39,12 @@ public class GlobalLoginFilter implements Filter {
 
     @Autowired
     private RedisService redisService;
+
+    @Autowired
+    private RoleService roleService;
+
+    @Autowired
+    private PermissionService permissionService;
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -56,19 +68,8 @@ public class GlobalLoginFilter implements Filter {
                     // 获取登录状态
                     AdminInfoVo adminInfoVo = redisService.opsForValueGet(token, AdminInfoVo.class);
                     if (adminInfoVo != null) {
-                        List<Role> roles = adminInfoVo.getRoleList();
-                        // 鉴权过程
-                        boolean hasAuthority = true;
-                        if (servletPath.startsWith("/admin/room") && !roles.contains("")) {
-
-                        } else if (servletPath.startsWith("/admin/appointment")) {
-
-                        } else if (servletPath.startsWith("/admin/managers")) {
-
-                        } else if (servletPath.startsWith("/admin/news")) {
-
-                        }
-                        if (hasAuthority) {
+                        // 鉴权
+                        if (checkPrivilege(adminInfoVo, servletPath)) {
                             // 更新活动状态
                             redisService.updateExpire(token, 30, TimeUnit.MINUTES);
                             filterChain.doFilter(servletRequest, servletResponse);
@@ -117,5 +118,23 @@ public class GlobalLoginFilter implements Filter {
 //                filterChain.doFilter(servletRequest, servletResponse  );
             }
         }
+    };
+
+    /**
+     * 
+     * Check Admin's Privilege.
+     * {@link https://shimo.im/docs/e1Az42LLOOcENEqW }
+     * 
+     * @param adminInfoVo
+     * @param servletPath
+     * @return
+     * @throws MalformedURLException
+     */
+    private Boolean checkPrivilege(AdminInfoVo adminInfoVo,String servletPath) throws MalformedURLException{
+        List<Role> roles = roleService.getRolesByAdminId(adminInfoVo.getId());
+        String path = (new URL(servletPath)).getPath();
+        System.out.println(path);
+        Permission perm = permissionService.getPermissionByURL(path);
+        return permissionService.checkPermission(perm, roles);
     }
 }

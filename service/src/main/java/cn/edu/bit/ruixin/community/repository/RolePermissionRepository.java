@@ -1,6 +1,11 @@
 package cn.edu.bit.ruixin.community.repository;
 
+import cn.edu.bit.ruixin.community.domain.Permission;
+import cn.edu.bit.ruixin.community.domain.Role;
 import cn.edu.bit.ruixin.community.domain.RolePermission;
+
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -18,4 +23,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface RolePermissionRepository extends 
     JpaRepository<RolePermission, Integer>, 
     JpaSpecificationExecutor<RolePermission> {
+    Boolean existsRolePermissionByPermissionEqualsAndRoleIn(Permission permission, List<Role> roles);
 }

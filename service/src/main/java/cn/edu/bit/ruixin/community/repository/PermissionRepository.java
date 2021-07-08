@@ -15,4 +15,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  */
 public interface PermissionRepository extends 
     JpaRepository<Permission, Integer>, JpaSpecificationExecutor<Permission> {
+    Permission findPermissionByUrl(String url);
+    
 }
