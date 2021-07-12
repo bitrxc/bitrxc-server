@@ -4,8 +4,13 @@ import cn.edu.bit.ruixin.base.common.CommonResult;
 import cn.edu.bit.ruixin.base.common.ResultCode;
 import cn.edu.bit.ruixin.base.security.utils.ResponseUtils;
 import cn.edu.bit.ruixin.base.security.utils.TokenManager;
+import cn.edu.bit.ruixin.community.domain.Permission;
+import cn.edu.bit.ruixin.community.domain.Role;
 import cn.edu.bit.ruixin.community.domain.WxAppVO;
+import cn.edu.bit.ruixin.community.service.PermissionService;
 import cn.edu.bit.ruixin.community.service.RedisService;
+import cn.edu.bit.ruixin.community.service.RoleService;
+import cn.edu.bit.ruixin.community.vo.AdminInfoVo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,28 +26,35 @@ import javax.servlet.http.HttpServletResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
-* 用户 token 过滤器，
-* 由于通过 token 校验会话时间，无法直接使用HTTP Plain Auth的处理方法（{@link BasicAuthenticationFilter}）
+* 管理员 token 过滤器，
+* 由于通过 token 校验并刷新会话时间，无法直接使用HTTP Plain Auth的处理方法
+*  （{@link BasicAuthenticationFilter}）
 * 实质上的凭据管理器为{@link RedisService}，但该管理器无法嵌入上述过滤器
-*
-* @author 78165
+* 目前鉴权模块继承于 filter 内
+* 
 * @author jingkaimori
 * @date 2021/07/12
 */
-public class TokenBasicFilter extends OncePerRequestFilter {
-
-    @Autowired
-    private TokenManager tokenManager;
+public class TokenAdminFilter extends OncePerRequestFilter {
 
     @Autowired
     private RedisService redisService;
 
-    public TokenBasicFilter(AuthenticationManager authenticationManager) {
+    @Autowired
+    private PermissionService permissionService;
+    
+    @Autowired
+    private RoleService roleService;
+
+    public TokenAdminFilter() {
         // super(authenticationManager);
         // this.tokenManager = tokenManager;
     }
@@ -54,10 +66,19 @@ public class TokenBasicFilter extends OncePerRequestFilter {
         String token = request.getHeader("token");
         if (token != null && !token.equals("")) {
             try{
-                UsernamePasswordAuthenticationToken authRequest = getAuthentication(token,chain);
-                //将用户凭据放到认证权限上下文中
-                SecurityContextHolder.getContext().setAuthentication(authRequest);
-                chain.doFilter(request,response);
+                // 获取登录状态
+                AdminInfoVo adminInfoVo = redisService.opsForValueGet(token, AdminInfoVo.class);
+                String servletPath = request.getServletPath();
+                // 鉴权
+                if (checkPrivilege(adminInfoVo, servletPath)) {
+                    // 更新活动状态
+                    redisService.updateExpire(token, 30, TimeUnit.MINUTES);
+                    chain.doFilter(request, response);
+                } else {
+                    ResponseUtils.out(
+                        (HttpServletResponse) response, 
+                        CommonResult.error(ResultCode.NOAHTHORITY));
+                }
             } catch (Exception e) {
                 ResponseUtils.out(
                     (HttpServletResponse) response, 
@@ -70,31 +91,26 @@ public class TokenBasicFilter extends OncePerRequestFilter {
         }
     }
 
-    /**
-     * 认证当前用户，通过 redis 缓存机制保证会话时间
-     * @return 当前认证成功用户会话信息
-     */
-    private UsernamePasswordAuthenticationToken getAuthentication(
-        String token, FilterChain filterChain
-    ) throws JsonProcessingException, InvalidTokenException {
-        WxAppVO appVO = redisService.opsForValueGet(token, WxAppVO.class);
-        if (appVO != null) {
-            String openid = appVO.getOpenid();
-            String sessionKey = appVO.getSession_key();
-            Map<String, String> info = tokenManager.getInfoFromToken(token);
-            if (info.get("openid").equals(openid) && info.get("session_key").equals(sessionKey)) {
-                redisService.opsForValueSetWithExpire(token, appVO, 30, TimeUnit.MINUTES);
-                return new UsernamePasswordAuthenticationToken(openid, token, new ArrayList<>());
-            }else{
-                throw new InvalidTokenException();
-            }
-        } else {
-            throw new InvalidTokenException();
-        }
-    }
 
     private class InvalidTokenException extends Exception{
 
     }
 
+    /**
+     * 
+     * Check Admin's Privilege.
+     * {@link https://shimo.im/docs/e1Az42LLOOcENEqW }
+     * 
+     * @param adminInfoVo
+     * @param servletPath
+     * @return
+     * @throws MalformedURLException
+     */
+    private Boolean checkPrivilege(AdminInfoVo adminInfoVo,String servletPath) throws MalformedURLException{
+        List<Role> roles = roleService.getRolesByAdminId(adminInfoVo.getId());
+        String path = (new URL(servletPath)).getPath();
+        System.out.println(path);
+        Permission perm = permissionService.getPermissionByURL(path);
+        return permissionService.checkPermission(perm, roles);
+    }
 }

@@ -25,19 +25,19 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @EnableAutoConfiguration(exclude = {MultipartAutoConfiguration.class})
 public class MyWebConfig {
 
-    @Autowired
-    private GlobalLoginFilter loginFilter;
+    // @Autowired
+    // private GlobalLoginFilter loginFilter;
 
-    @Bean
-    public FilterRegistrationBean registerBean() {
-        System.out.println(loginFilter);
-        FilterRegistrationBean<Filter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(loginFilter);
-        registrationBean.addUrlPatterns("/*");
-        registrationBean.setName("globalAuthenticationFilter");
-        registrationBean.setOrder(1);
-        return registrationBean;
-    }
+    // @Bean
+    // public FilterRegistrationBean registerBean() {
+    //     System.out.println(loginFilter);
+    //     FilterRegistrationBean<Filter> registrationBean = new FilterRegistrationBean<>();
+    //     registrationBean.setFilter(loginFilter);
+    //     registrationBean.addUrlPatterns("/*");
+    //     registrationBean.setName("globalAuthenticationFilter");
+    //     registrationBean.setOrder(1);
+    //     return registrationBean;
+    // }
 
     @Bean
     public RestTemplate restTemplate() {
