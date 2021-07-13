@@ -1,6 +1,6 @@
 # bitrxc-server
 
-[![Build Status](https://jenkins.hyperzsb.tech/buildStatus/icon?job=bitrxc-server)](https://jenkins.hyperzsb.tech/job/bitrxc-server/)
+[![Build Status](https://jenkins.hyperzsb.tech/buildStatus/icon?job=bitrxc-dev%2Fbitrxc-server-dev)](https://jenkins.hyperzsb.tech/job/bitrxc-dev/job/bitrxc-server-dev/)
 
 This is the server of Management System of BIT Ruixin Community.
 
