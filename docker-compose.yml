@@ -7,10 +7,6 @@ services:
     ports:
       - target: ${SERVER_TARGET_PORT}
         published: ${SERVER_PUBLISHED_PORT}
-    volumes:
-      - type: bind
-        source: ${SERVER_STATIC_MOUNTPOINT}
-        target: /app/static
     depends_on:
       - mariadb
       - redis
@@ -21,10 +17,6 @@ services:
   mariadb:
     image: "mariadb:10.5"
     container_name: ${MARIADB_CONTAINER_NAME}
-    volumes:
-      - type: bind
-        source: ${MARIADB_DATA_MOUNTPOINT}
-        target: /var/lib/mysql
 
   redis:
     image: "redis:6.2"
