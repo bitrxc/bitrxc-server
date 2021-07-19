@@ -45,7 +45,7 @@ public class AdminServiceImpl implements AdminService {
         else {
             String username = admin.getUsername();
             Admin adminByUsername = adminRepository.findAdminByUsername(username);
-            String password = admin.getPassword();
+            String password = adminByUsername.getPassword();
 //            password = passwordEncoder.encode(password);
             if (!password.equals(admin.getPassword())) {
                 throw new UserDaoException("用户名密码错误!");
