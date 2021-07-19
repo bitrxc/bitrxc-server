@@ -1,4 +1,6 @@
 version: "3.9"
+networks:
+  bitrxc-server:
 
 services:
   server:
@@ -10,6 +12,8 @@ services:
     depends_on:
       - mariadb
       - redis
+    networks:
+      - bitrxc-server
     entrypoint: [ "/app/wait-for-it.sh", "mariadb:3306", "-s", "--",
                "/app/wait-for-it.sh", "redis:6379", "-s", "--",
                "sh", "-c", "java ${JAVA_OPTS} -jar /app/app.jar" ]
@@ -17,10 +21,22 @@ services:
   mariadb:
     image: "mariadb:10.5"
     container_name: ${MARIADB_CONTAINER_NAME}
+    networks:
+      - bitrxc-server
+    volumes:
+      - type: bind
+        source: ${MARIADB_INIT_MOUNTPOINT}
+        target: /docker-entrypoint-initdb.d
+    environment:
+      # see also ./deploy/application.
+      MARIADB_ROOT_PASSWORD: "root"
+      MARIADB_DATABASE: "bitrxc"
 
   redis:
     image: "redis:6.2"
     container_name: ${REDIS_CONTAINER_NAME}
+    networks:
+      - bitrxc-server
     volumes:
       - type: bind
         source: ${REDIS_CONF_MOUNTPOINT}

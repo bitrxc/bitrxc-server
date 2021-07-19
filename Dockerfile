@@ -5,15 +5,10 @@ WORKDIR /usr/src/app
 COPY service/pom.xml service/pom.xml
 COPY service-base/pom.xml service-base/pom.xml
 COPY pom.xml settings.xml ./
+COPY deploy/application.yaml service/src/main/resources/application.yaml
 RUN mvn -B -e -s settings.xml dependency:go-offline
 COPY . .
 RUN mvn -B -e -s settings.xml clean package -DskipTests
-
-# Database
-FROM mariadb:10.5 AS mariadb-env
-WORKDIR /app
-COPY deploy/mariadb/bitrxc.sql bitrxc.sql
-RUN mysql -uroot < bitrxc.sql
 
 # Package
 FROM openjdk:8u282 AS serve-env
