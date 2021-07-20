@@ -6,6 +6,7 @@ import cn.edu.bit.ruixin.community.repository.PermissionRepository;
 import cn.edu.bit.ruixin.community.repository.RolePermissionRepository;
 import cn.edu.bit.ruixin.community.service.PermissionService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     /**
-     * TODO: URL Injection and unsecure protocol(ssh://)
+     * This method only accepts path like `/path/to/api`, not include scheme.
      */
     @Override
     public Permission getPermissionByURL(String url){
@@ -41,6 +42,12 @@ public class PermissionServiceImpl implements PermissionService {
     
     @Override
     public Boolean checkPermission(Permission permission, List<Role> roles){
-        return rolePermissionRepository.existsRolePermissionByPermissionEqualsAndRoleIn(permission, roles);
+        Integer perId=permission.getId();
+        List<Integer> rolesId=new ArrayList<Integer>();
+        
+        for(Role i : roles){
+            rolesId.add(i.getId());
+        }
+        return rolePermissionRepository.existsRolePermissionByPermissionIdEqualsAndRoleIdIn(perId, rolesId);
     };
 }

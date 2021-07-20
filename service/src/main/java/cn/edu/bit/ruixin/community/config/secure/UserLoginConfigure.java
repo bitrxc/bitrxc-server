@@ -1,4 +1,4 @@
-package cn.edu.bit.ruixin.community.config;
+package cn.edu.bit.ruixin.community.config.secure;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;

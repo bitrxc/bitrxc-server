@@ -26,57 +26,54 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
-* 用户 token 过滤器，
-* 由于通过 token 校验会话时间，无法直接使用HTTP Plain Auth的处理方法（{@link BasicAuthenticationFilter}）
-* 实质上的凭据管理器为{@link RedisService}，但该管理器无法嵌入上述过滤器
-*
-* @author 78165
-* @author jingkaimori
-* @date 2021/07/12
-*/
+ * 用户 token 过滤器， 由于通过 token 校验会话，而且需要更新会话时间，无法直接使用HTTP Plain
+ * Auth的处理方法（{@link BasicAuthenticationFilter}）
+ * 实质上的凭据管理器为{@link RedisService}，但该管理器无法嵌入上述过滤器
+ * 过滤器要将成功的认证放入安全上下文
+ *
+ * @author 78165
+ * @author jingkaimori
+ * @date 2021/07/12
+ */
 public class TokenBasicFilter extends OncePerRequestFilter {
 
-    @Autowired
     private TokenManager tokenManager;
 
-    @Autowired
     private RedisService redisService;
 
-    public TokenBasicFilter(AuthenticationManager authenticationManager) {
-        // super(authenticationManager);
-        // this.tokenManager = tokenManager;
+    public TokenBasicFilter(TokenManager tokenManager,RedisService redisService) {
+        this.tokenManager = tokenManager;
+        this.redisService = redisService;
     }
 
     @Override
-    protected void doFilterInternal(
-        HttpServletRequest request, HttpServletResponse response, FilterChain chain
-    ) throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+        logger.debug("triggered UserF");
         String token = request.getHeader("token");
         if (token != null && !token.equals("")) {
-            try{
-                UsernamePasswordAuthenticationToken authRequest = getAuthentication(token,chain);
-                //将用户凭据放到认证权限上下文中
+            try {
+                UsernamePasswordAuthenticationToken authRequest = getAuthentication(token, chain);
+                // 将用户凭据放到认证权限上下文中
                 SecurityContextHolder.getContext().setAuthentication(authRequest);
-                chain.doFilter(request,response);
+                chain.doFilter(request, response);
             } catch (Exception e) {
-                ResponseUtils.out(
-                    (HttpServletResponse) response, 
-                    CommonResult.error(ResultCode.UNAUTHENTICATION_ERROR).msg("登录过期，请重新登录！"));
+                ResponseUtils.out((HttpServletResponse) response,
+                        CommonResult.error(ResultCode.UNAUTHENTICATION_ERROR).msg("登录过期，请重新登录！"));
             }
-        }else{
-            ResponseUtils.out(
-                (HttpServletResponse) response, 
-                CommonResult.error(ResultCode.UNAUTHENTICATION_ERROR).msg("请先登录！"));
+        } else {
+            ResponseUtils.out((HttpServletResponse) response,
+                    CommonResult.error(ResultCode.UNAUTHENTICATION_ERROR).msg("请先登录！"));
         }
     }
 
     /**
      * 认证当前用户，通过 redis 缓存机制保证会话时间
+     * 
      * @return 当前认证成功用户会话信息
      */
-    private UsernamePasswordAuthenticationToken getAuthentication(
-        String token, FilterChain filterChain
-    ) throws JsonProcessingException, InvalidTokenException {
+    private UsernamePasswordAuthenticationToken getAuthentication(String token, FilterChain filterChain)
+            throws JsonProcessingException, InvalidTokenException {
         WxAppVO appVO = redisService.opsForValueGet(token, WxAppVO.class);
         if (appVO != null) {
             String openid = appVO.getOpenid();
@@ -85,7 +82,7 @@ public class TokenBasicFilter extends OncePerRequestFilter {
             if (info.get("openid").equals(openid) && info.get("session_key").equals(sessionKey)) {
                 redisService.opsForValueSetWithExpire(token, appVO, 30, TimeUnit.MINUTES);
                 return new UsernamePasswordAuthenticationToken(openid, token, new ArrayList<>());
-            }else{
+            } else {
                 throw new InvalidTokenException();
             }
         } else {
@@ -93,8 +90,6 @@ public class TokenBasicFilter extends OncePerRequestFilter {
         }
     }
 
-    private class InvalidTokenException extends Exception{
-
-    }
+    private class InvalidTokenException extends Exception { }
 
 }

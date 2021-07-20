@@ -66,7 +66,9 @@ public class AdminController {
         // 添加用户角色信息
         List<Role> roles = roleService.getRolesByAdminId(loginAdmin.getId());
         adminInfoVo.setRoleList(roles);
-        adminInfoVo.setPassword(null);
+        // 暂时补救措施：将密码设为空串以避免从redis取出内容时报错
+        // TODO: adminInfoVo 移除密码字段
+        adminInfoVo.setPassword("");
 
         // 生成token，放置Redis中
         String token = tokenManager.createTokenForAdmin(adminInfoVo.getMobile());

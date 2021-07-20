@@ -15,6 +15,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  * This repo give the relationship between permission and role.If given tuple 
  *   <permission,role> can be found in this repo, the permission is granted to
  *   the role.
+ * SQL statements only accept id, not entire data field.
  * 
  * @author 78165
  * @author jingkaimori
@@ -23,5 +24,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface RolePermissionRepository extends 
     JpaRepository<RolePermission, Integer>, 
     JpaSpecificationExecutor<RolePermission> {
-    Boolean existsRolePermissionByPermissionEqualsAndRoleIn(Permission permission, List<Role> roles);
+    Boolean existsRolePermissionByPermissionIdEqualsAndRoleIdIn(Integer permission, List<Integer> roles);
 }

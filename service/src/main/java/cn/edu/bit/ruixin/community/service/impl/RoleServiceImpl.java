@@ -20,10 +20,10 @@ import java.util.List;
 public class RoleServiceImpl implements RoleService {
 
     @Autowired
-    private AdminRoleRepository adminRoleRepository;
+    private RoleRepository roleRepository;
 
     @Override
     public List<Role> getRolesByAdminId(Integer id) {
-        return adminRoleRepository.findRolesByAdminId(id);
+        return roleRepository.findAdminRoles(id);
     }
 }
