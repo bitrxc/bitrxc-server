@@ -172,7 +172,13 @@ CREATE TABLE `permission` (
 
 LOCK TABLES `permission` WRITE;
 /*!40000 ALTER TABLE `permission` DISABLE KEYS */;
-INSERT INTO `permission` VALUES (1,'/admin');
+INSERT INTO `permission` VALUES (1,'/admin/managers');
+INSERT INTO `permission` VALUES (2,'/admin/managers/%');
+INSERT INTO `permission` VALUES (3,'/admin/appointment');
+INSERT INTO `permission` VALUES (4,'/admin/appointment/%');
+INSERT INTO `permission` VALUES (5,'/admin/rooms');
+INSERT INTO `permission` VALUES (6,'/admin/rooms/%');
+INSERT INTO `permission` VALUES (7,'/admin/schedule/all');
 /*!40000 ALTER TABLE `permission` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -196,8 +202,8 @@ CREATE TABLE `role` (
 
 LOCK TABLES `role` WRITE;
 /*!40000 ALTER TABLE `role` DISABLE KEYS */;
-INSERT INTO `role` VALUES (1,'/admin/appointment');
-INSERT INTO `role` VALUES (2,'/admin/**');
+INSERT INTO `role` VALUES (1,'normal');
+INSERT INTO `role` VALUES (2,'super');
 /*!40000 ALTER TABLE `role` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -222,7 +228,18 @@ CREATE TABLE `role_permission` (
 
 LOCK TABLES `role_permission` WRITE;
 /*!40000 ALTER TABLE `role_permission` DISABLE KEYS */;
-INSERT INTO `role_permission` VALUES (1,1,1);
+INSERT INTO `role_permission` VALUES (1,1,3);
+INSERT INTO `role_permission` VALUES (2,1,4);
+INSERT INTO `role_permission` VALUES (3,1,5);
+INSERT INTO `role_permission` VALUES (4,1,6);
+INSERT INTO `role_permission` VALUES (5,1,7);
+INSERT INTO `role_permission` VALUES (6,2,1);
+INSERT INTO `role_permission` VALUES (7,2,2);
+INSERT INTO `role_permission` VALUES (8,2,3);
+INSERT INTO `role_permission` VALUES (9,2,4);
+INSERT INTO `role_permission` VALUES (10,2,5);
+INSERT INTO `role_permission` VALUES (11,2,6);
+INSERT INTO `role_permission` VALUES (12,2,7);
 /*!40000 ALTER TABLE `role_permission` ENABLE KEYS */;
 UNLOCK TABLES;
 

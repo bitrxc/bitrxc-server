@@ -3,6 +3,7 @@ package cn.edu.bit.ruixin.community.repository;
 import cn.edu.bit.ruixin.community.domain.Permission;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 
 /**
  * TODO
@@ -15,6 +16,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  */
 public interface PermissionRepository extends 
     JpaRepository<Permission, Integer>, JpaSpecificationExecutor<Permission> {
-    Permission findPermissionByUrl(String url);
+        
+    @Query(nativeQuery=true,value="SELECT * FROM permission WHERE ? LIKE url")
+    Permission findPermissionLikeUrl(String url);
     
 }

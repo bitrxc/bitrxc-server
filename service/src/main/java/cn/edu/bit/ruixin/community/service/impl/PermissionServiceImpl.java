@@ -37,7 +37,7 @@ public class PermissionServiceImpl implements PermissionService {
      */
     @Override
     public Permission getPermissionByURL(String url){
-        return permissionRepository.findPermissionByUrl(url);
+        return permissionRepository.findPermissionLikeUrl(url);
     }
     
     @Override
