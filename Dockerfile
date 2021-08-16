@@ -5,7 +5,6 @@ WORKDIR /usr/src/app
 COPY service/pom.xml service/pom.xml
 COPY service-base/pom.xml service-base/pom.xml
 COPY pom.xml settings.xml ./
-COPY deploy/application.yaml service/src/main/resources/application.yaml
 RUN mvn -B -e -s settings.xml dependency:go-offline
 COPY . .
 RUN mvn -B -e -s settings.xml clean package -DskipTests

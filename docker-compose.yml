@@ -1,6 +1,4 @@
 version: "3.9"
-networks:
-  bitrxc-server:
 
 services:
   server:
@@ -9,34 +7,28 @@ services:
     ports:
       - target: ${SERVER_TARGET_PORT}
         published: ${SERVER_PUBLISHED_PORT}
+    volumes:
+      - type: bind
+        source: ${SERVER_STATIC_MOUNTPOINT}
+        target: /app/static
     depends_on:
       - mariadb
       - redis
-    networks:
-      - bitrxc-server
     entrypoint: [ "/app/wait-for-it.sh", "mariadb:3306", "-s", "--",
-               "/app/wait-for-it.sh", "redis:6379", "-s", "--",
-               "sh", "-c", "java ${JAVA_OPTS} -jar /app/app.jar" ]
+                  "/app/wait-for-it.sh", "redis:6379", "-s", "--",
+                  "sh", "-c", "java ${JAVA_OPTS} -jar /app/app.jar" ]
 
   mariadb:
     image: "mariadb:10.5"
     container_name: ${MARIADB_CONTAINER_NAME}
-    networks:
-      - bitrxc-server
     volumes:
       - type: bind
-        source: ${MARIADB_INIT_MOUNTPOINT}
-        target: /docker-entrypoint-initdb.d
-    environment:
-      # see also ./deploy/application.
-      MARIADB_ROOT_PASSWORD: "root"
-      MARIADB_DATABASE: "bitrxc"
+        source: ${MARIADB_DATA_MOUNTPOINT}
+        target: /var/lib/mysql
 
   redis:
     image: "redis:6.2"
     container_name: ${REDIS_CONTAINER_NAME}
-    networks:
-      - bitrxc-server
     volumes:
       - type: bind
         source: ${REDIS_CONF_MOUNTPOINT}
