@@ -13,7 +13,7 @@ services:
       - mariadb
       - redis
     networks:
-      - bitrxc-server
+      - ${SERVER_NETWORK_NAME}
     entrypoint: [ "/app/wait-for-it.sh", "mariadb:3306", "-s", "--",
                "/app/wait-for-it.sh", "redis:6379", "-s", "--",
                "sh", "-c", "java ${JAVA_OPTS} -jar /app/app.jar" ]
