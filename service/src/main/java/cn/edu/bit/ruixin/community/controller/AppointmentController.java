@@ -56,4 +56,5 @@ public class AppointmentController {
         appointmentService.cancelAppointmentById(id);
         return CommonResult.ok(ResultCode.SUCCESS).msg("撤销预约成功!");
     }
+
 }

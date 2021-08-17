@@ -1,10 +1,12 @@
 package cn.edu.bit.ruixin.community.service.impl;
 
+import cn.edu.bit.ruixin.community.domain.Admin;
 import cn.edu.bit.ruixin.community.domain.Appointment;
 import cn.edu.bit.ruixin.community.domain.Schedule;
 import cn.edu.bit.ruixin.community.domain.User;
 import cn.edu.bit.ruixin.community.exception.AppointmentDaoException;
 import cn.edu.bit.ruixin.community.myenum.AppointmentStatus;
+import cn.edu.bit.ruixin.community.repository.AdminRepository;
 import cn.edu.bit.ruixin.community.repository.AppointmentRepository;
 import cn.edu.bit.ruixin.community.repository.ScheduleRepository;
 import cn.edu.bit.ruixin.community.repository.UserRepository;
@@ -19,8 +21,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * TODO
@@ -39,6 +44,9 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private AdminRepository adminRepository;
 
     @Transactional(readOnly = true)
     @Override
@@ -106,6 +114,103 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
     @Override
+    public List<Appointment> addNewAppointmentsByAdmin(List<Appointment> appointments) {
+        List<String> adminLaunchers = adminRepository.findAll()
+                .stream()
+                .map(admin -> admin.getUsername())
+                .collect(Collectors.toList());
+
+        for (Appointment appointment : appointments) {
+            // 在管理员预约的格式中，发起者为空
+            if (appointment.getLauncher() != null) {
+                throw new AppointmentDaoException("管理员预约的格式有误，发起者不为空!");
+            }
+
+            // 在管理员预约的格式中，审核者为管理员
+            if (!adminLaunchers.contains(appointment.getLauncher())) {
+                throw new AppointmentDaoException("管理员预约的格式有误，审核者不为管理员!");
+            }
+
+            // 查找发生冲突的管理员预约管理员
+            Integer roomId = appointment.getRoomId();
+            Integer appointmentBegin = appointment.getBegin();
+            Integer appointmentEnd = appointment.getEnd();
+            Date execDate = appointment.getExecDate();
+            List<Appointment> conflictingAppointments = appointmentRepository.findConflictingAppointmentsAppointedByAdmin(roomId, execDate, appointmentBegin, appointmentEnd, AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.SIGNED.getStatus());
+            if (conflictingAppointments != null && conflictingAppointments.size() > 0) {
+                throw new AppointmentDaoException("该房间此时间段已被其他管理员的预约占用！");
+            } else {
+                // 预约时间检查
+                // 保证预约发起时间早于要预约的时间段的起始
+                Date launchDate = new Date();
+                Schedule schedule = scheduleRepository.getOne(appointmentBegin);
+                String begin = schedule.getBegin();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                String date = dateFormat.format(execDate);
+                String dateTime = date + " " + begin;
+                Date executeDate = null;
+                try {
+                    executeDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(dateTime);
+                } catch (ParseException e) {
+                    throw new AppointmentDaoException("实际执行预约使用的时间格式有误！");
+                }
+                if (launchDate.after(executeDate)) {
+                    throw new AppointmentDaoException("该时间段已过，不可预约！");
+                } else {
+                    appointment.setLaunchDate(launchDate);
+                }
+            }
+        }
+
+        List<Appointment> result = new ArrayList<>();
+        for (Appointment appointment : appointments) {
+            appointment.setStatus(AppointmentStatus.RECEIVE.getStatus());
+            Integer roomId = appointment.getRoomId();
+            Integer appointmentBegin = appointment.getBegin();
+            Integer appointmentEnd = appointment.getEnd();
+            Date execDate = appointment.getExecDate();
+            List<Appointment> conflictingAppointments = appointmentRepository.findConflictingAppointmentsAppointedByUser(roomId, execDate, appointmentBegin, appointmentEnd, AppointmentStatus.NEW.getStatus(), AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.SIGNED.getStatus());
+            if (conflictingAppointments != null && conflictingAppointments.size() > 0) {
+                conflictingAppointments.stream()
+                        .forEach(a -> a.setStatus(AppointmentStatus.REJECT.getStatus()));
+                result.addAll(conflictingAppointments);
+            }
+        }
+
+        // 撤销冲突的用户预约
+        appointmentRepository.saveAll(result);
+
+        // 加入管理员预约
+        appointmentRepository.saveAll(appointments);
+        return result;
+    }
+
+    @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
+    @Override
+    public void cancelAppointmentsByAdminThroughIds(Integer[] ids) {
+        List<Appointment> appointments = appointmentRepository.findAppointmentByIds(Arrays.asList(ids));
+        if (appointments != null && appointments.size() == ids.length) {
+            for (Appointment appointment : appointments) {
+                if (appointment.getStatus().equals(AppointmentStatus.CANCEL.getStatus())) {
+                    throw new AppointmentDaoException("该预约已被撤销，不可重复撤销!");
+                }
+
+                if (appointment.getStatus().equals(AppointmentStatus.ILLEGAL.getStatus()) || appointment.getStatus().equals(AppointmentStatus.FINISH.getStatus()) || appointment.getStatus().equals(AppointmentStatus.MISSED.getStatus())) {
+                    throw new AppointmentDaoException("该预约已不可撤销!");
+                }
+
+                appointment.setStatus(AppointmentStatus.CANCEL.getStatus());
+            }
+        } else {
+            throw new AppointmentDaoException("预约记录不存在");
+        }
+
+        appointmentRepository.saveAll(appointments);
+    }
+
+
+    @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
+    @Override
     public void cancelAppointmentById(Integer id) {
         Appointment appointment = appointmentRepository.findAppointmentById(id);
         if (appointment != null) {
@@ -130,6 +235,12 @@ public class AppointmentServiceImpl implements AppointmentService {
         } else {
             throw new AppointmentDaoException("不存在该预约记录!");
         }
+    }
+
+    @Override
+    public List<Appointment> getAllAppointmentsAppointedByAdmin() {
+        List<Appointment> appointments = appointmentRepository.findAppointmentAppointedByAdmin();
+        return appointments;
     }
 
     @Transactional(readOnly = true)

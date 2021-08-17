@@ -20,7 +20,13 @@ public interface AppointmentService {
 
     void addANewAppointment(Appointment appointment);
 
+    List<Appointment> addNewAppointmentsByAdmin(List<Appointment> appointments);
+
+    void cancelAppointmentsByAdminThroughIds(Integer[] ids);
+
     void cancelAppointmentById(Integer id);
+
+    List<Appointment> getAllAppointmentsAppointedByAdmin();
 
     List<Appointment> getAllAppointment(String status);
 
