@@ -1,14 +1,19 @@
 package cn.edu.bit.ruixin.community.service.impl;
 
 import cn.edu.bit.ruixin.community.domain.Appointment;
+import cn.edu.bit.ruixin.community.domain.Room;
 import cn.edu.bit.ruixin.community.domain.Schedule;
 import cn.edu.bit.ruixin.community.domain.User;
+import cn.edu.bit.ruixin.community.domain.WxMsgTemplateVo;
 import cn.edu.bit.ruixin.community.exception.AppointmentDaoException;
 import cn.edu.bit.ruixin.community.myenum.AppointmentStatus;
 import cn.edu.bit.ruixin.community.repository.AppointmentRepository;
+import cn.edu.bit.ruixin.community.repository.RoomsRepository;
 import cn.edu.bit.ruixin.community.repository.ScheduleRepository;
 import cn.edu.bit.ruixin.community.repository.UserRepository;
 import cn.edu.bit.ruixin.community.service.AppointmentService;
+import cn.edu.bit.ruixin.community.service.WechatService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -39,6 +44,12 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private WechatService wechatService;
+
+    @Autowired
+    private RoomsRepository roomsRepository;
 
     @Transactional(readOnly = true)
     @Override
@@ -177,6 +188,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                         if (!app.getId().equals(appointment.getId())) {
                             app.setStatus(AppointmentStatus.REJECT.getStatus());
                             appointmentRepository.save(app);
+                            notifyUser(app);
                         }
                     }
                 }
@@ -184,6 +196,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 appointment.setConductor(conductor);
                 appointment.setCheckNote(checkNote);
                 appointmentRepository.save(appointment);
+                notifyUser(appointment);
             } else {
                 throw new AppointmentDaoException("审批人姓名不可为空!");
             }
@@ -213,4 +226,44 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
         throw new AppointmentDaoException("不存在该学号用户！");
     }
+
+    private Date getExecDate(Date execDate,String begin) throws AppointmentDaoException{
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String date = dateFormat.format(execDate);
+        String dateTime = date + " " + begin;
+        try {
+            return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(dateTime);
+        } catch (ParseException e) {
+            throw new AppointmentDaoException("实际执行预约使用的时间格式有误！");
+        }
+    }
+
+    private void notifyUser(Appointment appointment) {
+            // 生成模板消息，通知预约人
+            String launcherName = appointment.getLauncher();
+            if(launcherName.length() > 0){
+                WxMsgTemplateVo message = new WxMsgTemplateVo();
+                User launcher = userRepository.findUserByUsername(launcherName);
+                message.setName5(launcher.getName());
+                Room room = roomsRepository.getOne(appointment.getRoomId());
+                message.setThing2(room.getName());
+                
+                Date execDate = appointment.getExecDate();
+                Schedule beginS = scheduleRepository.getOne(appointment.getBegin());
+                String begin = beginS.getBegin();
+                message.setDate3(getExecDate(execDate, begin));
+
+                Schedule endS = scheduleRepository.getOne(appointment.getEnd());
+                String end = endS.getBegin();
+                message.setDate4(getExecDate(execDate, end));
+                
+                try{ //ignore failure 
+                    wechatService.notifyWechatUser(launcherName,message);
+                }catch(Exception e){
+                    // TODO 日志服务.记录("通知预约人时发生错误!");
+                }
+            }
+    }
+
+    
 }
