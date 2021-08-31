@@ -137,7 +137,7 @@ public class MsgCheck {
         if (responseBody == null) {
             throw new RuntimeException("服务器异常，请重试！");
         }
-        return responseBody.getErrcode() == 87014;
+        return responseBody.getErrcode() != 87014;
         
     }
 }
