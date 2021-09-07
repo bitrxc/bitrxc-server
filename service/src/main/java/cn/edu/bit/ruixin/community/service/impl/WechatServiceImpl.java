@@ -45,7 +45,7 @@ public class WechatServiceImpl implements WechatService {
     public void notifyWechatUser(String openid,WxMsgTemplateVo appointmentinfo) throws JsonMappingException, JsonProcessingException  {
         // TODO Auto-generated method stub
         WxAppAccessVo accessVo = ensureAccessToken();
-        String url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret="+accessVo.getAccess_token();
+        String url = "https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=" + accessVo.getAccess_token();
         // 封装HTTP请求
         // 请求头，其实是一种多值Map
         HttpHeaders headers = new HttpHeaders();
