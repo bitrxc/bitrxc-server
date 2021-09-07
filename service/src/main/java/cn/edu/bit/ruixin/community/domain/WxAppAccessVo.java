@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
+ * 服务器的接口调用凭据( access_token )接口的返回类型
  * TODO
  *
  * @author 78165

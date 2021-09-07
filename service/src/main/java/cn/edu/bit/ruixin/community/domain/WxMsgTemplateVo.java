@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 服务器的接口调用凭据 (access_token) 接口的返回类型
+ * 微信订阅消息的模板参数，模板id{@code F5-LCFCIXt04AY0WPSC0vJAQsjyFXOn2vltNKXs5ABQ}
  *
  * @author jingkaimori
  * @date 2021/8/24
