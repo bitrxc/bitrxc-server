@@ -81,6 +81,12 @@ public class AdminController {
         }
     }
 
+    @GetMapping("/roles")
+    public CommonResult getAllRoles() {
+        List<Role> roles = roleService.getAllRoles();
+        return CommonResult.ok(ResultCode.SUCCESS).data("roles",roles);
+    }
+
     /**
      * 获取管理员分页列表
      *
