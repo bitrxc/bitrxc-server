@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
+ * 小程序用户登录接口的返回类型
  * TODO
  *
  * @author 78165

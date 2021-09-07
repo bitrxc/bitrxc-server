@@ -14,6 +14,8 @@ import cn.edu.bit.ruixin.community.repository.UserRepository;
 import cn.edu.bit.ruixin.community.service.AppointmentService;
 import cn.edu.bit.ruixin.community.service.WechatService;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -50,6 +52,8 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Autowired
     private RoomsRepository roomsRepository;
+
+    private Logger logger = LogManager.getLogger(AppointmentService.class);
 
     @Transactional(readOnly = true)
     @Override
@@ -257,10 +261,10 @@ public class AppointmentServiceImpl implements AppointmentService {
                 String end = endS.getBegin();
                 message.setDate4(getExecDate(execDate, end));
                 
-                try{ //ignore failure 
+                try{ //log and ignore failure 
                     wechatService.notifyWechatUser(launcherName,message);
                 }catch(Exception e){
-                    // TODO 日志服务.记录("通知预约人时发生错误!");
+                    logger.debug("通知预约人时发生错误!");
                 }
             }
     }

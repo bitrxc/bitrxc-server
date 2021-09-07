@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
+ * 敏感词检查结果的返回类型
  * TODO
  *
  * @author 78165
