@@ -1,5 +1,6 @@
 package cn.edu.bit.ruixin.community.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,15 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public List<Role> getAllRoles() {
         return roleRepository.findAll();
+    }
+
+    @Override
+    public List<Role> getRoles(List<Integer> ids) {
+        List<Role> roles = new ArrayList<Role>();
+        for(int rid : ids){
+            roles.add(roleRepository.getOne(rid));
+        }
+        return roles;
     }
     
 }

@@ -163,4 +163,28 @@ public class AdminController {
         adminService.assignRoleToAdmin(id, role_id);
         return CommonResult.ok(ResultCode.SUCCESS).msg("分配角色成功！");
     }
+    
+    /**
+     * 修改管理员权限，并更新redis缓存使权限修改生效
+     * 注意，修改权限后，会产生新的 token ，新 token 内有提升的权限
+     * TODO 旧 token 失效
+     */
+    @PostMapping("/managers/{id}/roles")
+    public CommonResult modifyAdminRoles(@PathVariable(name = "id") int id,
+                                    @RequestBody(required = true) List<Integer> roles) {
+        Admin admin = adminService.modifyAdminRoleByAdminId(id, roles);
+        List<Role> rolelist = roleService.getRoles(roles);
+        AdminInfoVo infoVo = AdminInfoVo.convertToVo(admin);
+        infoVo.setRoleList(rolelist);
+            // 生成token，放置Redis中
+        String token = tokenManager.createTokenForAdmin(infoVo.getMobile());
+        try {
+            redisService.opsForValueSetWithExpire(token, infoVo, 30, TimeUnit.MINUTES);
+
+            return CommonResult.ok(ResultCode.SUCCESS).msg("权限修改成功!").data("userInfo", infoVo).data("token", token);
+        } catch (JsonProcessingException e) {
+            return CommonResult.error(ResultCode.INTERNAL_SERVER_ERROR).msg("权限修改失败，请重试！");
+        }
+        
+    }
 }
