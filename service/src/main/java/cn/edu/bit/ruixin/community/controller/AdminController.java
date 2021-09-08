@@ -81,7 +81,7 @@ public class AdminController {
         }
     }
 
-    @GetMapping("/roles")
+    @GetMapping("/managers/roles")
     public CommonResult getAllRoles() {
         List<Role> roles = roleService.getAllRoles();
         return CommonResult.ok(ResultCode.SUCCESS).data("roles",roles);
