@@ -42,7 +42,7 @@ public class WechatServiceImpl implements WechatService {
      * 通知微信用户
      */
     @Override
-    public void notifyWechatUser(String openid,WxMsgTemplateVo appointmentinfo) throws JsonMappingException, JsonProcessingException  {
+    public void notifyWechatUser(String openid,WxMsgTemplateVo appointmentinfo) throws JsonMappingException, JsonProcessingException, RuntimeException  {
         // TODO Auto-generated method stub
         WxAppAccessVo accessVo = ensureAccessToken();
         String url = "https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=" + accessVo.getAccess_token();

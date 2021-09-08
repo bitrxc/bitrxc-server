@@ -261,10 +261,11 @@ public class AppointmentServiceImpl implements AppointmentService {
                 String end = endS.getBegin();
                 message.setDate4(getExecDate(execDate, end));
                 
-                try{ //log and ignore failure 
+                try{ //Notify fail should not cause appoint fail,so log and ignore failure 
                     wechatService.notifyWechatUser(launcherName,message);
                 }catch(Exception e){
                     logger.debug("通知预约人时发生错误!");
+                    logger.debug(e);
                 }
             }
     }
