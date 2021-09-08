@@ -104,8 +104,7 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public Admin modifyAdminRoleByAdminId(int aid,List<Integer> rids) {
-        Admin admin = adminRepository.getOne(aid) ;
-        List<AdminRole> adminRoles = adminRoleRepository.findAdminRolesByAdmin(admin);
+        List<AdminRole> adminRoles = adminRoleRepository.findAdminRolesByAdminId(aid);
         Iterator<AdminRole> adminRolesIt = adminRoles.iterator();
         for(int rid : rids){
             if(adminRolesIt.hasNext()){
@@ -126,6 +125,7 @@ public class AdminServiceImpl implements AdminService {
         }
         adminRoleRepository.saveAll(adminRoles);
         adminRoleRepository.deleteAll(removableAdminRoles);
+        Admin admin = adminRepository.getOne(aid) ;
         return admin;
     }
 }

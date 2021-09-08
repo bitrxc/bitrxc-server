@@ -25,5 +25,5 @@ public interface AdminRoleRepository extends JpaRepository<AdminRole, Integer>, 
     @Query(nativeQuery = true, value = "INSERT INTO `admin_role`(`admin_id`, `role_id`) VALUES (?, ?)")
     void assignRoleToAdmin(int id, int role_id);
 
-    List<AdminRole> findAdminRolesByAdmin(Admin admin);
+    List<AdminRole> findAdminRolesByAdminId(int aid);
 }
