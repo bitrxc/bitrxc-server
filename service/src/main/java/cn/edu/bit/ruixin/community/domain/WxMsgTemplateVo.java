@@ -12,9 +12,14 @@ import lombok.NoArgsConstructor;
  * @author jingkaimori
  * @date 2021/8/24
  */
+@Data
 public class WxMsgTemplateVo {
     public WxMsgTemplateVo(){
         this.name5 = new Wrapper<String>();
+        this.thing2 = new Wrapper<String>();
+        this.date3 = new Wrapper<Date>();
+        this.date4 = new Wrapper<Date>();
+        this.phrase8 = new Wrapper<String>();
     }
 
     public void setName5(String arg) {
