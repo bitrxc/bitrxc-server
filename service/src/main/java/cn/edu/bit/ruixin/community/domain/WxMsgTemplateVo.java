@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
  * @author jingkaimori
  * @date 2021/8/24
  */
+@Data
 public class WxMsgTemplateVo {
     public WxMsgTemplateVo(){
         this.name5 = new Wrapper<String>();
