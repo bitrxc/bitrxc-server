@@ -262,9 +262,9 @@ public class AppointmentServiceImpl implements AppointmentService {
                 message.setDate4(getExecDate(execDate, end));
 
                 //TODO 状态的本地化显示
-                if(appointment.getStatus() == "receive"){
+                if(appointment.getStatus().equals("receive")){
                     message.setPhrase8("通过");
-                }else if(appointment.getStatus() == "reject"){
+                }else if(appointment.getStatus().equals("reject")){
                     message.setPhrase8("拒绝");
                 }else{
                     message.setPhrase8("未知");
