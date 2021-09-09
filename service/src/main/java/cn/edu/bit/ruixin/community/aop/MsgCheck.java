@@ -123,13 +123,12 @@ public class MsgCheck {
         // 请求头，其实是一种多值Map
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+
         // 封装请求体，json类型
         Map<String, String> map = new HashMap<>();
         map.put("content", content);
-
         String valueAsString = mapper.writeValueAsString(map);
 
-        headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(valueAsString, headers);
         ResponseEntity<WxAppResultVo> response = restTemplate.postForEntity(postUrl, request, WxAppResultVo.class);
         // 获取响应体
