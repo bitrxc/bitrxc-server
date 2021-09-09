@@ -267,7 +267,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 }else if(appointment.getStatus() == "reject"){
                     message.setPhrase8("拒绝");
                 }else{
-                    message.setPhrase8(appointment.getStatus());
+                    message.setPhrase8("未知");
                 }
                 
                 try{ //Notify fail should not cause appoint fail,so log and ignore failure 

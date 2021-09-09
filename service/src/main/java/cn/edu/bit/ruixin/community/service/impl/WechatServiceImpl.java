@@ -1,5 +1,6 @@
 package cn.edu.bit.ruixin.community.service.impl;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -43,6 +45,8 @@ public class WechatServiceImpl implements WechatService {
      */
     @Override
     public void notifyWechatUser(String openid,WxMsgTemplateVo appointmentinfo) throws JsonMappingException, JsonProcessingException, RuntimeException  {
+        // 将字符编码调整为utf-8
+        restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
         // TODO Auto-generated method stub
         WxAppAccessVo accessVo = ensureAccessToken();
         String url = "https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=" + accessVo.getAccess_token();
