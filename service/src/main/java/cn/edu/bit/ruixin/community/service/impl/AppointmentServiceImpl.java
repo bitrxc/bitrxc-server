@@ -260,6 +260,15 @@ public class AppointmentServiceImpl implements AppointmentService {
                 Schedule endS = scheduleRepository.getOne(appointment.getEnd());
                 String end = endS.getEnd();
                 message.setDate4(getExecDate(execDate, end));
+
+                //TODO 状态的本地化显示
+                if(appointment.getStatus() == "receive"){
+                    message.setPhrase8("通过");
+                }else if(appointment.getStatus() == "reject"){
+                    message.setPhrase8("拒绝");
+                }else{
+                    message.setPhrase8(appointment.getStatus());
+                }
                 
                 try{ //Notify fail should not cause appoint fail,so log and ignore failure 
                     wechatService.notifyWechatUser(launcherName,message);
