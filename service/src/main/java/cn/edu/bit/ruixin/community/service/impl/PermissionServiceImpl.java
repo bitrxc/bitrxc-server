@@ -2,12 +2,15 @@ package cn.edu.bit.ruixin.community.service.impl;
 
 import cn.edu.bit.ruixin.community.domain.Permission;
 import cn.edu.bit.ruixin.community.domain.Role;
+import cn.edu.bit.ruixin.community.domain.RolePermission;
 import cn.edu.bit.ruixin.community.repository.PermissionRepository;
 import cn.edu.bit.ruixin.community.repository.RolePermissionRepository;
 import cn.edu.bit.ruixin.community.service.PermissionService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,11 +62,11 @@ public class PermissionServiceImpl implements PermissionService {
         for(Role i : roles){
             rolesId.add(i.getId());
         }
-        List<Integer> permids=rolePermissionRepository.getPermissionIdByRoleIdIn(rolesId);
-        List<Permission> perms = new ArrayList<Permission>();
-        for(Integer i:permids){
-            perms.add(permissionRepository.getOne(i));
+        List<RolePermission> permids=rolePermissionRepository.getByRoleIdIn(rolesId);
+        Set<Permission> perms = new TreeSet<Permission>();
+        for(RolePermission i:permids){
+            perms.add(permissionRepository.getOne(i.getPermissionId()));
         }
-        return perms;
+        return new ArrayList<Permission>(perms);
     };
 }

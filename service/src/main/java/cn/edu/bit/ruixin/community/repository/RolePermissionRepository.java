@@ -26,5 +26,5 @@ public interface RolePermissionRepository extends
     JpaSpecificationExecutor<RolePermission> {
     Boolean existsRolePermissionByPermissionIdEqualsAndRoleIdIn(Integer permission, List<Integer> roles);
 
-    List<Integer> getPermissionIdByRoleIdIn(List<Integer> roles);
+    List<RolePermission> getByRoleIdIn(List<Integer> roles);
 }
