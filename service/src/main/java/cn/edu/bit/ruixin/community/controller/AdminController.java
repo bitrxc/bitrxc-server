@@ -5,8 +5,10 @@ import cn.edu.bit.ruixin.base.common.ResultCode;
 import cn.edu.bit.ruixin.base.security.utils.TokenManager;
 import cn.edu.bit.ruixin.community.annotation.MsgSecCheck;
 import cn.edu.bit.ruixin.community.domain.Admin;
+import cn.edu.bit.ruixin.community.domain.Permission;
 import cn.edu.bit.ruixin.community.domain.Role;
 import cn.edu.bit.ruixin.community.service.AdminService;
+import cn.edu.bit.ruixin.community.service.PermissionService;
 import cn.edu.bit.ruixin.community.service.RedisService;
 import cn.edu.bit.ruixin.community.service.RoleService;
 import cn.edu.bit.ruixin.community.vo.AdminInfoVo;
@@ -46,6 +48,9 @@ public class AdminController {
     private RoleService  roleService;
 
     @Autowired
+    private PermissionService permissionService;
+
+    @Autowired
     private RedisService redisService;
 
 
@@ -63,8 +68,15 @@ public class AdminController {
         Admin loginAdmin = adminService.login(admin);
 
         AdminInfoVo adminInfoVo = AdminInfoVo.convertToVo(loginAdmin);
-        // 添加用户角色信息
+        // 添加用户角色、查询并添加用户可访问接口
+        // add user's permission, gather url entry points avaliable for user, return both of them
         List<Role> roles = roleService.getRolesByAdminId(loginAdmin.getId());
+        List<Permission> permissions = permissionService.getPermissionsByRoles(roles);
+        List<String> urls = new ArrayList<String>();
+        for(Permission i:permissions){
+            urls.add(i.getUrl());
+        }
+        adminInfoVo.setUrlList(urls);
         adminInfoVo.setRoleList(roles);
         // 暂时补救措施：将密码设为空串以避免从redis取出内容时报错
         // TODO: adminInfoVo 移除密码字段
