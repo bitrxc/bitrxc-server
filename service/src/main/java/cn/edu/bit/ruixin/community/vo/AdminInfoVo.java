@@ -27,6 +27,7 @@ public class AdminInfoVo {
     private String password;
 
     private List<Role> roleList = new ArrayList<>();
+    private List<String> urlList = new ArrayList<>();
 
     public static Admin convertToPo(AdminInfoVo infoVo) {
         Admin admin = new Admin();

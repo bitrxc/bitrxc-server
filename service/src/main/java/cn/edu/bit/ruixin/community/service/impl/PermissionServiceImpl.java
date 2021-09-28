@@ -49,5 +49,21 @@ public class PermissionServiceImpl implements PermissionService {
             rolesId.add(i.getId());
         }
         return rolePermissionRepository.existsRolePermissionByPermissionIdEqualsAndRoleIdIn(perId, rolesId);
+    }
+
+    @Override
+    public List<Permission> getPermissionsByRoles(List<Role> roles) {
+        // TODO need confirm
+        List<Integer> rolesId=new ArrayList<Integer>();
+        
+        for(Role i : roles){
+            rolesId.add(i.getId());
+        }
+        List<Integer> permids=rolePermissionRepository.getPermissionIdByRoleIdIn(rolesId);
+        List<Permission> perms = new ArrayList<Permission>();
+        for(Integer i:permids){
+            perms.add(permissionRepository.getOne(i));
+        }
+        return perms;
     };
 }
