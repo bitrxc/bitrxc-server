@@ -8,6 +8,7 @@ import cn.edu.bit.ruixin.community.repository.RolePermissionRepository;
 import cn.edu.bit.ruixin.community.service.PermissionService;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -63,7 +64,7 @@ public class PermissionServiceImpl implements PermissionService {
             rolesId.add(i.getId());
         }
         List<RolePermission> permids=rolePermissionRepository.getByRoleIdIn(rolesId);
-        Set<Permission> perms = new TreeSet<Permission>();
+        Set<Permission> perms = new HashSet<Permission>() ;
         for(RolePermission i:permids){
             perms.add(permissionRepository.getOne(i.getPermissionId()));
         }
