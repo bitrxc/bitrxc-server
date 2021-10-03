@@ -202,8 +202,10 @@ public class AppointmentServiceImpl implements AppointmentService {
                 appointmentRepository.save(appointment);
                 notifyUser(appointment);
             } else {
-                throw new AppointmentDaoException("审批人姓名不可为空!");
+                throw new AppointmentDaoException("审批人姓名不可为空！");
             }
+        } else {
+            throw new AppointmentDaoException("预约不存在！");
         }
     }
 
