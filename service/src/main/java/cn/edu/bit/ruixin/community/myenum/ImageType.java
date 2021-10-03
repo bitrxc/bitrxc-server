@@ -1,7 +1,8 @@
 package cn.edu.bit.ruixin.community.myenum;
 
 /**
- * TODO
+ * Enum for accepted MIME type
+ * TODO replace this with Spring's MIME enumation
  *
  * @author 78165
  * @date 2021/3/15

@@ -5,8 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 敏感词检查结果的返回类型
- * TODO
+ * 只返回错误码的微信接口的返回类型
  *
  * @author 78165
  * @date 2021/4/6
