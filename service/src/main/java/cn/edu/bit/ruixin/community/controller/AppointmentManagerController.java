@@ -187,4 +187,11 @@ public class AppointmentManagerController {
                         })
                         .collect(Collectors.toList()));
     }
+
+    //TODO 根据房间获取可用时段
+    @GetMapping("/availablePeriod/{room_id}")
+    public CommonResult getAvailablePeriodByRoomId(@PathVariable(name="room_id") Integer id) {
+
+        return null;
+    }
 }

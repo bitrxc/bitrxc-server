@@ -277,4 +277,23 @@ public class RoomServiceImpl implements RoomService {
 
         return map;
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, List<Schedule>> getRoomFreeTimeByAdmin(Integer roomId, String date) {
+        Date nowDate = new Date();
+
+        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        List<Schedule> allTime = scheduleRepository.findAll();
+
+        /***
+        List<Schedule> passTime = allTime.stream().forEach(time -> {
+
+        })  ;
+         ***/
+
+        return null;
+    }
 }
