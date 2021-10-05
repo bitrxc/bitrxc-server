@@ -1,5 +1,15 @@
 package cn.edu.bit.ruixin.community.service.impl;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
 import cn.edu.bit.ruixin.base.security.utils.DefaultPasswordEncoder;
 import cn.edu.bit.ruixin.community.domain.Admin;
 import cn.edu.bit.ruixin.community.domain.AdminRole;
@@ -7,11 +17,6 @@ import cn.edu.bit.ruixin.community.exception.UserDaoException;
 import cn.edu.bit.ruixin.community.repository.AdminRepository;
 import cn.edu.bit.ruixin.community.repository.AdminRoleRepository;
 import cn.edu.bit.ruixin.community.service.AdminService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 
 /**
  * TODO 制定事务管理
@@ -90,5 +95,37 @@ public class AdminServiceImpl implements AdminService {
         adminRole.setAdminId(id);
         adminRole.setRoleId(role_id);
         adminRoleRepository.save(adminRole);
+    }
+    
+    /**
+     * 将管理员的权限设置为参数列表中的权限，并移除先前所有权限。
+     * 就地更新 admin_role 表的记录
+     * @return rid列表对应的角色列表
+     */
+    @Override
+    public Admin modifyAdminRoleByAdminId(int aid,List<Integer> rids) {
+        List<AdminRole> adminRoles = adminRoleRepository.findAdminRolesByAdminId(aid);
+        Iterator<AdminRole> adminRolesIt = adminRoles.iterator();
+        for(int rid : rids){
+            if(adminRolesIt.hasNext()){
+                AdminRole curAR = adminRolesIt.next();
+                curAR.setAdminId(aid);
+                curAR.setRoleId(rid);
+            }else{
+                AdminRole newAR = new AdminRole();
+                newAR.setAdminId(aid);
+                newAR.setRoleId(rid);
+                adminRoles.add(newAR);
+            }
+        }
+        // 删除多余的权限
+        List<AdminRole> removableAdminRoles = new ArrayList<AdminRole>();
+        while(adminRolesIt.hasNext()){
+            removableAdminRoles.add(adminRolesIt.next()) ;
+        }
+        adminRoleRepository.saveAll(adminRoles);
+        adminRoleRepository.deleteAll(removableAdminRoles);
+        Admin admin = adminRepository.getOne(aid) ;
+        return admin;
     }
 }

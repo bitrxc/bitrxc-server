@@ -2,12 +2,16 @@ package cn.edu.bit.ruixin.community.service.impl;
 
 import cn.edu.bit.ruixin.community.domain.Permission;
 import cn.edu.bit.ruixin.community.domain.Role;
+import cn.edu.bit.ruixin.community.domain.RolePermission;
 import cn.edu.bit.ruixin.community.repository.PermissionRepository;
 import cn.edu.bit.ruixin.community.repository.RolePermissionRepository;
 import cn.edu.bit.ruixin.community.service.PermissionService;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,5 +53,21 @@ public class PermissionServiceImpl implements PermissionService {
             rolesId.add(i.getId());
         }
         return rolePermissionRepository.existsRolePermissionByPermissionIdEqualsAndRoleIdIn(perId, rolesId);
+    }
+
+    @Override
+    public List<Permission> getPermissionsByRoles(List<Role> roles) {
+        // TODO need confirm
+        List<Integer> rolesId=new ArrayList<Integer>();
+        
+        for(Role i : roles){
+            rolesId.add(i.getId());
+        }
+        List<RolePermission> permids=rolePermissionRepository.getByRoleIdIn(rolesId);
+        Set<Permission> perms = new HashSet<Permission>() ;
+        for(RolePermission i:permids){
+            perms.add(permissionRepository.getOne(i.getPermissionId()));
+        }
+        return new ArrayList<Permission>(perms);
     };
 }

@@ -17,4 +17,6 @@ public interface PermissionService {
     Permission getPermissionByURL(String url);
 
     Boolean checkPermission(Permission perm, List<Role> roles);
+
+    List<Permission> getPermissionsByRoles(List<Role> roles);
 }

@@ -1,14 +1,14 @@
 package cn.edu.bit.ruixin.community.service.impl;
 
-import cn.edu.bit.ruixin.community.domain.Role;
-import cn.edu.bit.ruixin.community.repository.AdminRoleRepository;
-import cn.edu.bit.ruixin.community.repository.RoleRepository;
-import cn.edu.bit.ruixin.community.service.RoleService;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import cn.edu.bit.ruixin.community.domain.Role;
+import cn.edu.bit.ruixin.community.repository.RoleRepository;
+import cn.edu.bit.ruixin.community.service.RoleService;
 
 /**
  * TODO
@@ -26,4 +26,19 @@ public class RoleServiceImpl implements RoleService {
     public List<Role> getRolesByAdminId(Integer id) {
         return roleRepository.findAdminRoles(id);
     }
+
+    @Override
+    public List<Role> getAllRoles() {
+        return roleRepository.findAll();
+    }
+
+    @Override
+    public List<Role> getRoles(List<Integer> ids) {
+        List<Role> roles = new ArrayList<Role>();
+        for(int rid : ids){
+            roles.add(roleRepository.getOne(rid));
+        }
+        return roles;
+    }
+    
 }

@@ -5,8 +5,10 @@ import cn.edu.bit.ruixin.base.common.ResultCode;
 import cn.edu.bit.ruixin.base.security.utils.TokenManager;
 import cn.edu.bit.ruixin.community.annotation.MsgSecCheck;
 import cn.edu.bit.ruixin.community.domain.Admin;
+import cn.edu.bit.ruixin.community.domain.Permission;
 import cn.edu.bit.ruixin.community.domain.Role;
 import cn.edu.bit.ruixin.community.service.AdminService;
+import cn.edu.bit.ruixin.community.service.PermissionService;
 import cn.edu.bit.ruixin.community.service.RedisService;
 import cn.edu.bit.ruixin.community.service.RoleService;
 import cn.edu.bit.ruixin.community.vo.AdminInfoVo;
@@ -46,6 +48,9 @@ public class AdminController {
     private RoleService  roleService;
 
     @Autowired
+    private PermissionService permissionService;
+
+    @Autowired
     private RedisService redisService;
 
 
@@ -63,8 +68,15 @@ public class AdminController {
         Admin loginAdmin = adminService.login(admin);
 
         AdminInfoVo adminInfoVo = AdminInfoVo.convertToVo(loginAdmin);
-        // 添加用户角色信息
+        // 添加用户角色、查询并添加用户可访问接口
+        // add user's permission, gather url entry points avaliable for user, return both of them
         List<Role> roles = roleService.getRolesByAdminId(loginAdmin.getId());
+        List<Permission> permissions = permissionService.getPermissionsByRoles(roles);
+        List<String> urls = new ArrayList<String>();
+        for(Permission i:permissions){
+            urls.add(i.getUrl());
+        }
+        adminInfoVo.setUrlList(urls);
         adminInfoVo.setRoleList(roles);
         // 暂时补救措施：将密码设为空串以避免从redis取出内容时报错
         // TODO: adminInfoVo 移除密码字段
@@ -79,6 +91,12 @@ public class AdminController {
         } catch (JsonProcessingException e) {
             return CommonResult.error(ResultCode.INTERNAL_SERVER_ERROR).msg("登录失败，请重试！");
         }
+    }
+
+    @GetMapping("/managers/roles")
+    public CommonResult getAllRoles() {
+        List<Role> roles = roleService.getAllRoles();
+        return CommonResult.ok(ResultCode.SUCCESS).data("roles",roles);
     }
 
     /**
@@ -156,5 +174,29 @@ public class AdminController {
     public CommonResult assignRoleToAdmin(@PathVariable("id") int id, @RequestParam("rid") int role_id) {
         adminService.assignRoleToAdmin(id, role_id);
         return CommonResult.ok(ResultCode.SUCCESS).msg("分配角色成功！");
+    }
+    
+    /**
+     * 修改管理员权限，并更新redis缓存使权限修改生效
+     * 注意，修改权限后，会产生新的 token ，新 token 内有提升的权限
+     * TODO 旧 token 失效
+     */
+    @PostMapping("/managers/{id}/roles")
+    public CommonResult modifyAdminRoles(@PathVariable(name = "id") int id,
+                                    @RequestBody(required = true) List<Integer> roles) {
+        Admin admin = adminService.modifyAdminRoleByAdminId(id, roles);
+        List<Role> rolelist = roleService.getRoles(roles);
+        AdminInfoVo infoVo = AdminInfoVo.convertToVo(admin);
+        infoVo.setRoleList(rolelist);
+            // 生成token，放置Redis中
+        String token = tokenManager.createTokenForAdmin(infoVo.getMobile());
+        try {
+            redisService.opsForValueSetWithExpire(token, infoVo, 30, TimeUnit.MINUTES);
+
+            return CommonResult.ok(ResultCode.SUCCESS).msg("权限修改成功!").data("userInfo", infoVo).data("token", token);
+        } catch (JsonProcessingException e) {
+            return CommonResult.error(ResultCode.INTERNAL_SERVER_ERROR).msg("权限修改失败，请重试！");
+        }
+        
     }
 }

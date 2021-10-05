@@ -61,12 +61,6 @@ public class MsgCheck {
         try {
             // 获取access_token
             WxAppAccessVo accessVo = mapper.readValue(accessResponse, WxAppAccessVo.class);
-            // 请求微信后台的敏感词检验
-            String postUrl = "https://api.weixin.qq.com/wxa/msg_sec_check?access_token="+accessVo.getAccess_token();
-            // 封装HTTP请求
-            // 请求头，其实是一种多值Map
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
 
             // 利用反射，获取切入点方法参数
             Object[] args = joinPoint.getArgs();
@@ -91,22 +85,8 @@ public class MsgCheck {
                 Object arg = args[i];
                 // String 类型 直接进行检验
                 if (arg instanceof String) {
-                    String content = (String) arg;
-                    // 封装请求体，json类型
-                    Map<String, String> map = new HashMap<>();
-                    map.put("content", content);
-
-                    String valueAsString = mapper.writeValueAsString(map);
-
-                    HttpEntity<String> request = new HttpEntity<>(valueAsString, headers);
-                    ResponseEntity<WxAppResultVo> response = restTemplate.postForEntity(postUrl, request, WxAppResultVo.class);
-                    // 获取响应体
-                    WxAppResultVo responseBody = response.getBody();
-                    if (responseBody == null) {
-                        throw new RuntimeException("服务器异常，请重试！");
-                    }
-                    if (responseBody.getErrcode() == 87014) {
-                        flag = false;
+                    flag = checkString((String) arg,accessVo.getAccess_token());
+                    if(!flag){
                         break;
                     }
                 } else { // 自定义类型检查打了标记的字段
@@ -118,19 +98,8 @@ public class MsgCheck {
                         FieldNeedCheck fnc = field.getAnnotation(FieldNeedCheck.class);
                         if (fnc != null && field.getType() == String.class) { // 打了检查标记注解，进行敏感词检查
                             field.setAccessible(true);
-                            HashMap<String, String> map = new HashMap<>();
-                            map.put("content", (String) field.get(arg));
-                            String valueAsString = mapper.writeValueAsString(map);
-                            HttpEntity<String> request = getHttpEntity(MediaType.APPLICATION_JSON, valueAsString);
-                            ResponseEntity<WxAppResultVo> response = restTemplate.postForEntity(postUrl, request, WxAppResultVo.class);
-
-                            // 获取响应体
-                            WxAppResultVo responseBody = response.getBody();
-                            if (responseBody == null) {
-                                throw new RuntimeException("服务器异常，请重试！");
-                            }
-                            if (responseBody.getErrcode() == 87014) {
-                                flag = false;
+                            flag = checkString((String) field.get(arg),accessVo.getAccess_token());
+                            if(!flag){
                                 break;
                             }
                         }
@@ -146,11 +115,28 @@ public class MsgCheck {
         }
     }
 
-    private <T> HttpEntity<T> getHttpEntity(MediaType mediaType, T body) {
+    /** 请求微信后台的敏感词检验 */ 
+    private Boolean checkString(String content,String token) throws JsonProcessingException {
+        
+        String postUrl = "https://api.weixin.qq.com/wxa/msg_sec_check?access_token="+token;
+        // 封装HTTP请求
+        // 请求头，其实是一种多值Map
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(mediaType);
-        HttpEntity<T> entity = new HttpEntity<>(body, headers);
-        return entity;
-    }
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
+        // 封装请求体，json类型
+        Map<String, String> map = new HashMap<>();
+        map.put("content", content);
+        String valueAsString = mapper.writeValueAsString(map);
+
+        HttpEntity<String> request = new HttpEntity<>(valueAsString, headers);
+        ResponseEntity<WxAppResultVo> response = restTemplate.postForEntity(postUrl, request, WxAppResultVo.class);
+        // 获取响应体
+        WxAppResultVo responseBody = response.getBody();
+        if (responseBody == null) {
+            throw new RuntimeException("服务器异常，请重试！");
+        }
+        return responseBody.getErrcode() != 87014;
+        
+    }
 }
