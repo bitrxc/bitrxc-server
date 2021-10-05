@@ -21,7 +21,7 @@ import org.springframework.web.client.RestTemplate;
 import cn.edu.bit.ruixin.community.domain.WxAppAccessVo;
 import cn.edu.bit.ruixin.community.domain.WxAppProperties;
 import cn.edu.bit.ruixin.community.domain.WxAppResultVo;
-import cn.edu.bit.ruixin.community.domain.WxMsgTemplateVo;
+import cn.edu.bit.ruixin.community.domain.WxMessageTemplateVo;
 import cn.edu.bit.ruixin.community.service.WechatService;
 
 @Service
@@ -44,7 +44,7 @@ public class WechatServiceImpl implements WechatService {
      * 通知微信用户
      */
     @Override
-    public void notifyWechatUser(String openid,WxMsgTemplateVo appointmentinfo) throws JsonMappingException, JsonProcessingException, RuntimeException  {
+    public void notifyWechatUser(String openid,WxMessageTemplateVo appointmentinfo) throws JsonMappingException, JsonProcessingException, RuntimeException  {
         // 将字符编码调整为utf-8
         restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
         // TODO Auto-generated method stub
@@ -58,7 +58,7 @@ public class WechatServiceImpl implements WechatService {
         // 封装请求体，json类型
         Map<String, Object> body = new HashMap<>();
         body.put("touser", openid);
-        body.put("template_id", "F5-LCFCIXt04AY0WPSC0vJAQsjyFXOn2vltNKXs5ABQ");
+        body.put("template_id", appointmentinfo.getType());
         body.put("miniprogram_state", "develop");
         body.put("data", appointmentinfo);
 

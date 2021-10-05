@@ -5,7 +5,8 @@ import cn.edu.bit.ruixin.community.domain.Appointment;
 import cn.edu.bit.ruixin.community.domain.Room;
 import cn.edu.bit.ruixin.community.domain.Schedule;
 import cn.edu.bit.ruixin.community.domain.User;
-import cn.edu.bit.ruixin.community.domain.WxMsgTemplateVo;
+import cn.edu.bit.ruixin.community.domain.WxAppointmentChangeTemplateVo;
+import cn.edu.bit.ruixin.community.domain.WxAppointmentPassTemplateVo;
 import cn.edu.bit.ruixin.community.exception.AppointmentDaoException;
 import cn.edu.bit.ruixin.community.myenum.AppointmentStatus;
 import cn.edu.bit.ruixin.community.repository.AdminRepository;
@@ -186,8 +187,10 @@ public class AppointmentServiceImpl implements AppointmentService {
             Date execDate = appointment.getExecDate();
             List<Appointment> conflictingAppointments = appointmentRepository.findConflictingAppointmentsAppointedByUser(roomId, execDate, appointmentBegin, appointmentEnd, AppointmentStatus.NEW.getStatus(), AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.SIGNED.getStatus());
             if (conflictingAppointments != null && conflictingAppointments.size() > 0) {
-                conflictingAppointments.stream()
-                        .forEach(a -> a.setStatus(AppointmentStatus.REJECT.getStatus()));
+                conflictingAppointments.stream().forEach(a -> {
+                    a.setStatus(AppointmentStatus.REJECT.getStatus());
+                    notifyUserChange(a);
+                });
                 result.addAll(conflictingAppointments);
             }
         }
@@ -303,7 +306,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                         if (!app.getId().equals(appointment.getId())) {
                             app.setStatus(AppointmentStatus.REJECT.getStatus());
                             appointmentRepository.save(app);
-                            notifyUser(app);
+                            notifyUserSuccess(appointment);
                         }
                     }
                 }
@@ -311,7 +314,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 appointment.setConductor(conductor);
                 appointment.setCheckNote(checkNote);
                 appointmentRepository.save(appointment);
-                notifyUser(appointment);
+                notifyUserSuccess(appointment);
             } else {
                 throw new AppointmentDaoException("审批人姓名不可为空！");
             }
@@ -355,42 +358,70 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
     }
 
-    private void notifyUser(Appointment appointment) {
-            // 生成模板消息，通知预约人
-            String launcherName = appointment.getLauncher();
-            if(launcherName.length() > 0){
-                WxMsgTemplateVo message = new WxMsgTemplateVo();
-                User launcher = userRepository.findUserByUsername(launcherName);
-                message.setName5(launcher.getName());
-                Room room = roomsRepository.getOne(appointment.getRoomId());
-                message.setThing2(room.getName());
+    private void notifyUserSuccess(Appointment appointment) {
+        // 生成模板消息，通知预约人
+        String launcherName = appointment.getLauncher();
+        if(launcherName.length() > 0){
+            WxAppointmentPassTemplateVo message = new WxAppointmentPassTemplateVo();
+            User launcher = userRepository.findUserByUsername(launcherName);
+            message.setName5(launcher.getName());
+            Room room = roomsRepository.getOne(appointment.getRoomId());
+            message.setThing2(room.getName());
 
-                Date execDate = appointment.getExecDate();
-                Schedule beginS = scheduleRepository.getOne(appointment.getBegin());
-                String begin = beginS.getBegin();
-                message.setDate3(getExecDate(execDate, begin));
+            Date execDate = appointment.getExecDate();
+            Schedule beginS = scheduleRepository.getOne(appointment.getBegin());
+            String begin = beginS.getBegin();
+            message.setDate3(getExecDate(execDate, begin));
 
-                Schedule endS = scheduleRepository.getOne(appointment.getEnd());
-                String end = endS.getEnd();
-                message.setDate4(getExecDate(execDate, end));
+            Schedule endS = scheduleRepository.getOne(appointment.getEnd());
+            String end = endS.getEnd();
+            message.setDate4(getExecDate(execDate, end));
 
-                //TODO 状态的本地化显示
-                if(appointment.getStatus().equals("receive")){
-                    message.setPhrase8("通过");
-                }else if(appointment.getStatus().equals("reject")){
-                    message.setPhrase8("拒绝");
-                }else{
-                    message.setPhrase8("未知");
-                }
-
-                try{ //Notify fail should not cause appoint fail,so log and ignore failure
-                    wechatService.notifyWechatUser(launcherName,message);
-                }catch(Exception e){
-                    logger.error("通知预约人时发生错误!");
-                    logger.error(e);
-                }
+            //TODO 状态的本地化显示
+            if(appointment.getStatus().equals("receive")){
+                message.setPhrase8("通过");
+            }else if(appointment.getStatus().equals("reject")){
+                message.setPhrase8("拒绝");
+            }else{
+                message.setPhrase8("未知");
             }
+
+            try{ //Notify fail should not cause appoint fail,so log and ignore failure
+                wechatService.notifyWechatUser(launcherName,message);
+            }catch(Exception e){
+                logger.error("通知预约人时发生错误!");
+                logger.error(e);
+            }
+        }
     }
 
+    
+    private void notifyUserChange(Appointment appointment) {
+        // 生成模板消息，通知预约人
+        String launcherName = appointment.getLauncher();
+        if(launcherName.length() > 0){
+            WxAppointmentChangeTemplateVo message = new WxAppointmentChangeTemplateVo();
+            User launcher = userRepository.findUserByUsername(launcherName);
+            message.setThing9(launcher.getName());
+
+            message.setThing17(appointment.getCheckNote());
+
+            message.setDate2(appointment.getLaunchDate());
+
+            //TODO 状态的本地化显示
+            if(appointment.getStatus().equals("reject")){
+                message.setPhrase16("预约失效");
+            }else{
+                message.setPhrase16("未知");
+            }
+
+            try{ //Notify fail should not cause appoint fail,so log and ignore failure
+                wechatService.notifyWechatUser(launcherName,message);
+            }catch(Exception e){
+                logger.error("通知被拒绝预约人时发生错误!");
+                logger.error(e);
+            }
+        }
+    }
 
 }
