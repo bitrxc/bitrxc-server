@@ -1,19 +1,15 @@
 package cn.edu.bit.ruixin.community.config;
 
-import cn.edu.bit.ruixin.community.filter.GlobalLoginFilter;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.servlet.MultipartAutoConfiguration;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-
-import javax.servlet.Filter;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * TODO
@@ -25,19 +21,19 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @EnableAutoConfiguration(exclude = {MultipartAutoConfiguration.class})
 public class MyWebConfig {
 
-    @Autowired
-    private GlobalLoginFilter loginFilter;
+    // @Autowired
+    // private GlobalLoginFilter loginFilter;
 
-    @Bean
-    public FilterRegistrationBean registerBean() {
-        System.out.println(loginFilter);
-        FilterRegistrationBean<Filter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(loginFilter);
-        registrationBean.addUrlPatterns("/*");
-        registrationBean.setName("globalAuthenticationFilter");
-        registrationBean.setOrder(1);
-        return registrationBean;
-    }
+    // @Bean
+    // public FilterRegistrationBean registerBean() {
+    //     System.out.println(loginFilter);
+    //     FilterRegistrationBean<Filter> registrationBean = new FilterRegistrationBean<>();
+    //     registrationBean.setFilter(loginFilter);
+    //     registrationBean.addUrlPatterns("/*");
+    //     registrationBean.setName("globalAuthenticationFilter");
+    //     registrationBean.setOrder(1);
+    //     return registrationBean;
+    // }
 
     @Bean
     public RestTemplate restTemplate() {

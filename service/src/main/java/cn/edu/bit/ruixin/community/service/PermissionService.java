@@ -1,5 +1,10 @@
 package cn.edu.bit.ruixin.community.service;
 
+import java.util.List;
+
+import cn.edu.bit.ruixin.community.domain.Permission;
+import cn.edu.bit.ruixin.community.domain.Role;
+
 /**
  * TODO
  *
@@ -9,4 +14,7 @@ package cn.edu.bit.ruixin.community.service;
 public interface PermissionService {
     boolean addPermission();
 
+    Permission getPermissionByURL(String url);
+
+    Boolean checkPermission(Permission perm, List<Role> roles);
 }

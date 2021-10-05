@@ -15,8 +15,8 @@ services:
       - mariadb
       - redis
     entrypoint: [ "/app/wait-for-it.sh", "mariadb:3306", "-s", "--",
-               "/app/wait-for-it.sh", "redis:6379", "-s", "--",
-               "sh", "-c", "java ${JAVA_OPTS} -jar /app/app.jar" ]
+                  "/app/wait-for-it.sh", "redis:6379", "-s", "--",
+                  "sh", "-c", "java ${JAVA_OPTS} -jar /app/app.jar" ]
 
   mariadb:
     image: "mariadb:10.5"

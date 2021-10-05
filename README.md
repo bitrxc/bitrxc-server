@@ -1,10 +1,6 @@
 # bitrxc-server
 
-<<<<<<< HEAD
 [![Build Status](https://jenkins.hyperzsb.tech/buildStatus/icon?job=bitrxc-dev%2Fbitrxc-server-dev)](https://jenkins.hyperzsb.tech/job/bitrxc-dev/job/bitrxc-server-dev/)
-=======
-[![Build Status](https://jenkins.hyperzsb.tech/buildStatus/icon?job=bitrxc%2Fbitrxc-server)](https://jenkins.hyperzsb.tech/job/bitrxc/job/bitrxc-server/)
->>>>>>> dev-gjf
 
 This is the server of Management System of BIT Ruixin Community.
 

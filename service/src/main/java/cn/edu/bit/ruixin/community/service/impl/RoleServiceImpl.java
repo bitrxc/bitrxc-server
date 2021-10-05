@@ -1,6 +1,7 @@
 package cn.edu.bit.ruixin.community.service.impl;
 
 import cn.edu.bit.ruixin.community.domain.Role;
+import cn.edu.bit.ruixin.community.repository.AdminRoleRepository;
 import cn.edu.bit.ruixin.community.repository.RoleRepository;
 import cn.edu.bit.ruixin.community.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,6 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public List<Role> getRolesByAdminId(Integer id) {
-        return roleRepository.findRolesByAdminId(id);
+        return roleRepository.findAdminRoles(id);
     }
 }
