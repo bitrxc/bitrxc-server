@@ -19,10 +19,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * TODO
@@ -46,7 +44,7 @@ public class AppointmentManagerController {
 
 
     @GetMapping("")
-    public CommonResult lookupAppointmentById(@RequestParam("id")Integer id) {
+    public CommonResult lookupAppointmentById(@RequestParam("id") Integer id) {
         Appointment appointment = appointmentService.getAppointmentById(id);
 
         AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
@@ -60,7 +58,7 @@ public class AppointmentManagerController {
     }
 
     @GetMapping("/{current}/{limit}/{schoolId}")
-    public CommonResult lookupAppointmentBySchoolId(@PathVariable("current")int current,@PathVariable("limit") int limit, @PathVariable("schoolId") String schoolId) {
+    public CommonResult lookupAppointmentBySchoolId(@PathVariable("current") int current, @PathVariable("limit") int limit, @PathVariable("schoolId") String schoolId) {
         // 构造分页对象
         Pageable pageable = PageRequest.of(current, limit);
         Page<Appointment> page = appointmentService.getAppointmentsBySchoolId(pageable, schoolId);
@@ -87,12 +85,12 @@ public class AppointmentManagerController {
     }
 
     @GetMapping("all")
-    public CommonResult getAllAppointment(@RequestParam(required = false, name = "status")String status) {
+    public CommonResult getAllAppointment(@RequestParam(required = false, name = "status") String status) {
         List<Appointment> list = appointmentService.getAllAppointment(status);
         List<AppointmentInfoVo> infoVos = new ArrayList<>();
 
-        for (Appointment appointment:list
-             ) {
+        for (Appointment appointment : list
+        ) {
             AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
             User user = userService.getUserByUsername(infoVo.getLauncher());
             Room room = roomService.getRoomInfoById(infoVo.getRoomId());
@@ -106,12 +104,13 @@ public class AppointmentManagerController {
 
     /**
      * 分页查询
+     *
      * @param current
      * @param limit
      * @return
      */
     @GetMapping("/{current}/{limit}")
-    public CommonResult getAppointmentPages(@PathVariable("current") int current, @PathVariable("limit") int limit, @RequestParam(required = false, name = "status")String status) {
+    public CommonResult getAppointmentPages(@PathVariable("current") int current, @PathVariable("limit") int limit, @RequestParam(required = false, name = "status") String status) {
         // 构造排序对象
 //        Sort sort = Sort.by(Sort.Direction.DESC, "launchDate", "execDate", "launchTime");
         // 构造分页对象
@@ -147,11 +146,52 @@ public class AppointmentManagerController {
 
     @MsgSecCheck({"conductor", "checkNote"})
     @PutMapping("/check/{appointmentId}")
-    public CommonResult check(@PathVariable(name = "appointmentId")Integer id,
-                               @RequestParam(required = true, name = "status")String status,
-                               @RequestParam(required = true, name = "conductor")String conductor,
+    public CommonResult check(@PathVariable(name = "appointmentId") Integer id,
+                              @RequestParam(required = true, name = "status") String status,
+                              @RequestParam(required = true, name = "conductor") String conductor,
                               @RequestParam("checkNote") String checkNote) {
         appointmentService.checkOutAppointment(id, status, conductor, checkNote);
         return CommonResult.ok(ResultCode.SUCCESS).msg("审批操作成功!");
+    }
+
+    @PostMapping("/appoint")
+    public CommonResult appoint(@RequestBody(required = true) AppointmentInfoVo[] infoVos) {
+        List<Appointment> appointments = Arrays.stream(infoVos)
+                .map(infoVo -> AppointmentInfoVo.convertToPo(infoVo))
+                .collect(Collectors.toList());
+
+        List<Appointment> deletedAppointments = appointmentService.addNewAppointmentsByAdmin(appointments);
+
+        return CommonResult.ok(ResultCode.SUCCESS).msg("管理员预约成功").data("conflictingAppointments",
+                deletedAppointments.stream()
+                        .map(appointment -> AppointmentInfoVo.convertToVo(appointment))
+                        .collect(Collectors.toList()));
+    }
+
+    @PutMapping("/cancel")
+    public CommonResult cancel(@RequestBody(required = true) Integer[] ids) {
+        appointmentService.cancelAppointmentsByAdminThroughIds(ids);
+        return CommonResult.ok(ResultCode.SUCCESS).msg("撤销预约成功!");
+    }
+
+    @GetMapping("/allByAdmin")
+    public CommonResult getAllAppointmentAppointedByAdmin() {
+        List<Appointment> appointments = appointmentService.getAllAppointmentsAppointedByAdmin();
+        return CommonResult.ok(ResultCode.SUCCESS)
+                .data("appointments", appointments.stream()
+                        .map(appointment -> {
+                            AppointmentInfoVo appointmentInfoVo = AppointmentInfoVo.convertToVo(appointment);
+                            Room room = roomService.getRoomInfoById(appointment.getRoomId());
+                            appointmentInfoVo.setRoomName(room.getName());
+                            return appointmentInfoVo;
+                        })
+                        .collect(Collectors.toList()));
+    }
+
+    //TODO 根据房间获取可用时段
+    @GetMapping("/availablePeriod/{room_id}")
+    public CommonResult getAvailablePeriodByRoomId(@PathVariable(name="room_id") Integer id) {
+
+        return null;
     }
 }
