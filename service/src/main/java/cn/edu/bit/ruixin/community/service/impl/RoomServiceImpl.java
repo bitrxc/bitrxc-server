@@ -280,20 +280,76 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     @Transactional(readOnly = true)
-    public Map<String, List<Schedule>> getRoomFreeTimeByAdmin(Integer roomId, String date) {
+    public Map<String, List<Schedule>> getRoomFreeTimeByAdmin(Integer roomId, String conductor, String date) {
         Date nowDate = new Date();
 
         SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         List<Schedule> allTime = scheduleRepository.findAll();
+        // <时段,是否被预约> 标记被占用的时段
+        Map<Integer, Boolean> scheduleMap = new HashMap<>();
+        List<Schedule> passTime = allTime.stream()
+                .filter(schedule -> {
+                    String dateTime = date + " " + schedule.getBegin();
+                    Date execDateTime = null;
+                    try {
+                        execDateTime = dateTimeFormat.parse(dateTime);
+                    } catch (ParseException e) {
+                        throw new GlobalParamException("日期格式有误！");
+                    }
+                    return execDateTime.before(nowDate);
+                }).collect(Collectors.toList());
 
-        /***
-        List<Schedule> passTime = allTime.stream().forEach(time -> {
+        Date execDate = null;
+        try {
+            execDate = dateFormat.parse(date);
+        } catch (ParseException e) {
+            throw new GlobalParamException("日期格式有误！");
+        }
 
-        })  ;
-         ***/
+        //TODO 待重写Repository方法直接获取所需预约列表
+        List<Appointment> conflictingAppointments = appointmentRepository
+                .findAppointmentAppointedByAdmin()
+                .stream()
+                .filter(appointment -> appointment.getRoomId() == roomId && !appointment.getConductor().equals(conductor)
+                        && (appointment.getStatus() == AppointmentStatus.RECEIVE.getStatus() || appointment.getStatus() == AppointmentStatus.SIGNED.getStatus()))
+                .collect(Collectors.toList());
 
-        return null;
+
+        conflictingAppointments.stream()
+                .forEach(appointment -> {
+                    scheduleMap.put(appointment.getBegin(), true);
+                    scheduleMap.put(appointment.getEnd(), true);
+                });
+        List<Schedule> busyTime = allTime.stream()
+                .filter(schedule -> scheduleMap.get(schedule.getId()))
+                .collect(Collectors.toList());
+        passTime.forEach(schedule -> scheduleMap.put(schedule.getId(), true));
+
+        List<Appointment> adminAppointments = appointmentRepository.findAppointmentAppointedByAdminThroughAdmin(conductor);
+        adminAppointments.forEach(appointment -> {
+            scheduleMap.put(appointment.getBegin(), null);
+            scheduleMap.put(appointment.getEnd(), null);
+        });
+        List<Schedule> myTime = allTime.stream()
+                .filter(schedule -> !scheduleMap.get(schedule.getId()))
+                .collect(Collectors.toList());
+        adminAppointments.stream()
+                .forEach(appointment -> {
+                    scheduleMap.put(appointment.getBegin(), true);
+                    scheduleMap.put(appointment.getEnd(), true);
+                });
+
+        List<Schedule> freeTime = allTime.stream()
+                .filter(schedule -> !scheduleMap.get(schedule.getId()))
+                .collect(Collectors.toList());
+
+        Map<String, List<Schedule>> map = new HashMap<>();
+        map.put("passTime", passTime);
+        map.put("busyTime", busyTime);
+        map.put("myTime", myTime);
+        map.put("freeTime", freeTime);
+        return map;
     }
 }

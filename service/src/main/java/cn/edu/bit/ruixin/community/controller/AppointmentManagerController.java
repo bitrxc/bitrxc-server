@@ -5,10 +5,12 @@ import cn.edu.bit.ruixin.base.common.ResultCode;
 import cn.edu.bit.ruixin.community.annotation.MsgSecCheck;
 import cn.edu.bit.ruixin.community.domain.Appointment;
 import cn.edu.bit.ruixin.community.domain.Room;
+import cn.edu.bit.ruixin.community.domain.Schedule;
 import cn.edu.bit.ruixin.community.domain.User;
 import cn.edu.bit.ruixin.community.myenum.AppointmentStatus;
 import cn.edu.bit.ruixin.community.service.AppointmentService;
 import cn.edu.bit.ruixin.community.service.RoomService;
+import cn.edu.bit.ruixin.community.service.ScheduleService;
 import cn.edu.bit.ruixin.community.service.UserService;
 import cn.edu.bit.ruixin.community.vo.AppointmentInfoVo;
 import cn.edu.bit.ruixin.community.vo.RoomInfoVo;
@@ -42,6 +44,8 @@ public class AppointmentManagerController {
     @Autowired
     private RoomService roomService;
 
+    @Autowired
+    private ScheduleService scheduleService;
 
     @GetMapping("")
     public CommonResult lookupAppointmentById(@RequestParam("id") Integer id) {
@@ -188,10 +192,58 @@ public class AppointmentManagerController {
                         .collect(Collectors.toList()));
     }
 
-    //TODO 根据房间获取可用时段
-    @GetMapping("/availablePeriod/{room_id}")
-    public CommonResult getAvailablePeriodByRoomId(@PathVariable(name="room_id") Integer id) {
+    @GetMapping("/availablePeriod")
+    public CommonResult getAvailablePeriodByRoomId(@RequestParam(name = "room_id") Integer id, @RequestParam(name = "conductor") String conductor, @RequestParam(name = "date") String date) {
+        Map result = roomService.getRoomFreeTimeByAdmin(id, conductor, date);
+        return CommonResult.ok(ResultCode.SUCCESS)
+                .data(result);
+    }
 
-        return null;
+    @GetMapping("/allTime")
+    public CommonResult getAllTimeByAdmin() {
+        List<Schedule> scheduleList = scheduleService.getAllTime();
+
+        class scheduleBeginTime {
+            private Integer id;
+            private String beginTime;
+
+            public scheduleBeginTime(Integer id, String beginTime) {
+                this.id = id;
+                this.beginTime = beginTime;
+            }
+
+            public Integer getId() {
+                return id;
+            }
+
+            public String getBeginTime() {
+                return beginTime;
+            }
+        }
+        class scheduleEndTime {
+            private Integer id;
+            private String endTime;
+
+            public scheduleEndTime(Integer id, String endTime) {
+                this.id = id;
+                this.endTime = endTime;
+            }
+
+            public Integer getId() {
+                return id;
+            }
+
+            public String getEndTime() {
+                return endTime;
+            }
+        }
+
+        return CommonResult.ok(ResultCode.SUCCESS)
+                .data("beginTimes", scheduleList.stream()
+                        .map(schedule -> new scheduleBeginTime(schedule.getId(), schedule.getBegin()))
+                        .collect(Collectors.toList()))
+                .data("endTimes", scheduleList.stream()
+                        .map(schedule -> new scheduleEndTime(schedule.getId(), schedule.getEnd()))
+                        .collect(Collectors.toList()));
     }
 }

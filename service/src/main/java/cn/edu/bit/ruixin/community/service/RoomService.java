@@ -34,5 +34,5 @@ public interface RoomService {
 //    List<Schedule> getRoomFreeTime(Integer roomId);
     Map<String , List<Schedule>> getRoomFreeTime(Integer roomId, String username, String date);
 
-    Map<String, List<Schedule>> getRoomFreeTimeByAdmin(Integer roomId, String date);
+    Map<String, List<Schedule>> getRoomFreeTimeByAdmin(Integer roomId, String conductor, String date);
 }

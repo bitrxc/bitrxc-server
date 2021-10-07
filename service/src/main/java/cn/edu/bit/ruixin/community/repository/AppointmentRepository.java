@@ -26,6 +26,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
     @Query(nativeQuery = true, value = "SELECT * FROM `deal` WHERE `launcher` IS NULL")
     List<Appointment> findAppointmentAppointedByAdmin();
 
+    @Query(nativeQuery = true, value = "SELECT  * FROM  `deal` WHERE `launcher` IS NULL AND `conductor` = :conductor")
+    List<Appointment> findAppointmentAppointedByAdminThroughAdmin(@Param("conductor") String conductor);
     List<Appointment> findAllByLauncher(String username);
 
     List<Appointment> findAllByLauncherEqualsOrderByLaunchDate(String username);
