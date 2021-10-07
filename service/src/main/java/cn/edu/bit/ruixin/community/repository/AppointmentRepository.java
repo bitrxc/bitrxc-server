@@ -26,8 +26,9 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
     @Query(nativeQuery = true, value = "SELECT * FROM `deal` WHERE `launcher` IS NULL")
     List<Appointment> findAppointmentAppointedByAdmin();
 
-    @Query(nativeQuery = true, value = "SELECT  * FROM  `deal` WHERE `launcher` IS NULL AND `conductor` = :conductor")
-    List<Appointment> findAppointmentAppointedByAdminThroughAdmin(@Param("conductor") String conductor);
+    @Query(nativeQuery = true, value = "SELECT  * FROM  `deal` WHERE `launcher` IS NULL AND `conductor` = :conductor AND `room` = :roomId AND `exec_date` = :execDate AND (`status` = :receive OR `status` = :executing)")
+    List<Appointment> findAppointmentAppointedByAdminThroughAdminAndRoomIdAndExecDate(@Param("conductor") String conductor, @Param("roomId") Integer roomId, @Param("execDate") Date execDate, @Param("receive") String receive, @Param("executing") String executing);
+
     List<Appointment> findAllByLauncher(String username);
 
     List<Appointment> findAllByLauncherEqualsOrderByLaunchDate(String username);
@@ -52,11 +53,15 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
     @Query(nativeQuery = true, value = "SELECT * FROM `deal` WHERE `launcher` IS NOT NULL AND `room` = :roomId AND `exec_date` = :execDate AND ((`begin` >= :begin AND `begin` <= :end) OR (`end` >= :begin AND `end` <= :end )) AND (`status` = :unreceived OR`status` = :receive OR `status` = :executing)")
     List<Appointment> findConflictingAppointmentsAppointedByUser(@Param("roomId") Integer roomId, @Param("execDate") Date execDate, @Param("begin") Integer begin, @Param("end") Integer end, @Param("unreceived") String unreceived, @Param("receive") String receive, @Param("executing") String executing);
 
-    // 查找与当前预约冲突的管理员的预约(管理员预约的发起者为空)
+    // 查找与当前预约冲突的管理员的预约(管理员预约的发起者为空，包括自己的预约)
     @Query(nativeQuery = true, value = "SELECT * FROM `deal` WHERE `launcher` IS NULL AND `room` = :roomId AND `exec_date` = :execDate AND ((`begin` >= :begin AND `begin` <= :end) OR (`end` >= :begin AND `end` <= :end )) AND (`status` = :receive OR `status` = :executing)")
     List<Appointment> findConflictingAppointmentsAppointedByAdmin(@Param("roomId") Integer roomId, @Param("execDate") Date execDate, @Param("begin") Integer begin, @Param("end") Integer end, @Param("receive") String receive, @Param("executing") String executing);
 //    @Query(nativeQuery = true, value = "SELECT `launch_time` FROM `deal` WHERE `room` = ? AND `status` = ?")
 //    List<Integer> findLaunchTimeByRoomIdAndStatus(Integer roomId, String status);
+
+    // 查找与当前房间冲突的管理员的预约(管理员预约的发起者为空，不包括自己的预约)
+    @Query(nativeQuery = true, value = "SELECT * FROM `deal` WHERE `launcher` IS NULL AND `room` = :roomId AND `conductor` != :conductor  AND `exec_date = :execDate AND (`status` = :receive OR `status` = :executing)")
+    List<Appointment> findConflictingAppointmentsAppointedByAdminThroughConductor(@Param("roomId") Integer roomId, @Param("conductor") String conductor, @Param("execDate") Date execDate, @Param("receive") String receive, @Param("executing") String executing);
 
     @Query(nativeQuery = true, value = "SELECT * FROM `deal` WHERE `room` = :roomId AND `exec_date` = :execDate AND (`status` = :receive OR `status` = :executing)")
     List<Appointment> findLaunchTimeByRoomIdAndExecuteDateAndStatus(@Param("roomId") Integer roomId, @Param("execDate") Date execDate, @Param("receive") String receive, @Param("executing") String executing);

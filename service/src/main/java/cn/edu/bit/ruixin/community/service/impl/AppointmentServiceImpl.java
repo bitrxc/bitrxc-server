@@ -142,7 +142,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             }
 
             // 在管理员预约的格式中，审核者为管理员
-            if (!adminLaunchers.contains(appointment.getLauncher())) {
+            if (!adminLaunchers.contains(appointment.getConductor())) {
                 throw new AppointmentDaoException("管理员预约的格式有误，审核者不为管理员!");
             }
 
