@@ -193,8 +193,8 @@ public class AppointmentManagerController {
     }
 
     @GetMapping("/availablePeriod")
-    public CommonResult getAvailablePeriodByRoomId(@RequestParam(name = "room_id") Integer id, @RequestParam(name = "conductor") String conductor, @RequestParam(name = "date") String date) {
-        Map result = roomService.getRoomFreeTimeByAdmin(id, conductor, date);
+    public CommonResult getAvailablePeriodByRoomId(@RequestParam(name = "roomId") Integer roomId, @RequestParam(name = "conductor") String conductor, @RequestParam(name = "date") String date) {
+        Map result = roomService.getRoomFreeTimeByAdmin(roomId, conductor, date);
         return CommonResult.ok(ResultCode.SUCCESS)
                 .data(result);
     }
@@ -211,15 +211,8 @@ public class AppointmentManagerController {
                 this.id = id;
                 this.beginTime = beginTime;
             }
-
-            public Integer getId() {
-                return id;
-            }
-
-            public String getBeginTime() {
-                return beginTime;
-            }
         }
+
         class scheduleEndTime {
             private Integer id;
             private String endTime;
@@ -227,14 +220,6 @@ public class AppointmentManagerController {
             public scheduleEndTime(Integer id, String endTime) {
                 this.id = id;
                 this.endTime = endTime;
-            }
-
-            public Integer getId() {
-                return id;
-            }
-
-            public String getEndTime() {
-                return endTime;
             }
         }
 
