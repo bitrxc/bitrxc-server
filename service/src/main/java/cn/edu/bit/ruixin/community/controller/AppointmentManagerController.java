@@ -14,6 +14,8 @@ import cn.edu.bit.ruixin.community.service.ScheduleService;
 import cn.edu.bit.ruixin.community.service.UserService;
 import cn.edu.bit.ruixin.community.vo.AppointmentInfoVo;
 import cn.edu.bit.ruixin.community.vo.RoomInfoVo;
+import lombok.Getter;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -203,6 +205,7 @@ public class AppointmentManagerController {
     public CommonResult getAllTimeByAdmin() {
         List<Schedule> scheduleList = scheduleService.getAllTime();
 
+        @Getter
         class scheduleBeginTime {
             private Integer id;
             private String beginTime;
@@ -213,6 +216,7 @@ public class AppointmentManagerController {
             }
         }
 
+        @Getter
         class scheduleEndTime {
             private Integer id;
             private String endTime;
