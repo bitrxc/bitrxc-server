@@ -60,7 +60,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
 //    List<Integer> findLaunchTimeByRoomIdAndStatus(Integer roomId, String status);
 
     // 查找与当前房间冲突的管理员的预约(管理员预约的发起者为空，不包括自己的预约)
-    @Query(nativeQuery = true, value = "SELECT * FROM `deal` WHERE `launcher` IS NULL AND `room` = :roomId AND `conductor` != :conductor  AND `exec_date = :execDate AND (`status` = :receive OR `status` = :executing)")
+    @Query(nativeQuery = true, value = "SELECT * FROM `deal` WHERE `launcher` IS NULL AND `room` = :roomId AND `conductor` != :conductor  AND `exec_date` = :execDate AND (`status` = :receive OR `status` = :executing)")
     List<Appointment> findConflictingAppointmentsAppointedByAdminThroughConductor(@Param("roomId") Integer roomId, @Param("conductor") String conductor, @Param("execDate") Date execDate, @Param("receive") String receive, @Param("executing") String executing);
 
     @Query(nativeQuery = true, value = "SELECT * FROM `deal` WHERE `room` = :roomId AND `exec_date` = :execDate AND (`status` = :receive OR `status` = :executing)")
