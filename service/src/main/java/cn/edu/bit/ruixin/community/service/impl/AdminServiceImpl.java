@@ -17,6 +17,7 @@ import cn.edu.bit.ruixin.community.exception.UserDaoException;
 import cn.edu.bit.ruixin.community.repository.AdminRepository;
 import cn.edu.bit.ruixin.community.repository.AdminRoleRepository;
 import cn.edu.bit.ruixin.community.service.AdminService;
+import lombok.extern.apachecommons.CommonsLog;
 
 /**
  * TODO 制定事务管理
@@ -25,6 +26,7 @@ import cn.edu.bit.ruixin.community.service.AdminService;
  * @date 2021/2/21
  */
 @Service
+@CommonsLog
 public class AdminServiceImpl implements AdminService {
 
     @Autowired
@@ -104,6 +106,7 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public Admin modifyAdminRoleByAdminId(int aid,List<Integer> rids) {
+        log.debug(rids);
         List<AdminRole> adminRoles = adminRoleRepository.findAdminRolesByAdminId(aid);
         Iterator<AdminRole> adminRolesIt = adminRoles.iterator();
         for(int rid : rids){
