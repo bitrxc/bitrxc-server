@@ -2,6 +2,7 @@ package cn.edu.bit.ruixin.community.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,11 +33,17 @@ public class RoleServiceImpl implements RoleService {
         return roleRepository.findAll();
     }
 
+    /**
+     * 给定id列表，从数据库中查询对应的角色
+     */
     @Override
     public List<Role> getRoles(List<Integer> ids) {
         List<Role> roles = new ArrayList<Role>();
         for(int rid : ids){
-            roles.add(roleRepository.getOne(rid));
+            Optional<Role> role = roleRepository.findById(rid);
+            if(role.isPresent()){
+                roles.add(role.get());
+            }
         }
         return roles;
     }
