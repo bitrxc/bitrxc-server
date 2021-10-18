@@ -9,6 +9,8 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import cn.edu.bit.ruixin.base.security.utils.DefaultPasswordEncoder;
 import cn.edu.bit.ruixin.community.domain.Admin;
@@ -115,16 +117,15 @@ public class AdminServiceImpl implements AdminService {
                 curAR.setAdminId(aid);
                 curAR.setRoleId(rid);
             }else{
-                AdminRole newAR = new AdminRole();
-                newAR.setAdminId(aid);
-                newAR.setRoleId(rid);
-                adminRoles.add(newAR);
+                // 此处不能使用{@link saveall}方法来保存新增的权限，因为saveall不会自动生成ID
+                adminRoleRepository.assignRoleToAdmin(aid, rid);
             }
         }
         // 删除多余的权限
         List<AdminRole> removableAdminRoles = new ArrayList<AdminRole>();
         while(adminRolesIt.hasNext()){
             removableAdminRoles.add(adminRolesIt.next()) ;
+            adminRolesIt.remove();
         }
         adminRoleRepository.saveAll(adminRoles);
         adminRoleRepository.deleteAll(removableAdminRoles);
