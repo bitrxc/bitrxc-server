@@ -22,7 +22,7 @@ import cn.edu.bit.ruixin.community.service.AdminService;
 import lombok.extern.apachecommons.CommonsLog;
 
 /**
- * TODO 制定事务管理
+ * TODO 事务管理测试
  *
  * @author 78165
  * @date 2021/2/21
@@ -40,6 +40,7 @@ public class AdminServiceImpl implements AdminService {
     @Autowired
     private AdminRoleRepository adminRoleRepository;
 
+    @Transactional(isolation = Isolation.READ_COMMITTED,rollbackFor = Exception.class)
     @Override
     public Admin registerAdmin(Admin admin) {
         adminRepository.save(admin);
@@ -75,6 +76,7 @@ public class AdminServiceImpl implements AdminService {
         return adminRepository.findAll(pageable);
     }
 
+    @Transactional(isolation = Isolation.REPEATABLE_READ,rollbackFor = Exception.class)
     @Override
     public Admin modifyAdminById(int id, String email, String mobile) {
         Admin admin = adminRepository.getOne(id);
@@ -88,11 +90,13 @@ public class AdminServiceImpl implements AdminService {
         return admin;
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED,rollbackFor = Exception.class)
     @Override
     public void deleteAdminById(int id) {
         adminRepository.deleteById(id);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED,rollbackFor = Exception.class)
     @Override
     public void assignRoleToAdmin(int id, int role_id) {
         AdminRole adminRole = new AdminRole();
@@ -106,6 +110,7 @@ public class AdminServiceImpl implements AdminService {
      * 就地更新 admin_role 表的记录
      * @return rid列表对应的角色列表
      */
+    @Transactional(isolation = Isolation.SERIALIZABLE,rollbackFor = Exception.class)
     @Override
     public Admin modifyAdminRoleByAdminId(int aid,List<Integer> rids) {
         log.debug(rids);
