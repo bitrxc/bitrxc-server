@@ -1,5 +1,6 @@
 package cn.edu.bit.ruixin.community.config.secure;
 
+import cn.edu.bit.ruixin.community.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -27,7 +28,7 @@ public class UserConfigure extends WebSecurityConfigurerAdapter {
 
     @Autowired
     RedisService redisService;
-    
+
     protected void configure(HttpSecurity http) throws Exception {
 
         http

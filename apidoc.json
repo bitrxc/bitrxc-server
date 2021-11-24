@@ -1,0 +1,7 @@
+{
+  "name": "bitrxc-server",
+  "version": "0.0.1",
+  "description": "apiDoc test",
+  "title": "Custom apiDoc browser title",
+  "url" : "https://api.github.com/v1"
+}

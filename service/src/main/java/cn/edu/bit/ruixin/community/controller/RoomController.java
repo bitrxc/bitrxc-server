@@ -50,6 +50,19 @@ public class RoomController {
      * @param id
      * @return
      */
+    /**
+     * @api {Get} /room/{id} 根据Id查询房间信息
+     * @apiGroup test
+     * @apiDescription 根据Id查询房间信息
+     * @apiSuccess {RoomInfoVo} roomInfo data携带"rooms"，是对象数组形式，每个元素是一个房间信息
+     */
+
+    /**
+     * @api {Get} /room 获取所有房间信息
+     * @apiGroup test
+     * @apiDescription 获取所有房间信息
+     * @apiSuccess {RoomInfoVo} roomInfo data携带"roomInfo"
+     */
     @GetMapping("/{id}")
     public CommonResult getRoomInfoById(@PathVariable("id") Integer id) {
         Room room = roomService.getRoomInfoById(id);
@@ -97,12 +110,24 @@ public class RoomController {
         return CommonResult.ok(ResultCode.SUCCESS).data(map);
     }
 
+    /**
+     * @api {Get} /room/name 根据房间名精确查询房间信息
+     * @apiGroup test
+     * @apiDescription 根据房间名精确查询房间信息
+     * @apiParam {String} name 房间名
+     */
     @GetMapping("/name")
     public CommonResult getRoomByName(@RequestParam("name")String name) {
         Room room = roomService.getRoomInfoByName(name);
         return CommonResult.ok(ResultCode.SUCCESS).data("roomInfo", RoomInfoVo.convertToVo(room));
     }
 
+    /**
+     * @api {Get} /room/nameLike 根据房间名模糊查询
+     * @apiGroup test
+     * @apiDescription 根据房间名模糊查询
+     * @apiParam {String} name 房间名
+     */
     @GetMapping("/nameLike")
     public CommonResult getRoomByNameLike(@RequestParam("nameLike")String name) {
         List<Room> list = roomService.getRoomInfoByNameLike("%" + name + "%");
@@ -114,6 +139,61 @@ public class RoomController {
         return CommonResult.ok(ResultCode.SUCCESS).data("rooms", infoVos);
     }
 
+    /**
+     * @api {Get} /free/time 根据房间获取可用时段
+     * @apiGroup test
+     * @apiDescription 根据房间获取可用时段
+     * @apiParam {Integer} roomId 房间ID
+     * @apiParam {String} username wxid
+     * @apiParam {String} date 要预约的时间段的当天日期，字符串形式：2021-02-26
+     * @apiSuccess {Array} data 返回结果包括当天已过去时间段、空闲时间段、已被占据时间段、我已发起申请时间段
+     * @apiSuccessExample {json} 响应数据示例
+     * {
+     *     "success": true,
+     *     "code": 200,
+     *     "message": "操作成功",
+     *     "data": {
+     *         "passTime": [
+     *             {
+     *                 "id": 1,
+     *                 "begin": "07:00:00",
+     *                 "end": "08:00:00"
+     *             },
+     *             {
+     *                 "id": 2,
+     *                 "begin": "08:00:00",
+     *                 "end": "09:00:00"
+     *             },
+     *             {
+     *                 "id": 3,
+     *                 "begin": "09:00:00",
+     *                 "end": "10:00:00"
+     *             }
+     *         ],
+     *         "freeTime": [
+     *             {
+     *                 "id": 4,
+     *                 "begin": "13:00:00",
+     *                 "end": "14:00:00"
+     *             }
+     *         ],
+     *         "myTime": [
+     *             {
+     *                 "id": 6,
+     *                 "begin": "21:00:00",
+     *                 "end": "22:00:00"
+     *             }
+     *         ],
+     *         "busyTime": [
+     *             {
+     *                 "id": 5,
+     *                 "begin": "14:00:00",
+     *                 "end": "15:00:00"
+     *             }
+     *         ]
+     *     }
+     * }
+     */
     @GetMapping("/free/time")
     public CommonResult getFreeTimeByRoomId(@RequestParam("roomId") Integer roomId, @RequestParam("username") String username, @RequestParam("date") String date) {
         Map map = roomService.getRoomFreeTime(roomId, username, date);

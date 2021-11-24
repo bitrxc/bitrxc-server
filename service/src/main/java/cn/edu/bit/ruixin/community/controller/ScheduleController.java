@@ -26,6 +26,12 @@ public class ScheduleController {
     @Autowired
     private ScheduleService scheduleService;
 
+    /**
+     * @api {Get} /schedule/all 获取所有时间段
+     * @apiGroup user interface: get all available time
+     * @apiDescription 获取所有时间段
+     * @apiSuccess {Array} timelist 时间表
+     */
     @GetMapping("/all")
     public CommonResult getAllTime() {
         List<Schedule> allTime = scheduleService.getAllTime();

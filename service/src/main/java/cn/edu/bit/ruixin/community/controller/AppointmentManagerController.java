@@ -47,6 +47,7 @@ public class AppointmentManagerController {
     @Autowired
     private ScheduleService scheduleService;
 
+
     @GetMapping("")
     public CommonResult lookupAppointmentById(@RequestParam("id") Integer id) {
         Appointment appointment = appointmentService.getAppointmentById(id);
@@ -113,6 +114,98 @@ public class AppointmentManagerController {
      * @param limit
      * @return
      */
+
+    /**
+     * @api {Get} /admin/appointment/{current}/{limit} 获取预约记录列表
+     * @apiGroup test3
+     * @apiDescription 获取预约记录列表
+     * @apiParam {Integer} current 当前页, 路径占位符。
+     * @apiParam {Integer} limit 当前页记录数, 路径传值。
+     * @apiParam {String} [userName] 预约记录状态。枚举值。可选参数，可不传。房间状态枚举如下:
+     *
+      "executing"：房间使用中
+      "receive"： 通过
+      "rejected"：拒绝
+      "new": 提出申请待审批
+     * @apiSuccess {Number} totalpage 总记录页
+     * @apiSuccess {Boolean} hasPrevious 是否有前一页
+     * @apiSuccess {Boolean} hasNext 是否有后一页
+     * @apiSuccess {Number} totalElements 一页中的元素项数, 即 items 中有多少项
+     * @apiSuccess {Array} items 预约记录集合。各项具体含义如下：
+     *
+      "id"： 预约记录 ID
+      "begin": ?
+      "end": ?
+      "roomId": 房间 ID
+      "launchTime": ? 预约时间吗？
+      "launcher": ? 预约人吗？
+      "status": 房间状态
+      "conductor": ?
+      "checkNote": ?
+      "userNote": ?
+      "checkDate": ?
+      "launchDate": ?
+      "execDate": ?
+     * @apiSuccessExample {json} 响应数据示例
+     * {
+     *     "success": true,
+     *     "code": 200,
+     *     "message": "操作成功",
+     *     "data": {
+     *         "totalPages": 1,
+     *         "hasPrevious": false,
+     *         "hasNext": false,
+     *         "totalElements": 3,
+     *         "items": [
+     *             {
+     *                 "id": 3,
+     *                 "begin": null,
+     *                 "end": null,
+     *                 "roomId": 1,
+     *                 "launchTime": 1,
+     *                 "launcher": "123456",
+     *                 "status": "receive",
+     *                 "conductor": null,
+     *                 "checkNote": null,
+     *                 "userNote": null,
+     *                 "checkDate": 0,
+     *                 "launchDate": 0,
+     *                 "execDate": null
+     *             },
+     *             {
+     *                 "id": 18,
+     *                 "begin": null,
+     *                 "end": null,
+     *                 "roomId": 1,
+     *                 "launchTime": 3,
+     *                 "launcher": "omn3g4s_YpmXsN8n38iPwIrR5Gxk",
+     *                 "status": "receive",
+     *                 "conductor": null,
+     *                 "checkNote": null,
+     *                 "userNote": null,
+     *                 "checkDate": 0,
+     *                 "launchDate": 1614155056000,
+     *                 "execDate": "2021-02-26"
+     *             },
+     *             {
+     *                 "id": 23,
+     *                 "begin": null,
+     *                 "end": null,
+     *                 "roomId": 1,
+     *                 "launchTime": 5,
+     *                 "launcher": "omn3g4s_YpmXsN8n38iPwIrR5Gxk",
+     *                 "status": "receive",
+     *                 "conductor": null,
+     *                 "checkNote": null,
+     *                 "userNote": null,
+     *                 "checkDate": 0,
+     *                 "launchDate": 1614172187000,
+     *                 "execDate": "2021-02-26"
+     *             }
+     *         ]
+     *     }
+     * }
+     */
     @GetMapping("/{current}/{limit}")
     public CommonResult getAppointmentPages(@PathVariable("current") int current, @PathVariable("limit") int limit, @RequestParam(required = false, name = "status") String status) {
         // 构造排序对象
@@ -148,6 +241,52 @@ public class AppointmentManagerController {
         return CommonResult.ok(ResultCode.SUCCESS).data(map);
     }
 
+    /**
+     * @api {Put} /admin/appointment/check/{appointmentId} 审批预约记录、预约签到、预约完成记录
+     * @apiGroup 预约管理
+     * @apiDescription 审批预约记录、预约签到、预约完成记录
+     * @apiBody {AppointmentInfoVo[]} infoVos 请求体，携带批量预约的房间号信息
+     * @apiSuccessExample {json} 响应数据示例
+     * {
+     *     "success": true,
+     *     "code": 200,
+     *     "message": "管理员预约操作成功",
+     *     "data": {
+     *         "conflictingAppointments": [
+     *             {
+     *                 "id": 3,
+     *                 "begin": null,
+     *                 "end": null,
+     *                 "roomId": 1,
+     *                 "launchTime": 1,
+     *                 "launcher": "123456",
+     *                 "status": "receive",
+     *                 "conductor": null,
+     *                 "checkNote": null,
+     *                 "userNote": null,
+     *                 "checkDate": 0,
+     *                 "launchDate": 0,
+     *                 "execDate": null
+     *             },
+     *             {
+     *                 "id": 18,
+     *                 "begin": null,
+     *                 "end": null,
+     *                 "roomId": 1,
+     *                 "launchTime": 3,
+     *                 "launcher": "omn3g4s_YpmXsN8n38iPwIrR5Gxk",
+     *                 "status": "receive",
+     *                 "conductor": null,
+     *                 "checkNote": null,
+     *                 "userNote": null,
+     *                 "checkDate": 0,
+     *                 "launchDate": 1614155056000,
+     *                 "execDate": "2021-02-26"
+     *             }
+     *         ]
+     *     }
+     * }
+     */
     @MsgSecCheck({"conductor", "checkNote"})
     @PutMapping("/check/{appointmentId}")
     public CommonResult check(@PathVariable(name = "appointmentId") Integer id,
@@ -158,6 +297,52 @@ public class AppointmentManagerController {
         return CommonResult.ok(ResultCode.SUCCESS).msg("审批操作成功!");
     }
 
+    /**
+     * @api {Post} /admin/appointment/appoint 管理员批量预约接口
+     * @apiGroup 管理员预约管理
+     * @apiDescription 管理员批量预约接口
+     * @apiBody {AppointmentInfoVo[]} infoVos 请求体，携带批量预约的房间号信息
+     * @apiSuccessExample {json} 响应数据示例
+     * {
+     *     "success": true,
+     *     "code": 200,
+     *     "message": "管理员预约操作成功",
+     *     "data": {
+     *         "conflictingAppointments": [
+     *             {
+     *                 "id": 3,
+     *                 "begin": null,
+     *                 "end": null,
+     *                 "roomId": 1,
+     *                 "launchTime": 1,
+     *                 "launcher": "123456",
+     *                 "status": "receive",
+     *                 "conductor": null,
+     *                 "checkNote": null,
+     *                 "userNote": null,
+     *                 "checkDate": 0,
+     *                 "launchDate": 0,
+     *                 "execDate": null
+     *             },
+     *             {
+     *                 "id": 18,
+     *                 "begin": null,
+     *                 "end": null,
+     *                 "roomId": 1,
+     *                 "launchTime": 3,
+     *                 "launcher": "omn3g4s_YpmXsN8n38iPwIrR5Gxk",
+     *                 "status": "receive",
+     *                 "conductor": null,
+     *                 "checkNote": null,
+     *                 "userNote": null,
+     *                 "checkDate": 0,
+     *                 "launchDate": 1614155056000,
+     *                 "execDate": "2021-02-26"
+     *             }
+     *         ]
+     *     }
+     * }
+     */
     @PostMapping("/appoint")
     public CommonResult appoint(@RequestBody(required = true) AppointmentInfoVo[] infoVos) {
         List<Appointment> appointments = Arrays.stream(infoVos)
@@ -172,12 +357,78 @@ public class AppointmentManagerController {
                         .collect(Collectors.toList()));
     }
 
+    /**
+     * @api {Put} /admin/appointment/cancel 管理员批量撤销预约接口
+     * @apiGroup 管理员预约管理
+     * @apiDescription 管理员批量撤销预约接口
+     * @apiBody {Integer[]} ids 预约记录id集合
+     */
     @PutMapping("/cancel")
     public CommonResult cancel(@RequestBody(required = true) Integer[] ids) {
         appointmentService.cancelAppointmentsByAdminThroughIds(ids);
         return CommonResult.ok(ResultCode.SUCCESS).msg("撤销预约成功!");
     }
 
+    /**
+     * @api {Get} /admin/appointment/allByAdmin 查看管理员所有预约记录
+     * @apiGroup 管理员预约管理
+     * @apiDescription 查看管理员所有预约记录
+     * @apiSuccess {Array} appointments 各项具体含义如下：
+     *
+      "id"： 预约记录 ID
+      "begin": ?
+      "end": ?
+      "roomId": 房间 ID
+      "launchTime": ? 预约时间吗？
+      "launcher": null
+      "status": 房间状态
+      "conductor": ?
+      "checkNote": ?
+      "userNote": ?
+      "checkDate": ?
+      "launchDate": ?
+      "execDate": ?
+      管理员预约的launcher为null
+     * @apiSuccessExample {json} 响应数据示例
+     * {
+     *     "success": true,
+     *     "code": 200,
+     *     "data": {
+     *         "appointments": [
+     *             {
+     *                 "id": 3,
+     *                 "begin": null,
+     *                 "end": null,
+     *                 "roomId": 1,
+     *                 "launchTime": 1,
+     *                 "launcher": "null",
+     *                 "status": "receive",
+     *                 "conductor": "admin",
+     *                 "checkNote": null,
+     *                 "userNote": null,
+     *                 "checkDate": 0,
+     *                 "launchDate": 0,
+     *                 "execDate": null
+     *             },
+     *             {
+     *                 "id": 18,
+     *                 "begin": null,
+     *                 "end": null,
+     *                 "roomId": 1,
+     *                 "launchTime": 3,
+     *                 "launcher": "null",
+     *                 "status": "receive",
+     *                 "conductor": "admin",
+     *                 "checkNote": null,
+     *                 "userNote": null,
+     *                 "checkDate": 0,
+     *                 "launchDate": 1614155056000,
+     *                 "execDate": "2021-02-26"
+     *             }
+     *         ]
+     *     }
+     * }
+     */
     @GetMapping("/allByAdmin")
     public CommonResult getAllAppointmentAppointedByAdmin() {
         List<Appointment> appointments = appointmentService.getAllAppointmentsAppointedByAdmin();
@@ -192,6 +443,60 @@ public class AppointmentManagerController {
                         .collect(Collectors.toList()));
     }
 
+    /**
+     * @api {Get} /admin/appointment/availablePeriod 管理员获取可用时间段
+     * @apiGroup 管理员预约管理
+     * @apiDescription 管理员获取可用时间段
+     * @apiParam {Integer} roomId 待查询的房间id
+     * @apiParam {String} conductor 发起预约的管理员 管理员发起的预约发起者launcher为空，审核者为管理员自身，故以conductor作为发起预约的管理员标识
+     * @apiParam {String} date 待查询的日期，格式为yyyy-mm-dd 2021-10-07
+     * @apiSuccessExample {json} 响应数据示例
+     * {
+     *     "success": true,
+     *     "code": 200,
+     *     "message": "操作成功",
+     *     "data": {
+     *         "passTime": [
+     *             {
+     *                 "id": 1,
+     *                 "begin": "07:00:00",
+     *                 "end": "08:00:00"
+     *             },
+     *             {
+     *                 "id": 2,
+     *                 "begin": "08:00:00",
+     *                 "end": "09:00:00"
+     *             },
+     *             {
+     *                 "id": 3,
+     *                 "begin": "09:00:00",
+     *                 "end": "10:00:00"
+     *             }
+     *         ],
+     *         "freeTime": [
+     *             {
+     *                 "id": 4,
+     *                 "begin": "13:00:00",
+     *                 "end": "14:00:00"
+     *             }
+     *         ],
+     *         "myTime": [
+     *             {
+     *                 "id": 6,
+     *                 "begin": "21:00:00",
+     *                 "end": "22:00:00"
+     *             }
+     *         ],
+     *         "busyTime": [
+     *             {
+     *                 "id": 5,
+     *                 "begin": "14:00:00",
+     *                 "end": "15:00:00"
+     *             }
+     *         ]
+     *     }
+     * }
+     */
     @GetMapping("/availablePeriod")
     public CommonResult getAvailablePeriodByRoomId(@RequestParam(name = "roomId") Integer roomId, @RequestParam(name = "conductor") String conductor, @RequestParam(name = "date") String date) {
         Map result = roomService.getRoomFreeTimeByAdmin(roomId, conductor, date);
@@ -199,6 +504,34 @@ public class AppointmentManagerController {
                 .data(result);
     }
 
+    /**
+     * @api {Get} /admin/appointment/allTime 管理员获取所有预约时间段
+     * @apiGroup 管理员预约管理
+     * @apiDescription 管理员获取所有预约时间段
+     * @apiSuccessExample {json} 响应数据示例
+     * {
+     *   "code": 200,
+     *   "message": "",
+     *   "data": {
+     *     "beginTime": {
+     *       {"id": 1, "time": "08:00:00"},
+     *       {"id": 2, "time": "10:00:00"},
+     *       {"id": 3, "time": "13:00:00"},
+     *       {"id": 4, "time": "15:00:00"},
+     *       {"id": 5, "time": "18:00:00"},
+     *       {"id": 6, "time": "21:00:00"}
+     *     },
+     *     "endTime": {
+     *       {"id": 1, "time": "10:00:00"},
+     *       {"id": 2, "time": "12:00:00"},
+     *       {"id": 3, "time": "15:00:00"},
+     *       {"id": 4, "time": "18:00:00"},
+     *       {"id": 5, "time": "21:00:00"},
+     *       {"id": 6, "time": "22:00:00"}
+     *     }
+     *   }
+     * }
+     */
     @GetMapping("/allTime")
     public CommonResult getAllTimeByAdmin() {
         List<Schedule> scheduleList = scheduleService.getAllTime();
