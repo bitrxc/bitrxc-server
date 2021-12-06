@@ -51,7 +51,7 @@ public class AppointmentManagerController {
 
     private AppointmentInfoVo getAppointmentInfoVo(Appointment appointment) {
         AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
-        if (infoVo.getConductor() == null) {
+        if (infoVo.getLauncher() == null) {
             infoVo.setUsername(infoVo.getConductor());
         } else {
             User user = userService.getUserByUsername(infoVo.getLauncher());
@@ -67,12 +67,6 @@ public class AppointmentManagerController {
     public CommonResult lookupAppointmentById(@RequestParam("id") Integer id) {
         Appointment appointment = appointmentService.getAppointmentById(id);
         AppointmentInfoVo infoVo = getAppointmentInfoVo(appointment);
-//        AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
-//        User user = userService.getUserByUsername(infoVo.getLauncher());
-//        Room room = roomService.getRoomInfoById(infoVo.getRoomId());
-//        infoVo.setUsername(user.getName());
-//        infoVo.setRoomName(room.getName());
-//        infoVo.setSchoolId(user.getSchoolId());
 
         return CommonResult.ok(ResultCode.SUCCESS).data("appointment", infoVo);
     }
@@ -86,22 +80,7 @@ public class AppointmentManagerController {
 
         List<AppointmentInfoVo> infoVos = new ArrayList<>();
         list.forEach(appointment -> infoVos.add(getAppointmentInfoVo(appointment)));
-//        for (Appointment appointment :
-//                list) {
-//            AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
-//            if (infoVo.getConductor() == null) {
-//                infoVo.setUsername(infoVo.getConductor());
-//            } else {
-//                User user = userService.getUserByUsername(infoVo.getLauncher());
-//                infoVo.setUsername(user.getName());
-//                infoVo.setSchoolId(user.getSchoolId());
-//            }
-//
-//            Room room = roomService.getRoomInfoById(infoVo.getRoomId());
-//            infoVo.setRoomName(room.getName());
-//
-//            infoVos.add(infoVo);
-//        }
+
         Map<String, Object> map = new HashMap<>();
         map.put("totalElements", page.getTotalElements());
         map.put("totalPages", page.getTotalPages());
@@ -118,16 +97,7 @@ public class AppointmentManagerController {
         List<Appointment> list = appointmentService.getAllAppointment(status);
         List<AppointmentInfoVo> infoVos = new ArrayList<>();
         list.forEach(appointment -> infoVos.add(getAppointmentInfoVo(appointment)));
-//        for (Appointment appointment : list
-//        ) {
-//            AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
-//            User user = userService.getUserByUsername(infoVo.getLauncher());
-//            Room room = roomService.getRoomInfoById(infoVo.getRoomId());
-//            infoVo.setSchoolId(user.getSchoolId());
-//            infoVo.setUsername(user.getName());
-//            infoVo.setRoomName(room.getName());
-//            infoVos.add(infoVo);
-//        }
+
         return CommonResult.ok(ResultCode.SUCCESS).data("appointments", infoVos);
     }
 
@@ -149,21 +119,6 @@ public class AppointmentManagerController {
 
         List<AppointmentInfoVo> infoVos = new ArrayList<>();
         list.forEach(appointment -> infoVos.add(getAppointmentInfoVo(appointment)));
-//        for (Appointment appointment :
-//                list) {
-//            AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
-//            User user = userService.getUserByUsername(infoVo.getLauncher());
-//            Room room = roomService.getRoomInfoById(infoVo.getRoomId());
-//            infoVo.setSchoolId(user.getSchoolId());
-//            infoVo.setUsername(user.getName());
-//            infoVo.setRoomName(room.getName());
-////            if (status == null || "".equals(status)) {
-////                if (AppointmentStatus.CANCEL.getStatus().equals(infoVo.getStatus()) || AppointmentStatus.REJECT.getStatus().equals(infoVo.getStatus())) {
-////                    continue;
-////                }
-////            }
-//            infoVos.add(infoVo);
-//        }
 
         Map<String, Object> map = new HashMap<>();
         map.put("totalElements", page.getTotalElements());
