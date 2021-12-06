@@ -3,6 +3,9 @@ package cn.edu.bit.ruixin.community.domain;
 import lombok.Data;
 
 import javax.persistence.*;
+
+import org.hibernate.annotations.DynamicInsert;
+
 import java.util.Date;
 
 /**
@@ -14,6 +17,7 @@ import java.util.Date;
 @Entity
 @Table(name = "deal")
 @Data
+@DynamicInsert
 public class Appointment {
 
     @Id
