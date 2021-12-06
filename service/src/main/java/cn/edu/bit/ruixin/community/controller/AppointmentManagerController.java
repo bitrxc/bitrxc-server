@@ -49,16 +49,30 @@ public class AppointmentManagerController {
     @Autowired
     private ScheduleService scheduleService;
 
+    private AppointmentInfoVo getAppointmentInfoVo(Appointment appointment) {
+        AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
+        if (infoVo.getConductor() == null) {
+            infoVo.setUsername(infoVo.getConductor());
+        } else {
+            User user = userService.getUserByUsername(infoVo.getLauncher());
+            infoVo.setUsername(user.getName());
+            infoVo.setSchoolId(user.getSchoolId());
+        }
+        Room room = roomService.getRoomInfoById(infoVo.getRoomId());
+        infoVo.setRoomName(room.getName());
+        return infoVo;
+    }
+
     @GetMapping("")
     public CommonResult lookupAppointmentById(@RequestParam("id") Integer id) {
         Appointment appointment = appointmentService.getAppointmentById(id);
-
-        AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
-        User user = userService.getUserByUsername(infoVo.getLauncher());
-        Room room = roomService.getRoomInfoById(infoVo.getRoomId());
-        infoVo.setUsername(user.getName());
-        infoVo.setRoomName(room.getName());
-        infoVo.setSchoolId(user.getSchoolId());
+        AppointmentInfoVo infoVo = getAppointmentInfoVo(appointment);
+//        AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
+//        User user = userService.getUserByUsername(infoVo.getLauncher());
+//        Room room = roomService.getRoomInfoById(infoVo.getRoomId());
+//        infoVo.setUsername(user.getName());
+//        infoVo.setRoomName(room.getName());
+//        infoVo.setSchoolId(user.getSchoolId());
 
         return CommonResult.ok(ResultCode.SUCCESS).data("appointment", infoVo);
     }
@@ -71,22 +85,23 @@ public class AppointmentManagerController {
         List<Appointment> list = page.getContent();
 
         List<AppointmentInfoVo> infoVos = new ArrayList<>();
-        for (Appointment appointment :
-                list) {
-            AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
-            if (infoVo.getConductor() == null) {
-                infoVo.setUsername(infoVo.getConductor());
-            } else {
-                User user = userService.getUserByUsername(infoVo.getConductor());
-                infoVo.setUsername(user.getName());
-                infoVo.setSchoolId(user.getSchoolId());
-            }
-
-            Room room = roomService.getRoomInfoById(infoVo.getRoomId());
-            infoVo.setRoomName(room.getName());
-
-            infoVos.add(infoVo);
-        }
+        list.forEach(appointment -> infoVos.add(getAppointmentInfoVo(appointment)));
+//        for (Appointment appointment :
+//                list) {
+//            AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
+//            if (infoVo.getConductor() == null) {
+//                infoVo.setUsername(infoVo.getConductor());
+//            } else {
+//                User user = userService.getUserByUsername(infoVo.getLauncher());
+//                infoVo.setUsername(user.getName());
+//                infoVo.setSchoolId(user.getSchoolId());
+//            }
+//
+//            Room room = roomService.getRoomInfoById(infoVo.getRoomId());
+//            infoVo.setRoomName(room.getName());
+//
+//            infoVos.add(infoVo);
+//        }
         Map<String, Object> map = new HashMap<>();
         map.put("totalElements", page.getTotalElements());
         map.put("totalPages", page.getTotalPages());
@@ -96,21 +111,23 @@ public class AppointmentManagerController {
         return CommonResult.ok(ResultCode.SUCCESS).data(map);
     }
 
+
+
     @GetMapping("all")
     public CommonResult getAllAppointment(@RequestParam(required = false, name = "status") String status) {
         List<Appointment> list = appointmentService.getAllAppointment(status);
         List<AppointmentInfoVo> infoVos = new ArrayList<>();
-
-        for (Appointment appointment : list
-        ) {
-            AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
-            User user = userService.getUserByUsername(infoVo.getLauncher());
-            Room room = roomService.getRoomInfoById(infoVo.getRoomId());
-            infoVo.setSchoolId(user.getSchoolId());
-            infoVo.setUsername(user.getName());
-            infoVo.setRoomName(room.getName());
-            infoVos.add(infoVo);
-        }
+        list.forEach(appointment -> infoVos.add(getAppointmentInfoVo(appointment)));
+//        for (Appointment appointment : list
+//        ) {
+//            AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
+//            User user = userService.getUserByUsername(infoVo.getLauncher());
+//            Room room = roomService.getRoomInfoById(infoVo.getRoomId());
+//            infoVo.setSchoolId(user.getSchoolId());
+//            infoVo.setUsername(user.getName());
+//            infoVo.setRoomName(room.getName());
+//            infoVos.add(infoVo);
+//        }
         return CommonResult.ok(ResultCode.SUCCESS).data("appointments", infoVos);
     }
 
@@ -131,21 +148,22 @@ public class AppointmentManagerController {
         List<Appointment> list = page.getContent();
 
         List<AppointmentInfoVo> infoVos = new ArrayList<>();
-        for (Appointment appointment :
-                list) {
-            AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
-            User user = userService.getUserByUsername(infoVo.getLauncher());
-            Room room = roomService.getRoomInfoById(infoVo.getRoomId());
-            infoVo.setSchoolId(user.getSchoolId());
-            infoVo.setUsername(user.getName());
-            infoVo.setRoomName(room.getName());
-//            if (status == null || "".equals(status)) {
-//                if (AppointmentStatus.CANCEL.getStatus().equals(infoVo.getStatus()) || AppointmentStatus.REJECT.getStatus().equals(infoVo.getStatus())) {
-//                    continue;
-//                }
-//            }
-            infoVos.add(infoVo);
-        }
+        list.forEach(appointment -> infoVos.add(getAppointmentInfoVo(appointment)));
+//        for (Appointment appointment :
+//                list) {
+//            AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
+//            User user = userService.getUserByUsername(infoVo.getLauncher());
+//            Room room = roomService.getRoomInfoById(infoVo.getRoomId());
+//            infoVo.setSchoolId(user.getSchoolId());
+//            infoVo.setUsername(user.getName());
+//            infoVo.setRoomName(room.getName());
+////            if (status == null || "".equals(status)) {
+////                if (AppointmentStatus.CANCEL.getStatus().equals(infoVo.getStatus()) || AppointmentStatus.REJECT.getStatus().equals(infoVo.getStatus())) {
+////                    continue;
+////                }
+////            }
+//            infoVos.add(infoVo);
+//        }
 
         Map<String, Object> map = new HashMap<>();
         map.put("totalElements", page.getTotalElements());
