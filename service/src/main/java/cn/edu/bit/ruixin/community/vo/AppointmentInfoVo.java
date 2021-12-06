@@ -3,6 +3,8 @@ package cn.edu.bit.ruixin.community.vo;
 import cn.edu.bit.ruixin.community.annotation.FieldNeedCheck;
 import cn.edu.bit.ruixin.community.domain.Appointment;
 import cn.edu.bit.ruixin.community.exception.GlobalParamException;
+import com.fasterxml.jackson.annotation.JacksonInject;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 //import javax.validation.constraints.Pattern;
@@ -18,7 +20,7 @@ import java.util.Date;
  */
 @Data
 public class AppointmentInfoVo {
-
+    @JacksonInject
     private Integer id;
     private Integer begin; // 起始时间段
     private String username;

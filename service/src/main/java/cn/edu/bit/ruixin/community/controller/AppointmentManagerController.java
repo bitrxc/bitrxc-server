@@ -74,11 +74,17 @@ public class AppointmentManagerController {
         for (Appointment appointment :
                 list) {
             AppointmentInfoVo infoVo = AppointmentInfoVo.convertToVo(appointment);
-            User user = userService.getUserByUsername(infoVo.getLauncher());
+            if (infoVo.getConductor() == null) {
+                infoVo.setUsername(infoVo.getConductor());
+            } else {
+                User user = userService.getUserByUsername(infoVo.getConductor());
+                infoVo.setUsername(user.getName());
+                infoVo.setSchoolId(user.getSchoolId());
+            }
+
             Room room = roomService.getRoomInfoById(infoVo.getRoomId());
-            infoVo.setUsername(user.getName());
             infoVo.setRoomName(room.getName());
-            infoVo.setSchoolId(user.getSchoolId());
+
             infoVos.add(infoVo);
         }
         Map<String, Object> map = new HashMap<>();
