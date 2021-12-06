@@ -3,6 +3,7 @@ package cn.edu.bit.ruixin.community.service.impl;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -74,6 +75,12 @@ public class AdminServiceImpl implements AdminService {
             return adminRepository.findAll(example, pageable);
         }
         return adminRepository.findAll(pageable);
+    }
+
+    @Override
+    public Admin getAdminById(int adminId) throws NoSuchElementException {
+        // Throws error when element doesn't exist
+        return adminRepository.findById(adminId).get();
     }
 
     @Transactional(isolation = Isolation.REPEATABLE_READ,rollbackFor = Exception.class)

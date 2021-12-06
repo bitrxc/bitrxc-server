@@ -105,7 +105,7 @@ public class AdminController {
      * @return
      */
     @GetMapping("/managers")
-    public CommonResult getUserInfo(@RequestParam(value = "query", required = false) String nameLike, @RequestParam("pagenum") int current, @RequestParam("pagesize") int limit) {
+    public CommonResult getAdminPage(@RequestParam(value = "query", required = false) String nameLike, @RequestParam("pagenum") int current, @RequestParam("pagesize") int limit) {
         Pageable pageable = PageRequest.of(current, limit);
         if (nameLike != null && !nameLike.equals("")) {
             nameLike = "%" + nameLike + "%";
@@ -137,6 +137,18 @@ public class AdminController {
         return CommonResult.ok(ResultCode.SUCCESS).data(map);
     }
 
+    /**
+     * 根据ID获取管理员信息
+     *
+     * @return
+     */
+    @GetMapping("/managers/{aid}")
+    public CommonResult getAdminInfo(@PathVariable(value = "aid") int adminid) {
+
+        Admin admin = adminService.getAdminById(adminid);
+        AdminInfoVo adminInfoVo = AdminInfoVo.convertToVo(admin);
+        return CommonResult.ok(ResultCode.SUCCESS).data("info",adminInfoVo);
+    }
     /**
      * 添加管理员
      * @param adminInfoVo
