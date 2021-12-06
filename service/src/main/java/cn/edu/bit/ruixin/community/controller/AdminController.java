@@ -147,6 +147,8 @@ public class AdminController {
 
         Admin admin = adminService.getAdminById(adminid);
         AdminInfoVo adminInfoVo = AdminInfoVo.convertToVo(admin);
+        List<Role> roles = roleService.getRolesByAdminId(adminid);
+        adminInfoVo.setRoleList(roles);
         return CommonResult.ok(ResultCode.SUCCESS).data("info",adminInfoVo);
     }
     /**
