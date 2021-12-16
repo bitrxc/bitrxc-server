@@ -123,7 +123,7 @@ public class RoomManagerController {
      * 查询所有房间
      * @return
      */
-    @PreAuthorize("hasAuthority('room')")
+    @PreAuthorize("hasAnyAuthority('room','appointCheck')")
     @GetMapping("")
     public CommonResult getAllRoomList() {
         readLock.lock();
@@ -146,7 +146,7 @@ public class RoomManagerController {
      * @param limit
      * @return
      */
-    @PreAuthorize("hasAuthority('room')")
+    @PreAuthorize("hasAnyAuthority('room','appointCheck')")
     @GetMapping("/{current}/{limit}")
     public CommonResult getRoomPages(@PathVariable("current") int current, @PathVariable("limit") int limit) {
         readLock.lock();
