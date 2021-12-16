@@ -149,7 +149,7 @@ public class AppointmentManagerController {
     /**
      * 发起管理员预约。与一般用户预约不同，管理员预约的发起者字段为空。
      * @param infoVos
-     * @return
+     * @return 所有被撤销的管理员预约
      */
     @PreAuthorize("hasAuthority('appoint')")
     @PostMapping("/appoint")
@@ -162,7 +162,7 @@ public class AppointmentManagerController {
 
         return CommonResult.ok(ResultCode.SUCCESS).msg("管理员预约成功").data("conflictingAppointments",
                 deletedAppointments.stream()
-                        .map(appointment -> AppointmentInfoVo.convertToVo(appointment))
+                        .map(appointment -> getAppointmentInfoVo(appointment))
                         .collect(Collectors.toList()));
     }
 
@@ -189,9 +189,7 @@ public class AppointmentManagerController {
         return CommonResult.ok(ResultCode.SUCCESS)
                 .data("appointments", appointments.stream()
                         .map(appointment -> {
-                            AppointmentInfoVo appointmentInfoVo = AppointmentInfoVo.convertToVo(appointment);
-                            Room room = roomService.getRoomInfoById(appointment.getRoomId());
-                            appointmentInfoVo.setRoomName(room.getName());
+                            AppointmentInfoVo appointmentInfoVo = getAppointmentInfoVo(appointment);
                             return appointmentInfoVo;
                         })
                         .collect(Collectors.toList()));
