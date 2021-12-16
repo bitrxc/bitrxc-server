@@ -14,6 +14,4 @@ import org.springframework.data.jpa.repository.Query;
 public interface UserRepository extends JpaRepository<User, Integer>, JpaSpecificationExecutor<User> {
     User findUserByUsername(String username);
     User findUserBySchoolId(String schoolId);
-    @Query(nativeQuery = true, value = "SELECT * FROM ``")
-    User getUserBySchoolId(String schoolId);
 }

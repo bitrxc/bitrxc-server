@@ -23,9 +23,10 @@ public class PermissionController {
 
     /**
      * 添加权限，注意该接口尚未完成
-     * @deprecated
+     * 
      * @return
      */
+    @Deprecated
     @PreAuthorize("hasAuthority('manager')")
     @PostMapping("")
     public CommonResult addPermission(@RequestBody(required = true)Permission permission) {

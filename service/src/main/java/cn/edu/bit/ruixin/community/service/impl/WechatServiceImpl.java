@@ -47,7 +47,6 @@ public class WechatServiceImpl implements WechatService {
     public void notifyWechatUser(String openid,WxMessageTemplateVo appointmentinfo) throws JsonMappingException, JsonProcessingException, RuntimeException  {
         // 将字符编码调整为utf-8
         restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
-        // TODO Auto-generated method stub
         WxAppAccessVo accessVo = ensureAccessToken();
         String url = "https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=" + accessVo.getAccess_token();
         // 封装HTTP请求

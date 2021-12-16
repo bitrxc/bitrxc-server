@@ -20,7 +20,6 @@ import cn.edu.bit.ruixin.base.common.CommonResult;
 import cn.edu.bit.ruixin.base.common.ResultCode;
 import cn.edu.bit.ruixin.base.security.utils.ResponseUtils;
 import cn.edu.bit.ruixin.community.domain.Permission;
-import cn.edu.bit.ruixin.community.domain.Role;
 import cn.edu.bit.ruixin.community.service.PermissionService;
 import cn.edu.bit.ruixin.community.service.RedisService;
 import cn.edu.bit.ruixin.community.service.RoleService;
@@ -68,8 +67,6 @@ public class TokenAdminFilter extends OncePerRequestFilter {
                 // 更新活动状态
                 redisService.updateExpire(token, 30, TimeUnit.MINUTES);
                 chain.doFilter(request, response);
-                // ResponseUtils.out((HttpServletResponse) response,
-                //         CommonResult.error(ResultCode.NOAHTHORITY).msg("权限不足！"));
             } catch (Exception e) {
                 logger.debug("Error:", e);
                 ResponseUtils.out((HttpServletResponse) response,
@@ -97,26 +94,5 @@ public class TokenAdminFilter extends OncePerRequestFilter {
     private List<Permission> getPrivilege(AdminInfoVo adminInfoVo){
         List<Permission> perms = permissionService.getPermissionsByAdmin(AdminInfoVo.convertToPo(adminInfoVo));
         return perms;
-    }
-    
-    /**
-     * 
-     * Check Admin's Privilege. {@link https://shimo.im/docs/e1Az42LLOOcENEqW }
-     * 
-     * @param adminInfoVo
-     * @param servletPath
-     * @return
-     * @throws MalformedURLException
-     */
-    private Boolean checkPrivilege(AdminInfoVo adminInfoVo, String servletPath){
-        List<Role> roles = roleService.getRolesByAdminId(adminInfoVo.getId());
-        String path = servletPath;
-        Permission perm = permissionService.getPermissionByURL(path);
-        logger.debug("Path:"+path+" "+perm+" "+roles);
-        if(perm == null||roles==null){
-            return false;
-        }else{
-            return permissionService.checkPermission(perm, roles);
-        }
     }
 }

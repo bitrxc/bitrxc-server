@@ -39,7 +39,7 @@ public class UserConfigure extends WebSecurityConfigurerAdapter {
                 BasicAuthenticationFilter.class)
             .authorizeRequests(authorize -> authorize
                 .anyRequest().authenticated()
-                /* .hasRole("ADMIN")*/)
+                )
             .httpBasic();
     }
 }

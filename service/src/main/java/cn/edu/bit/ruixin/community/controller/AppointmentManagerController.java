@@ -7,13 +7,11 @@ import cn.edu.bit.ruixin.community.domain.Appointment;
 import cn.edu.bit.ruixin.community.domain.Room;
 import cn.edu.bit.ruixin.community.domain.Schedule;
 import cn.edu.bit.ruixin.community.domain.User;
-import cn.edu.bit.ruixin.community.myenum.AppointmentStatus;
 import cn.edu.bit.ruixin.community.service.AppointmentService;
 import cn.edu.bit.ruixin.community.service.RoomService;
 import cn.edu.bit.ruixin.community.service.ScheduleService;
 import cn.edu.bit.ruixin.community.service.UserService;
 import cn.edu.bit.ruixin.community.vo.AppointmentInfoVo;
-import cn.edu.bit.ruixin.community.vo.RoomInfoVo;
 import lombok.Getter;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,6 +91,11 @@ public class AppointmentManagerController {
         return CommonResult.ok(ResultCode.SUCCESS).data(map);
     }
 
+    /**
+     * 以不分页的方式，查询所有预约。可以查询某一状态的预约
+     * @param status
+     * @return
+     */
     @PreAuthorize("hasAuthority('appointCheck')")
     @GetMapping("all")
     public CommonResult getAllAppointment(@RequestParam(required = false, name = "status") String status) {
@@ -104,7 +107,7 @@ public class AppointmentManagerController {
     }
 
     /**
-     * 分页查询
+     * 以*分页*的方式，查询所有预约。可以查询某一状态的预约
      *
      * @param current
      * @param limit

@@ -14,7 +14,7 @@ import org.springframework.data.jpa.repository.Query;
  * TODO
  *
  * This repository handles which groups are assigned to an admin. Notice that 
- *   in fact this repository is an array field of admin, not a independent 
+ *   in fact this repository is an array field of admin, not an independent 
  *   record.
  * 
  * @author 78165

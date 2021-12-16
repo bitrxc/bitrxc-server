@@ -44,7 +44,9 @@ public class PermissionServiceImpl implements PermissionService {
 
     /**
      * This method only accepts path like `/path/to/api`, not include scheme.
+     * Entry point does not equals to url, so this method is incorrect
      */
+    @Deprecated
     @Override
     public Permission getPermissionByURL(String url){
         return permissionRepository.findPermissionLikeUrl(url);
