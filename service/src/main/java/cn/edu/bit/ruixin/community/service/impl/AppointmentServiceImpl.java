@@ -364,7 +364,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     private void notifyUserSuccess(Appointment appointment) {
         // 生成模板消息，通知预约人
         String launcherName = appointment.getLauncher();
-        if(launcherName.length() > 0){
+        if(launcherName != null &&  !launcherName.equals("")){
             WxAppointmentPassTemplateVo message = new WxAppointmentPassTemplateVo();
             User launcher = userRepository.findUserByUsername(launcherName);
             message.setName5(launcher.getName());
@@ -402,7 +402,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     private void notifyUserChange(Appointment appointment) {
         // 生成模板消息，通知预约人
         String launcherName = appointment.getLauncher();
-        if(launcherName.length() > 0){
+        if(launcherName != null &&  !launcherName.equals("")){
             WxAppointmentChangeTemplateVo message = new WxAppointmentChangeTemplateVo();
             User launcher = userRepository.findUserByUsername(launcherName);
             message.setThing9(launcher.getName());
