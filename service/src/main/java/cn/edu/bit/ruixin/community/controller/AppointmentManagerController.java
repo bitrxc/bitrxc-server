@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -63,6 +64,7 @@ public class AppointmentManagerController {
         return infoVo;
     }
 
+    @PreAuthorize("hasAuthority('appointCheck')")
     @GetMapping("")
     public CommonResult lookupAppointmentById(@RequestParam("id") Integer id) {
         Appointment appointment = appointmentService.getAppointmentById(id);
@@ -71,6 +73,7 @@ public class AppointmentManagerController {
         return CommonResult.ok(ResultCode.SUCCESS).data("appointment", infoVo);
     }
 
+    @PreAuthorize("hasAuthority('appointCheck')")
     @GetMapping("/{current}/{limit}/{schoolId}")
     public CommonResult lookupAppointmentBySchoolId(@PathVariable("current") int current, @PathVariable("limit") int limit, @PathVariable("schoolId") String schoolId) {
         // 构造分页对象
@@ -90,8 +93,7 @@ public class AppointmentManagerController {
         return CommonResult.ok(ResultCode.SUCCESS).data(map);
     }
 
-
-
+    @PreAuthorize("hasAuthority('appointCheck')")
     @GetMapping("all")
     public CommonResult getAllAppointment(@RequestParam(required = false, name = "status") String status) {
         List<Appointment> list = appointmentService.getAllAppointment(status);
@@ -108,6 +110,7 @@ public class AppointmentManagerController {
      * @param limit
      * @return
      */
+    @PreAuthorize("hasAuthority('appointCheck')")
     @GetMapping("/{current}/{limit}")
     public CommonResult getAppointmentPages(@PathVariable("current") int current, @PathVariable("limit") int limit, @RequestParam(required = false, name = "status") String status) {
         // 构造排序对象
@@ -129,6 +132,7 @@ public class AppointmentManagerController {
         return CommonResult.ok(ResultCode.SUCCESS).data(map);
     }
 
+    @PreAuthorize("hasAuthority('appointCheck')")
     @MsgSecCheck({"conductor", "checkNote"})
     @PutMapping("/check/{appointmentId}")
     public CommonResult check(@PathVariable(name = "appointmentId") Integer id,
@@ -139,6 +143,12 @@ public class AppointmentManagerController {
         return CommonResult.ok(ResultCode.SUCCESS).msg("审批操作成功!");
     }
 
+    /**
+     * 发起管理员预约。与一般用户预约不同，管理员预约的发起者字段为空。
+     * @param infoVos
+     * @return
+     */
+    @PreAuthorize("hasAuthority('appoint')")
     @PostMapping("/appoint")
     public CommonResult appoint(@RequestBody(required = true) AppointmentInfoVo[] infoVos) {
         List<Appointment> appointments = Arrays.stream(infoVos)
@@ -153,12 +163,23 @@ public class AppointmentManagerController {
                         .collect(Collectors.toList()));
     }
 
+    /**
+     * 撤销管理员预约
+     * @param ids
+     * @return
+     */
+    @PreAuthorize("hasAuthority('appoint')")
     @PutMapping("/cancel")
     public CommonResult cancel(@RequestBody(required = true) Integer[] ids) {
         appointmentService.cancelAppointmentsByAdminThroughIds(ids);
         return CommonResult.ok(ResultCode.SUCCESS).msg("撤销预约成功!");
     }
 
+    /**
+     * 查阅所有管理员预约
+     * @return
+     */
+    @PreAuthorize("hasAuthority('appoint')")
     @GetMapping("/allByAdmin")
     public CommonResult getAllAppointmentAppointedByAdmin() {
         List<Appointment> appointments = appointmentService.getAllAppointmentsAppointedByAdmin();
@@ -173,6 +194,11 @@ public class AppointmentManagerController {
                         .collect(Collectors.toList()));
     }
 
+    /**
+     * 管理员预约的可用房间时段
+     * @return
+     */
+    @PreAuthorize("hasAuthority('appoint')")
     @GetMapping("/availablePeriod")
     public CommonResult getAvailablePeriodByRoomId(@RequestParam(name = "roomId") Integer roomId, @RequestParam(name = "conductor") String conductor, @RequestParam(name = "date") String date) {
         Map result = roomService.getRoomFreeTimeByAdmin(roomId, conductor, date);
@@ -180,6 +206,11 @@ public class AppointmentManagerController {
                 .data(result);
     }
 
+    /**
+     * 所有时间段
+     * @return
+     */
+    @PreAuthorize("hasAuthority('appointCheck')")
     @GetMapping("/allTime")
     public CommonResult getAllTimeByAdmin() {
         List<Schedule> scheduleList = scheduleService.getAllTime();

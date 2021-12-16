@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -51,6 +52,7 @@ public class RoomManagerController {
         this.writeLock = readWriteLock.writeLock();
     }
 
+    @PreAuthorize("hasAuthority('room')")
     @MsgSecCheck("infoVo")
     @PostMapping("")
     public CommonResult addRoom(@RequestBody(required = true) RoomInfoVo infoVo) {
@@ -63,6 +65,7 @@ public class RoomManagerController {
      * @param id
      * @return
      */
+    @PreAuthorize("hasAuthority('room')")
     @DeleteMapping("/{id}")
     public CommonResult deleteRoomById(@PathVariable("id") Integer id) {
         // 保证缓存中数据一致性，使用写锁，防止在写操作完成前，读操作更新了缓存
@@ -80,6 +83,7 @@ public class RoomManagerController {
      * @param infoVo
      * @return
      */
+    @PreAuthorize("hasAuthority('room')")
     @MsgSecCheck("infoVo")
     @PutMapping("")
     public CommonResult updateRoomInfoById(@RequestBody(required = true) RoomInfoVo infoVo) {
@@ -98,6 +102,7 @@ public class RoomManagerController {
      * @param id
      * @return
      */
+    @PreAuthorize("hasAuthority('room')")
     @GetMapping("/{id}")
     public CommonResult getRoomInfoById(@PathVariable("id") Integer id) {
         readLock.lock();
@@ -118,6 +123,7 @@ public class RoomManagerController {
      * 查询所有房间
      * @return
      */
+    @PreAuthorize("hasAuthority('room')")
     @GetMapping("")
     public CommonResult getAllRoomList() {
         readLock.lock();
@@ -140,6 +146,7 @@ public class RoomManagerController {
      * @param limit
      * @return
      */
+    @PreAuthorize("hasAuthority('room')")
     @GetMapping("/{current}/{limit}")
     public CommonResult getRoomPages(@PathVariable("current") int current, @PathVariable("limit") int limit) {
         readLock.lock();
@@ -165,6 +172,7 @@ public class RoomManagerController {
         }
     }
 
+    @PreAuthorize("hasAuthority('room')")
     @GetMapping("/name")
     public CommonResult getRoomByName(@RequestParam("name")String name) {
         readLock.lock();
@@ -176,6 +184,7 @@ public class RoomManagerController {
         }
     }
 
+    @PreAuthorize("hasAuthority('room')")
     @GetMapping("/nameLike")
     public CommonResult getRoomByNameLike(@RequestParam("nameLike")String name) {
         readLock.lock();
@@ -199,6 +208,7 @@ public class RoomManagerController {
      * @param date
      * @return
      */
+    @PreAuthorize("hasAuthority('room')")
     @GetMapping("/free/time")
     public CommonResult getFreeTimeByRoomId(@RequestParam("roomId") Integer roomId, @RequestParam("username") String username, @RequestParam("date") String date) {
         Map map = roomService.getRoomFreeTime(roomId, username, date);

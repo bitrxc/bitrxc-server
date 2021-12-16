@@ -73,7 +73,7 @@ public class AdminController {
         // 添加用户角色、查询并添加用户可访问接口
         // add user's permission, gather url entry points avaliable for user, return both of them
         List<Role> roles = roleService.getRolesByAdminId(loginAdmin.getId());
-        List<Permission> permissions = permissionService.getPermissionsByRoles(roles);
+        List<Permission> permissions = permissionService.getPermissionsByAdmin(loginAdmin);
         List<String> urls = new ArrayList<String>();
         for(Permission i:permissions){
             urls.add(i.getUrl());
@@ -95,6 +95,7 @@ public class AdminController {
         }
     }
 
+    @PreAuthorize("hasAuthority('manager')")
     @GetMapping("/managers/roles")
     public CommonResult getAllRoles() {
         List<Role> roles = roleService.getAllRoles();
@@ -145,6 +146,7 @@ public class AdminController {
      *
      * @return
      */
+    @PreAuthorize("hasAuthority('manager')")
     @GetMapping("/managers/{aid}")
     public CommonResult getAdminInfo(@PathVariable(value = "aid") int adminid) {
 
@@ -159,6 +161,7 @@ public class AdminController {
      * @param adminInfoVo
      * @return
      */
+    @PreAuthorize("hasAuthority('manager')")
     @MsgSecCheck("adminInfoVo")
     @PostMapping("/managers")
     public CommonResult addAdmin(@RequestBody AdminInfoVo adminInfoVo) {
@@ -169,6 +172,7 @@ public class AdminController {
         return CommonResult.ok(ResultCode.SUCCESS).msg("添加成功！").data("adminInfo", infoVo);
     }
 
+    @PreAuthorize("hasAuthority('manager')")
     @MsgSecCheck({"email"})
     @PutMapping("/managers/{id}")
     public CommonResult modifyAdmin(@PathVariable(name = "id") int id,
@@ -181,12 +185,14 @@ public class AdminController {
         return CommonResult.ok(ResultCode.SUCCESS).data("adminInfo", infoVo);
     }
 
+    @PreAuthorize("hasAuthority('manager')")
     @DeleteMapping("/managers/{id}")
     public CommonResult deleteAdminById(@PathVariable("id") int id) {
         adminService.deleteAdminById(id);
         return CommonResult.ok(ResultCode.SUCCESS).msg("删除成功！");
     }
 
+    @PreAuthorize("hasAuthority('manager')")
     @PostMapping("/managers/{id}/role")
     public CommonResult assignRoleToAdmin(@PathVariable("id") int id, @RequestParam("rid") int role_id) {
         adminService.assignRoleToAdmin(id, role_id);
@@ -198,6 +204,7 @@ public class AdminController {
      * 注意，修改权限后，会产生新的 token ，新 token 内有提升的权限
      * TODO 旧 token 失效
      */
+    @PreAuthorize("hasAuthority('manager')")
     @PostMapping("/managers/{id}/roles")
     public CommonResult modifyAdminRoles(@PathVariable(name = "id") int id,
                                     @RequestBody(required = true) List<Integer> roles) {
