@@ -275,6 +275,13 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public void checkOutAppointment(Integer id, String status, String conductor, String checkNote) {
         Appointment appointment = appointmentRepository.findAppointmentById(id);
+        if (conductor == null || conductor.equals("")) {
+            throw new AppointmentDaoException("审批人姓名不可为空！");
+        }
+        if (checkNote == null) {
+            checkNote = "";
+            // throw new AppointmentDaoException("审批意见不可为空！");
+        }
         if (appointment != null) {
             if (appointment.getStatus().equals(AppointmentStatus.CANCEL.getStatus())) {
                 throw new AppointmentDaoException("该预约已经取消，无法审批!");
@@ -297,27 +304,23 @@ public class AppointmentServiceImpl implements AppointmentService {
                     throw new AppointmentDaoException("该预约未签退，只能修改为签退！");
                 }
             }
-            if (conductor != null && !conductor.equals("")) {
-                if (appointment.getStatus().equals(AppointmentStatus.NEW.getStatus()) && AppointmentStatus.RECEIVE.getStatus().equals(status)) {
-                    // 审批通过某一个预约，取消对该房间该时间段的其他预约，查询条件：roomId,时间段范围，状态：new
-                    List<Appointment> list = appointmentRepository.getAppointmentsByRoomIdAndTimesAndStatus(appointment.getRoomId(), appointment.getBegin(), appointment.getEnd(), AppointmentStatus.NEW.getStatus());
-                    for (Appointment app :
-                            list) {
-                        if (!app.getId().equals(appointment.getId())) {
-                            app.setStatus(AppointmentStatus.REJECT.getStatus());
-                            appointmentRepository.save(app);
-                            notifyUserSuccess(appointment);
-                        }
+            if (appointment.getStatus().equals(AppointmentStatus.NEW.getStatus()) && AppointmentStatus.RECEIVE.getStatus().equals(status)) {
+                // 审批通过某一个预约，取消对该房间该时间段的其他预约，查询条件：roomId,时间段范围，状态：new
+                List<Appointment> list = appointmentRepository.getAppointmentsByRoomIdAndTimesAndStatus(appointment.getRoomId(), appointment.getBegin(), appointment.getEnd(), AppointmentStatus.NEW.getStatus());
+                for (Appointment app :
+                        list) {
+                    if (!app.getId().equals(appointment.getId())) {
+                        app.setStatus(AppointmentStatus.REJECT.getStatus());
+                        appointmentRepository.save(app);
+                        notifyUserSuccess(appointment);
                     }
                 }
-                appointment.setStatus(status);
-                appointment.setConductor(conductor);
-                appointment.setCheckNote(checkNote);
-                appointmentRepository.save(appointment);
-                notifyUserSuccess(appointment);
-            } else {
-                throw new AppointmentDaoException("审批人姓名不可为空！");
             }
+            appointment.setStatus(status);
+            appointment.setConductor(conductor);
+            appointment.setCheckNote(checkNote);
+            appointmentRepository.save(appointment);
+            notifyUserSuccess(appointment);
         } else {
             throw new AppointmentDaoException("预约不存在！");
         }
