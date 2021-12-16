@@ -9,6 +9,7 @@ import cn.edu.bit.ruixin.community.exception.UserDaoException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -51,6 +52,13 @@ public class GlobalExceptionHandler {
     public CommonResult error(UserDaoException e) {
         logger.error(e.getMessage());
         return CommonResult.error(ResultCode.INTERNAL_SERVER_ERROR).msg(e.getMessage());
+    }
+    
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseBody
+    public CommonResult error(AccessDeniedException e) {
+        logger.error(e.getMessage());
+        return CommonResult.error(ResultCode.NOAHTHORITY).msg("当前用户权限不足！");
     }
 
     @ExceptionHandler(Exception.class)
