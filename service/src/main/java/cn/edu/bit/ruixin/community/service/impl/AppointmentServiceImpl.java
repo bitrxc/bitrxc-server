@@ -110,15 +110,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             // 还应该保证预约发起时间早于要预约的时间段的起始
             Schedule schedule = scheduleRepository.getOne(appointmentBegin);
             String begin = schedule.getBegin();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            String date = dateFormat.format(execDate);
-            String dateTime = date + " " + begin;
-            Date executeDate = null;
-            try {
-                executeDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(dateTime);
-            } catch (ParseException e) {
-                throw new AppointmentDaoException("实际执行预约使用的时间格式有误！");
-            }
+            Date executeDate = getExecDate(execDate,begin);
             if (launchDate.before(executeDate)) {
                 appointment.setLaunchDate(launchDate);
                 appointmentRepository.save(appointment);
@@ -161,15 +153,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 Date launchDate = new Date();
                 Schedule schedule = scheduleRepository.getOne(appointmentBegin);
                 String begin = schedule.getBegin();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                String date = dateFormat.format(execDate);
-                String dateTime = date + " " + begin;
-                Date executeDate = null;
-                try {
-                    executeDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(dateTime);
-                } catch (ParseException e) {
-                    throw new AppointmentDaoException("实际执行预约使用的时间格式有误！");
-                }
+                Date executeDate = getExecDate(execDate,begin);
                 if (launchDate.after(executeDate)) {
                     throw new AppointmentDaoException("该时间段已过，不可预约！");
                 } else {
@@ -329,9 +313,6 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public Page<Appointment> getAppointmentPages(Pageable pageable, String status) {
         if (status != null && !"".equals(status)) {
-//            Appointment appointment = new Appointment();
-//            appointment.setStatus(status);
-//            Example<Appointment> example = Example.of(appointment);
             return appointmentRepository.findAllPagesByStatus(status, pageable);
         } else {
             return appointmentRepository.findAllPages(AppointmentStatus.CANCEL.getStatus(), AppointmentStatus.REJECT.getStatus() , pageable);
@@ -350,6 +331,13 @@ public class AppointmentServiceImpl implements AppointmentService {
         throw new AppointmentDaoException("不存在该学号用户！");
     }
 
+    /**
+     * 根据预约执行的日期和当天的时间来生成预约执行的时间
+     * @param execDate
+     * @param begin 预约开始的时间，应为某一个时间段的begin或end属性
+     * @return
+     * @throws AppointmentDaoException
+     */
     private Date getExecDate(Date execDate,String begin) throws AppointmentDaoException{
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String date = dateFormat.format(execDate);

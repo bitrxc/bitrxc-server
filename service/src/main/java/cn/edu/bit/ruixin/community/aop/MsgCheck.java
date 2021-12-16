@@ -3,9 +3,10 @@ package cn.edu.bit.ruixin.community.aop;
 import cn.edu.bit.ruixin.community.annotation.FieldNeedCheck;
 import cn.edu.bit.ruixin.community.annotation.MsgSecCheck;
 import cn.edu.bit.ruixin.community.domain.WxAppAccessVo;
-import cn.edu.bit.ruixin.community.domain.WxAppProperties;
 import cn.edu.bit.ruixin.community.domain.WxAppResultVo;
 import cn.edu.bit.ruixin.community.exception.UserDaoException;
+import cn.edu.bit.ruixin.community.service.WechatService;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.aspectj.lang.JoinPoint;
@@ -38,7 +39,7 @@ import java.util.*;
 public class MsgCheck {
 
     @Autowired
-    private WxAppProperties appProperties;
+    private WechatService wechatService;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -54,13 +55,9 @@ public class MsgCheck {
     @Before(value = "@annotation(cn.edu.bit.ruixin.community.annotation.MsgSecCheck)&&@annotation(msgSecCheck)")
     public void beforeExecute(JoinPoint joinPoint, MsgSecCheck msgSecCheck) {
 //        System.out.println("进入切面");
-        // 向微信后台请求access_token
-        // 后期加入配置文件中，不使用硬编码
-        String url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="+appProperties.appId+"&secret="+appProperties.secret;
-        String accessResponse = restTemplate.getForObject(url, String.class);
         try {
-            // 获取access_token
-            WxAppAccessVo accessVo = mapper.readValue(accessResponse, WxAppAccessVo.class);
+            // 向微信后台请求access_token
+            WxAppAccessVo accessVo = wechatService.getAccessToken();
 
             // 利用反射，获取切入点方法参数
             Object[] args = joinPoint.getArgs();
