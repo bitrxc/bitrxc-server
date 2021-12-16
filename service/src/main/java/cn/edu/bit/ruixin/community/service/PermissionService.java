@@ -2,6 +2,7 @@ package cn.edu.bit.ruixin.community.service;
 
 import java.util.List;
 
+import cn.edu.bit.ruixin.community.domain.Admin;
 import cn.edu.bit.ruixin.community.domain.Permission;
 import cn.edu.bit.ruixin.community.domain.Role;
 
@@ -19,4 +20,6 @@ public interface PermissionService {
     Boolean checkPermission(Permission perm, List<Role> roles);
 
     List<Permission> getPermissionsByRoles(List<Role> roles);
+
+    List<Permission> getPermissionsByAdmin(Admin admin);
 }

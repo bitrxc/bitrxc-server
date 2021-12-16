@@ -5,6 +5,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -22,6 +23,7 @@ import cn.edu.bit.ruixin.community.service.RoleService;
  * @author jingkaimori
  * @date 2021/07/18
  */
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @Configuration
 @Order(4)                                                        
 public class AdminConfigure extends WebSecurityConfigurerAdapter {

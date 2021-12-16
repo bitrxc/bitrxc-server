@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -104,6 +106,7 @@ public class AdminController {
      *
      * @return
      */
+    @PreAuthorize("hasAuthority('manager')")
     @GetMapping("/managers")
     public CommonResult getAdminPage(@RequestParam(value = "query", required = false) String nameLike, @RequestParam("pagenum") int current, @RequestParam("pagesize") int limit) {
         Pageable pageable = PageRequest.of(current, limit);

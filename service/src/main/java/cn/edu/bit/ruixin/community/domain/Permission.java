@@ -4,6 +4,8 @@ import lombok.Data;
 
 import javax.persistence.*;
 
+import org.springframework.security.core.GrantedAuthority;
+
 /**
  * TODO
  *
@@ -13,11 +15,17 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name = "permission")
-public class Permission {
+public class Permission implements GrantedAuthority {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
     @Column(name = "url")
     private String url;
+    @Column(name = "name")
+    private String name;
+    @Override
+    public String getAuthority() {
+        return this.name;
+    }
 }

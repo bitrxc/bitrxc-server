@@ -31,6 +31,7 @@ import cn.edu.bit.ruixin.community.vo.AdminInfoVo;
  * Auth的处理方法（{@link BasicAuthenticationFilter}）
  * 实质上的凭据管理器为{@link RedisService}，但该管理器无法嵌入上述过滤器 目前鉴权模块继承于 filter 内
  * 将filter注册为component会导致过滤器链的顺序改变，详见{@link https://stackoverflow.com/questions/33537388/use-autowired-with-a-filter-configured-in-springboot}
+ * 利用springboot的鉴权注解来装饰controller方法实现鉴权
  * 
  * @author jingkaimori
  * @date 2021/07/12
@@ -59,19 +60,16 @@ public class TokenAdminFilter extends OncePerRequestFilter {
                 logger.debug("Service: " + redisService + " " + roleService + " Token:\" " + token + " \"");
                 // 获取登录状态
                 AdminInfoVo adminInfoVo = redisService.opsForValueGet(token, AdminInfoVo.class);
-                String servletPath = request.getServletPath();
-                // 鉴权
-                if (checkPrivilege(adminInfoVo, servletPath)) {
-                    UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(adminInfoVo.getId(), adminInfoVo.getPassword(), new ArrayList<>());
-                    // 将用户凭据放到认证权限上下文中，使得权限过滤器可以识别
-                    SecurityContextHolder.getContext().setAuthentication(authRequest);
-                    // 更新活动状态
-                    redisService.updateExpire(token, 30, TimeUnit.MINUTES);
-                    chain.doFilter(request, response);
-                } else {
-                    ResponseUtils.out((HttpServletResponse) response,
-                            CommonResult.error(ResultCode.NOAHTHORITY).msg("权限不足！"));
-                }
+                List<Permission> permlist = this.getPrivilege(adminInfoVo);
+
+                UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(adminInfoVo.getId(), adminInfoVo.getPassword(), permlist);
+                // 将用户凭据放到认证权限上下文中，使得权限过滤器可以识别
+                SecurityContextHolder.getContext().setAuthentication(authRequest);
+                // 更新活动状态
+                redisService.updateExpire(token, 30, TimeUnit.MINUTES);
+                chain.doFilter(request, response);
+                // ResponseUtils.out((HttpServletResponse) response,
+                //         CommonResult.error(ResultCode.NOAHTHORITY).msg("权限不足！"));
             } catch (Exception e) {
                 logger.debug("Error:", e);
                 ResponseUtils.out((HttpServletResponse) response,
@@ -87,6 +85,20 @@ public class TokenAdminFilter extends OncePerRequestFilter {
 
     }
 
+    /**
+     * 
+     * Get Admin's Privilege. {@link https://shimo.im/docs/e1Az42LLOOcENEqW }
+     * 
+     * @param adminInfoVo
+     * @param servletPath
+     * @return
+     * @throws MalformedURLException
+     */
+    private List<Permission> getPrivilege(AdminInfoVo adminInfoVo){
+        List<Permission> perms = permissionService.getPermissionsByAdmin(AdminInfoVo.convertToPo(adminInfoVo));
+        return perms;
+    }
+    
     /**
      * 
      * Check Admin's Privilege. {@link https://shimo.im/docs/e1Az42LLOOcENEqW }
