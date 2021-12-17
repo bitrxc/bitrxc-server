@@ -91,6 +91,33 @@ public class WechatServiceImpl implements WechatService {
         return accessVo;
     }
     
+    /** 请求微信后台的敏感词检验 */ 
+    @Override
+    public Boolean checkString(String content) throws JsonProcessingException {
+        WxAppAccessVo accessVo = ensureAccessToken();
+        String token = accessVo.getAccess_token();
+        String postUrl = "https://api.weixin.qq.com/wxa/msg_sec_check?access_token="+token;
+        // 封装HTTP请求
+        // 请求头，其实是一种多值Map
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // 封装请求体，json类型
+        Map<String, String> map = new HashMap<>();
+        map.put("content", content);
+        String valueAsString = mapper.writeValueAsString(map);
+
+        HttpEntity<String> request = new HttpEntity<>(valueAsString, headers);
+        ResponseEntity<WxAppResultVo> response = restTemplate.postForEntity(postUrl, request, WxAppResultVo.class);
+        // 获取响应体
+        WxAppResultVo responseBody = response.getBody();
+        if (responseBody == null) {
+            throw new RuntimeException("服务器异常，请重试！");
+        }
+        return responseBody.getErrcode() != 87014;
+        
+    }
+    
     private WxAppAccessVo ensureAccessToken() throws JsonMappingException, JsonProcessingException {
         if(expireTime.before(new Date())){ //token 过期
             accessVo = getAccessToken();

@@ -10,4 +10,6 @@ public interface WechatService {
     public void notifyWechatUser(String openid,WxMessageTemplateVo appointmentinfo) throws JsonMappingException, JsonProcessingException, RuntimeException;
 
     public WxAppAccessVo getAccessToken() throws JsonMappingException, JsonProcessingException;
+
+    public Boolean checkString(String content) throws JsonProcessingException;
 }
