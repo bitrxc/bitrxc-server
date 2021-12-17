@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import cn.edu.bit.ruixin.community.domain.WxAppAccessVo;
+import cn.edu.bit.ruixin.community.domain.WxAppVO;
 import cn.edu.bit.ruixin.community.domain.WxMessageTemplateVo;
 
 public interface WechatService {
@@ -12,4 +13,6 @@ public interface WechatService {
     public WxAppAccessVo getAccessToken() throws JsonMappingException, JsonProcessingException;
 
     public Boolean checkString(String content) throws JsonProcessingException;
+
+    public WxAppVO login(String tempcode) throws JsonMappingException, JsonProcessingException;
 }

@@ -5,17 +5,16 @@ import cn.edu.bit.ruixin.base.common.ResultCode;
 import cn.edu.bit.ruixin.base.security.utils.TokenManager;
 import cn.edu.bit.ruixin.community.annotation.MsgSecCheck;
 import cn.edu.bit.ruixin.community.domain.User;
-import cn.edu.bit.ruixin.community.domain.WxAppProperties;
 import cn.edu.bit.ruixin.community.domain.WxAppVO;
 import cn.edu.bit.ruixin.community.service.RedisService;
 import cn.edu.bit.ruixin.community.service.UserService;
+import cn.edu.bit.ruixin.community.service.WechatService;
 import cn.edu.bit.ruixin.community.vo.UserInfoVo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,16 +33,13 @@ import java.util.concurrent.TimeUnit;
 public class UserController {
 
     @Autowired
-    private WxAppProperties wxAppProperties;
-
-    @Autowired
     private UserService userService;
 
     @Autowired
-    private TokenManager tokenManager;
+    private WechatService wechatService;
 
     @Autowired
-    private RestTemplate restTemplate;
+    private TokenManager tokenManager;
 
     @Autowired
     private RedisService redisService;
@@ -51,13 +47,13 @@ public class UserController {
 
     @GetMapping("/login")
     public CommonResult loginFromWeiXin(@RequestParam("code")String code) {
-
-        String url = "https://api.weixin.qq.com/sns/jscode2session?appid="+ wxAppProperties.appId +"&secret="+wxAppProperties.secret+"&js_code="+code+"&grant_type=authorization_code";
-        String object = restTemplate.getForObject(url, String.class);
-        // JSON字符串处理工具
-        Gson gson = new Gson();
-
-        WxAppVO appVO = gson.fromJson(object, WxAppVO.class);
+        WxAppVO appVO;
+        try {
+            appVO = wechatService.login(code);
+        } catch (JsonProcessingException e1) {
+            // 抛出异常
+            return CommonResult.error(ResultCode.INTERNAL_SERVER_ERROR).msg("登录失败，请重试！");
+        }
 
         if (appVO.getOpenid() != null) { // 微信后台认证成功，存入数据库，表示登录成功
             User user = userService.getUserByUsername(appVO.getOpenid());

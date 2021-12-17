@@ -21,6 +21,7 @@ import org.springframework.web.client.RestTemplate;
 import cn.edu.bit.ruixin.community.domain.WxAppAccessVo;
 import cn.edu.bit.ruixin.community.domain.WxAppProperties;
 import cn.edu.bit.ruixin.community.domain.WxAppResultVo;
+import cn.edu.bit.ruixin.community.domain.WxAppVO;
 import cn.edu.bit.ruixin.community.domain.WxMessageTemplateVo;
 import cn.edu.bit.ruixin.community.service.WechatService;
 
@@ -124,5 +125,16 @@ public class WechatServiceImpl implements WechatService {
             expireTime.setTime(expireTime.getTime() + (accessVo.getExpires_in()-5)*1000);
         }else{}
         return accessVo;
+    }
+
+    @Override
+    public WxAppVO login(String tempcode) throws JsonProcessingException {
+
+        String url = "https://api.weixin.qq.com/sns/jscode2session?appid="+ appProperties.appId +"&secret="+appProperties.secret+"&js_code="+tempcode+"&grant_type=authorization_code";
+        String object = restTemplate.getForObject(url, String.class);
+        // JSON字符串处理工具
+
+        WxAppVO appVO = mapper.readValue(object, WxAppVO.class);
+        return appVO;
     }
 }
