@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -100,7 +101,11 @@ public class AdminServiceImpl implements AdminService {
     @Transactional(isolation = Isolation.READ_COMMITTED,rollbackFor = Exception.class)
     @Override
     public void deleteAdminById(int id) {
-        adminRepository.deleteById(id);
+        try {
+            adminRepository.deleteById(id);
+        } catch (ConstraintViolationException e) {
+            throw new UserDaoException("出于数据库完整性考虑，无法删除此管理员，请考虑撤销其所有权限");
+        }
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED,rollbackFor = Exception.class)
