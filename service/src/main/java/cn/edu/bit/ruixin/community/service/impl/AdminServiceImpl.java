@@ -52,16 +52,21 @@ public class AdminServiceImpl implements AdminService {
     public Admin login(Admin admin) {
         if (admin == null || admin.getUsername() == null || "".equals(admin.getUsername()) || admin.getPassword() == null || "".equals(admin.getPassword())) {
             throw new UserDaoException("用户名密码不能为空!");
-        }
-        else {
+        } else {
             String username = admin.getUsername();
             Admin adminByUsername = adminRepository.findAdminByUsername(username);
-            String password = adminByUsername.getPassword();
-//            password = passwordEncoder.encode(password);
-            if (!password.equals(admin.getPassword())) {
-                throw new UserDaoException("用户名密码错误!");
-            } else {
-                return adminByUsername;
+            if(adminByUsername != null){
+                String password = adminByUsername.getPassword();
+                // password = passwordEncoder.encode(password);
+                if (!password.equals(admin.getPassword())) {
+                    // 用户密码错误
+                    throw new UserDaoException("用户名或密码错误!");
+                } else {
+                    return adminByUsername;
+                }
+            }else{
+                // 用户未找到
+                throw new UserDaoException("用户名或密码错误!");
             }
         }
     }
