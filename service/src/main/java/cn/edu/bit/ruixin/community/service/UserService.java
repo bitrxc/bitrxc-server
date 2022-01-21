@@ -9,6 +9,8 @@ import cn.edu.bit.ruixin.community.domain.User;
  * @date 2021/2/5
  */
 public interface UserService {
+    User getUserBySchoolId(String schoolId);
+
     User getUserByUsername(String username);
 
     void registerNewUser(User user);

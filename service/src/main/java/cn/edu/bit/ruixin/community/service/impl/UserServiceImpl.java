@@ -39,6 +39,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public User getUserBySchoolId(String schoolId) {
+        return userRepository.findUserBySchoolId(schoolId);
+    }
+
+    @Override
     @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
     public void registerNewUser(User user) {
         String source = user.getPassword();
