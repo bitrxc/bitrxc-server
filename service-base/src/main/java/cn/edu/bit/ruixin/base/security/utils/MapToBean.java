@@ -1,16 +1,16 @@
 package cn.edu.bit.ruixin.base.security.utils;
 
-import org.springframework.stereotype.Component;
-
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * TODO
+ * 在Java类型的对象和Map键值对之间转换对象的工具方法
  *
  * @author 78165
- * @date 2021/3/16
+ * @author jingkaimori
+ * @date 2022/1/23
  */
 public class MapToBean {
     
@@ -29,8 +29,10 @@ public class MapToBean {
         return map;
     }
 
-    public static <T> T mapToBean(Map<String, Object> map, Class<T> tClass) throws IllegalAccessException, InstantiationException {
-        T instance = tClass.newInstance();
+    public static <T> T mapToBean(Map<String, Object> map, Class<T> tClass) throws 
+        NoSuchMethodException,InvocationTargetException, IllegalAccessException, InstantiationException
+    {
+        T instance = tClass.getConstructor().newInstance();
         Field[] fields = tClass.getDeclaredFields();
         for (Field field :
                 fields) {
