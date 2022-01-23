@@ -34,6 +34,7 @@ public class WechatServiceImpl implements WechatService {
     @Autowired
     private WxAppProperties appProperties;
     
+    /** JSON字符串处理工具 */
     @Autowired
     private ObjectMapper mapper;
 
@@ -45,7 +46,7 @@ public class WechatServiceImpl implements WechatService {
      * 通知微信用户
      */
     @Override
-    public void notifyWechatUser(String openid,WxMessageTemplateVo appointmentinfo) throws JsonMappingException, JsonProcessingException, RuntimeException  {
+    public void notifyWechatUser(String openid,WxMessageTemplateVo appointmentinfo) throws RuntimeException  {
         // 将字符编码调整为utf-8
         restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
         WxAppAccessVo accessVo = ensureAccessToken();
@@ -62,7 +63,12 @@ public class WechatServiceImpl implements WechatService {
         body.put("miniprogram_state", "develop");
         body.put("data", appointmentinfo);
 
-        String valueAsString = mapper.writeValueAsString(body);
+        String valueAsString;
+        try {
+            valueAsString = mapper.writeValueAsString(body);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("服务器异常，请联系开发人员以寻求帮助！",e);
+        }
 
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(valueAsString, headers);
@@ -83,18 +89,23 @@ public class WechatServiceImpl implements WechatService {
      * @throws JsonMappingException
      */
     @Override
-    public WxAppAccessVo getAccessToken() throws JsonMappingException, JsonProcessingException {
-        // 后期加入配置文件中，不使用硬编码
+    public WxAppAccessVo getAccessToken() throws RuntimeException {
+        // 由于微信的后台api相对稳定 额外的配置代码会引入其他问题 因此硬编码可以接受
         String url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="+appProperties.appId+"&secret="+appProperties.secret;
         String accessResponse = restTemplate.getForObject(url, String.class);
         // 获取access_token
-        WxAppAccessVo accessVo = mapper.readValue(accessResponse, WxAppAccessVo.class);
-        return accessVo;
+        // 处理上游服务器格式异常
+        try{
+            WxAppAccessVo accessVo = mapper.readValue(accessResponse, WxAppAccessVo.class);
+            return accessVo;
+        }catch(JsonProcessingException e){
+            throw new RuntimeException("服务器异常，请联系开发人员以寻求帮助！",e);
+        }
     }
     
     /** 请求微信后台的敏感词检验 */ 
     @Override
-    public Boolean checkString(String content) throws JsonProcessingException {
+    public Boolean checkString(String content) throws RuntimeException {
         WxAppAccessVo accessVo = ensureAccessToken();
         String token = accessVo.getAccess_token();
         String postUrl = "https://api.weixin.qq.com/wxa/msg_sec_check?access_token="+token;
@@ -106,7 +117,12 @@ public class WechatServiceImpl implements WechatService {
         // 封装请求体，json类型
         Map<String, String> map = new HashMap<>();
         map.put("content", content);
-        String valueAsString = mapper.writeValueAsString(map);
+        String valueAsString;
+        try {
+            valueAsString = mapper.writeValueAsString(map);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("服务器异常，请联系开发人员以寻求帮助！",e);
+        }
 
         HttpEntity<String> request = new HttpEntity<>(valueAsString, headers);
         ResponseEntity<WxAppResultVo> response = restTemplate.postForEntity(postUrl, request, WxAppResultVo.class);
@@ -119,7 +135,7 @@ public class WechatServiceImpl implements WechatService {
         
     }
     
-    private WxAppAccessVo ensureAccessToken() throws JsonMappingException, JsonProcessingException {
+    private WxAppAccessVo ensureAccessToken() throws RuntimeException {
         if(expireTime.before(new Date())){ //token 过期
             accessVo = getAccessToken();
             expireTime.setTime(expireTime.getTime() + (accessVo.getExpires_in()-5)*1000);
@@ -128,13 +144,15 @@ public class WechatServiceImpl implements WechatService {
     }
 
     @Override
-    public WxAppVO login(String tempcode) throws JsonProcessingException {
-
+    public WxAppVO login(String tempcode) throws RuntimeException {
         String url = "https://api.weixin.qq.com/sns/jscode2session?appid="+ appProperties.appId +"&secret="+appProperties.secret+"&js_code="+tempcode+"&grant_type=authorization_code";
         String object = restTemplate.getForObject(url, String.class);
-        // JSON字符串处理工具
 
-        WxAppVO appVO = mapper.readValue(object, WxAppVO.class);
-        return appVO;
+        try{
+            WxAppVO appVO = mapper.readValue(object, WxAppVO.class);
+            return appVO;
+        }catch(JsonProcessingException e){
+            throw new RuntimeException("登录失败，请重试！亦可联系开发人员以寻求帮助",e);
+        }
     }
 }

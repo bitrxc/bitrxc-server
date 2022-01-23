@@ -16,8 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
@@ -48,13 +46,8 @@ public class UserController {
     @GetMapping("/login")
     public CommonResult loginFromWeiXin(@RequestParam("code")String code) {
         WxAppVO appVO;
-        try {
-            appVO = wechatService.login(code);
-        } catch (JsonProcessingException e1) {
-            // 抛出异常
-            return CommonResult.error(ResultCode.INTERNAL_SERVER_ERROR).msg("登录失败，请重试！");
-        }
-
+        // 此处的异常由微信服务封装
+        appVO = wechatService.login(code);
         if (appVO.getOpenid() != null) { // 微信后台认证成功，存入数据库，表示登录成功
             User user = userService.getUserByUsername(appVO.getOpenid());
             // 如果是第一次登陆，将微信用户信息存入数据库

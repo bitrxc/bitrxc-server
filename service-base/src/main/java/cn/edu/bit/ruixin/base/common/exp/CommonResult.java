@@ -6,6 +6,7 @@ import cn.edu.bit.ruixin.base.common.ResultCode;
 
 /**
  * 统一返回结果封装（泛型化实验类）
+ * 
  * TODO 区分Object 根类型和Null类型
  * 由于Java语言中，null可以为任何类型，因此不存在专门的Null类型，文档中使用Object类型代替Null类型
  *
@@ -14,13 +15,13 @@ import cn.edu.bit.ruixin.base.common.ResultCode;
  */
 @Data
 public class CommonResult<T> {
-//    @ApiModelProperty("请求结果是否成功")
+    /** 请求结果是否成功 */
     private Boolean success;
-//    @ApiModelProperty("请求响应状态码")
+    /** 响应状态码 */
     private Integer code;
-//    @ApiModelProperty("响应消息")
+    /** 响应消息 */
     private String message;
-//    @ApiModelProperty("响应结果数据")
+    /** 响应结果数据 */
     private T data;
 
     private CommonResult(ResultCode resultCode) {

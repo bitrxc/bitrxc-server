@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -91,7 +89,7 @@ public class MsgCheck {
 
             if (!flag) throw new UserDaoException("您上传的内容含有敏感成分，请检查！");
 
-        } catch (JsonProcessingException | IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             throw new RuntimeException("服务器出错，请重试！");
         }
     }
