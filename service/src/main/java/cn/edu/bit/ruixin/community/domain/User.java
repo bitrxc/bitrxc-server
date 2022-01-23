@@ -11,9 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * `User` 数据库表，该表存储用户的个人信息
  * TODO
  *
  * @author 78165
+ * @author jingkaimori
  * @date 2021/2/5
  */
 @Entity
@@ -37,6 +39,10 @@ public class User {
     private String password;
     @Column(name = "school_id")
     private String schoolId;
+
+    /** 用户资质是否经过核验 */
+    @Column(name = "checked")
+    private Boolean checked;
     @Transient
     private List<String> permissionValueList = new ArrayList<>();
 

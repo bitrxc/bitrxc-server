@@ -18,7 +18,7 @@ import cn.edu.bit.ruixin.community.vo.UserInfoVo;
 import lombok.Data;
 
 /**
- * 
+ * 管理员用户信息更改接口
  *
  * @author jingkaimori
  * @date 2021/2/5
@@ -31,6 +31,11 @@ public class UserManagerController {
     @Autowired
     private UserService userService;
     
+    /**
+     * 修改用户信息
+     * @param infoVo 包含用户填写的各个字段的结构体
+     * @return
+     */
     @PreAuthorize("hasAuthority('user')")
     @MsgSecCheck("infoVo")
     @PostMapping("")
@@ -40,6 +45,26 @@ public class UserManagerController {
         return CommonResult.ok(Object.class).msg("修改用户信息成功!");
     }
 
+    /**
+     * 修改用户的验证状态
+     * @param userid 用户Id
+     * @param check 用户为合法用户是，此参数填true
+     * @return
+     */
+    @PreAuthorize("hasAuthority('user')")
+    @PostMapping("/check")
+    public CommonResult<Object> checkUser(
+        @RequestParam(required = true)int userid,@RequestParam(required = true)boolean check
+    ){
+        userService.checkUser(userid, check);
+        return CommonResult.ok(Object.class).msg("修改用户状态成功!");
+    }
+
+    /**
+     * 通过微信id查找用户
+     * @param username 微信Id
+     * @return
+     */
     @PreAuthorize("hasAnyAuthority('room','appointCheck')")
     @GetMapping("/byWxid")
     public CommonResult<UserInfoReturnVo> getUserInfoByWxid(
@@ -50,6 +75,12 @@ public class UserManagerController {
             .data(new UserInfoReturnVo(user));
     }
 
+    /**
+     * 通过用户学号来查找用户
+     * @see {@link AppointmentManagerController#lookupAppointmentBySchoolId(int, int, String) lookupAppointmentBySchoolId}
+     * @param schoolId
+     * @return
+     */
     @PreAuthorize("hasAnyAuthority('room','appointCheck')")
     @GetMapping("/bySchoolId")
     public CommonResult<UserInfoReturnVo> getUserInfoBySchoolId(
@@ -63,6 +94,7 @@ public class UserManagerController {
 
 @Data
 class UserInfoReturnVo{
+    /** 返回的用户信息 */
     private UserInfoVo userInfo;
 
     UserInfoReturnVo(User user){

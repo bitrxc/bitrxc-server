@@ -16,4 +16,6 @@ public interface UserService {
     void registerNewUser(User user);
 
     void modifyUser(User user);
+
+    void checkUser(int userid,boolean checked);
 }

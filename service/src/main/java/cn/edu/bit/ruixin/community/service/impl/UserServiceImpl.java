@@ -5,6 +5,9 @@ import cn.edu.bit.ruixin.community.domain.User;
 import cn.edu.bit.ruixin.community.exception.UserDaoException;
 import cn.edu.bit.ruixin.community.repository.UserRepository;
 import cn.edu.bit.ruixin.community.service.UserService;
+
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -56,6 +59,19 @@ public class UserServiceImpl implements UserService {
         }
 
         userRepository.save(user);
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
+    public void checkUser(int userid,boolean checked){
+        Optional<User> usergot = userRepository.findById(userid);
+        if(usergot.isPresent()){
+            User user = usergot.get();
+            user.setChecked(checked);
+            userRepository.save(user);
+        } else {
+            throw new UserDaoException("该用户不存在!");
+        }
     }
 
     @Override
