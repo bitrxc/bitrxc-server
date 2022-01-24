@@ -78,10 +78,6 @@ public class TokenAdminFilter extends OncePerRequestFilter {
         }
     }
 
-    private class InvalidTokenException extends Exception {
-
-    }
-
     /**
      * 
      * Get Admin's Privilege. {@link https://shimo.im/docs/e1Az42LLOOcENEqW }

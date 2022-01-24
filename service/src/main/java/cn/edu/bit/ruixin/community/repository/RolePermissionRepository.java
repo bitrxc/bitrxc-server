@@ -1,7 +1,5 @@
 package cn.edu.bit.ruixin.community.repository;
 
-import cn.edu.bit.ruixin.community.domain.Permission;
-import cn.edu.bit.ruixin.community.domain.Role;
 import cn.edu.bit.ruixin.community.domain.RolePermission;
 
 import java.util.List;

@@ -1,6 +1,5 @@
 package cn.edu.bit.ruixin.community.repository;
 
-import cn.edu.bit.ruixin.community.domain.Admin;
 import cn.edu.bit.ruixin.community.domain.AdminRole;
 
 import java.util.List;
