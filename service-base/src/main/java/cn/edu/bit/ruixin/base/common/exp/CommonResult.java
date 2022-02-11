@@ -7,8 +7,8 @@ import cn.edu.bit.ruixin.base.common.ResultCode;
 /**
  * 统一返回结果封装（泛型化实验类）
  * 
- * TODO 区分Object 根类型和Null类型
- * 由于Java语言中，null可以为任何类型，因此不存在专门的Null类型，文档中使用Object类型代替Null类型
+ * 由于Java语言中，null可以被赋值给任何类型，因此不存在专门的Null类型。
+ * 由于Void类型的唯一合理值为Null，故利用Void类型代替Null类型
  *
  * @author jingkaimori
  * @date 2022/1/20

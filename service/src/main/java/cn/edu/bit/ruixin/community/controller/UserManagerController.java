@@ -39,10 +39,10 @@ public class UserManagerController {
     @PreAuthorize("hasAuthority('user')")
     @MsgSecCheck("infoVo")
     @PostMapping("")
-    public CommonResult<Object> modifyUser(@RequestBody(required = true)UserInfoVo infoVo) {
+    public CommonResult<Void> modifyUser(@RequestBody(required = true)UserInfoVo infoVo) {
         User user = UserInfoVo.convertToPo(infoVo);
         userService.modifyUser(user);
-        return CommonResult.ok(Object.class).msg("修改用户信息成功!");
+        return CommonResult.ok(Void.class).msg("修改用户信息成功!");
     }
 
     /**
@@ -53,11 +53,11 @@ public class UserManagerController {
      */
     @PreAuthorize("hasAuthority('user')")
     @PostMapping("/check")
-    public CommonResult<Object> checkUser(
+    public CommonResult<Void> checkUser(
         @RequestParam(required = true)int userid,@RequestParam(required = true)boolean check
     ){
         userService.checkUser(userid, check);
-        return CommonResult.ok(Object.class).msg("修改用户状态成功!");
+        return CommonResult.ok(Void.class).msg("修改用户状态成功!");
     }
 
     /**
