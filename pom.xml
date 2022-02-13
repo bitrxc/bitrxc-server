@@ -6,6 +6,7 @@
     <modules>
         <module>service-base</module>
         <module>service</module>
+        <module>docgen</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -88,5 +89,24 @@
         </dependency>
     </dependencies>
 
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.3.1</version>
+                <configuration>
+                    <doclet>cn.edu.bit.ruixin.doc.Docgen</doclet>
+    
+                    <!-- <docletPath>/path/to/doccheck.jar</docletPath> -->
+                    <docletArtifact>
+                        <groupId>cn.edu.bit.ruixin</groupId>
+                        <artifactId>docgen</artifactId>
+                        <version>0.0.1-SNAPSHOT</version>
+                    </docletArtifact>
+                    <useStandardDocletOptions>false</useStandardDocletOptions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
