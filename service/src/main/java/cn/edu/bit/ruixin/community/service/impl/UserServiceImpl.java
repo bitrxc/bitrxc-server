@@ -6,8 +6,6 @@ import cn.edu.bit.ruixin.community.exception.UserDaoException;
 import cn.edu.bit.ruixin.community.repository.UserRepository;
 import cn.edu.bit.ruixin.community.service.UserService;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -38,13 +36,23 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public User getUserByUsername(String username) {
-        return userRepository.findUserByUsername(username);
+        User user = userRepository.findUserByUsername(username);
+        if(user != null){
+            return user;
+        }else{
+            throw new UserDaoException("用户不存在或未录入系统");
+        }
     }
 
     @Override
     @Transactional(readOnly = true)
     public User getUserBySchoolId(String schoolId) {
-        return userRepository.findUserBySchoolId(schoolId);
+        User user = userRepository.findUserBySchoolId(schoolId);
+        if(user != null){
+            return user;
+        }else{
+            throw new UserDaoException("用户不存在或未录入系统");
+        }
     }
 
     @Override
@@ -62,11 +70,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
-    public void checkUser(int userid,boolean checked){
-        Optional<User> usergot = userRepository.findById(userid);
-        if(usergot.isPresent()){
-            User user = usergot.get();
+    @Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
+    public void checkUser(String username,boolean checked){
+        User usergot = userRepository.findUserByUsername(username);
+        if(usergot != null){
+            User user = usergot;
             user.setChecked(checked);
             userRepository.save(user);
         } else {

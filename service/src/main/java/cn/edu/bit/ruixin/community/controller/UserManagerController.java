@@ -54,9 +54,9 @@ public class UserManagerController {
     @PreAuthorize("hasAuthority('user')")
     @PostMapping("/check")
     public CommonResult<Void> checkUser(
-        @RequestParam(required = true)int userid,@RequestParam(required = true)boolean check
+        @RequestParam(required = true)String username,@RequestParam(required = true)boolean check
     ){
-        userService.checkUser(userid, check);
+        userService.checkUser(username, check);
         return CommonResult.ok(Void.class).msg("修改用户状态成功!");
     }
 

@@ -17,5 +17,5 @@ public interface UserService {
 
     void modifyUser(User user);
 
-    void checkUser(int userid,boolean checked);
+    void checkUser(String username,boolean checked);
 }
