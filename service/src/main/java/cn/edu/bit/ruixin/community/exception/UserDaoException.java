@@ -1,6 +1,7 @@
 package cn.edu.bit.ruixin.community.exception;
 
 /**
+ * 如果错误和用户的认证或查询过程有关，则抛出此异常
  * TODO
  *
  * @author 78165
