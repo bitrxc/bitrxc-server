@@ -2,6 +2,8 @@ package cn.edu.bit.ruixin.community.vo;
 
 import cn.edu.bit.ruixin.community.annotation.FieldNeedCheck;
 import cn.edu.bit.ruixin.community.domain.User;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * TODO
@@ -9,6 +11,8 @@ import cn.edu.bit.ruixin.community.domain.User;
  * @author 78165
  * @date 2021/2/5
  */
+@Data
+@NoArgsConstructor
 public class UserInfoVo {
 
     // wxid
@@ -27,54 +31,11 @@ public class UserInfoVo {
     @FieldNeedCheck
     private String organization;
 
-    public String getSchoolId() {
-        return schoolId;
-    }
+    private Boolean checked;
 
-    public void setSchoolId(String schoolId) {
-        this.schoolId = schoolId;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getOrganization() {
-        return organization;
-    }
-
-    public void setOrganization(String organization) {
-        this.organization = organization;
-    }
-
+    /**
+     * 该方法会忽略传入的用户检查标志，即{@link UserInfoVo#checked checked}字段
+     */
     public static User convertToPo(UserInfoVo infoVo) {
         User user = new User();
         user.setUsername(infoVo.getUsername());
@@ -93,6 +54,7 @@ public class UserInfoVo {
         infoVo.setPhone(user.getPhone());
         infoVo.setUsername(user.getUsername());
         infoVo.setSchoolId(user.getSchoolId());
+        infoVo.setChecked(user.getChecked());
         return infoVo;
     }
 
