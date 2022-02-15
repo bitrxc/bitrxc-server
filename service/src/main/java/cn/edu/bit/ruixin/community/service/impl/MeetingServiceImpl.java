@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import cn.edu.bit.ruixin.community.domain.AttendenceRecord;
 import cn.edu.bit.ruixin.community.domain.Meeting;
@@ -16,6 +17,7 @@ import cn.edu.bit.ruixin.community.repository.UserRepository;
 import cn.edu.bit.ruixin.community.service.MeetingService;
 import cn.edu.bit.ruixin.community.vo.MeetingInfoVo;
 
+@Service
 public class MeetingServiceImpl implements MeetingService {
     @Autowired
     private AppointmentRepository appointmentRepository;
