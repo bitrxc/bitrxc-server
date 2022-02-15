@@ -28,13 +28,13 @@ public class MeetingController {
     @Autowired
     private MeetingService meetingService;
 
-    @GetMapping("/getMeeting")
+    @GetMapping("/getMeetingById")
     public CommonResult<meetingInfoReturnVo> getMeetingById(@RequestParam(name = "id") int meetingid){
         meetingInfoReturnVo mReturnVo = new meetingInfoReturnVo();
         mReturnVo.setMeeting(meetingService.getMeeting(meetingid));
         return CommonResult.ok(meetingInfoReturnVo.class).data(mReturnVo);
     }
-    @GetMapping("/getMeeting")
+    @GetMapping("/getMeetingByUser")
     public CommonResult<meetingListReturnVo> getMeetingByUser(@RequestParam(name = "username") String username){
         meetingListReturnVo mReturnVo = new meetingListReturnVo();
         mReturnVo.setMeetings(meetingService.getMeetingsByUsername(username));
