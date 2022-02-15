@@ -38,7 +38,7 @@ public class MeetingServiceImpl implements MeetingService {
         meeting.setBegin(new Date(meetinginfo.getBegin()));
         meeting.setEnd(new Date(meetinginfo.getEnd()));
         meeting.setDescription(meetinginfo.getDescription());
-        meeting.setLauncher(userRepository.getOne(meetinginfo.getLauncherId()));
+        meeting.setLauncher(userRepository.findUserByUsername(meetinginfo.getLauncherName()));
         meeting.setName(meetinginfo.getName());
         meetingRepository.save(meeting);
     }
@@ -50,7 +50,7 @@ public class MeetingServiceImpl implements MeetingService {
         meeting.setBegin(new Date(meetinginfo.getBegin()));
         meeting.setEnd(new Date(meetinginfo.getEnd()));
         meeting.setDescription(meetinginfo.getDescription());
-        meeting.setLauncher(userRepository.getOne(meetinginfo.getLauncherId()));
+        meeting.setLauncher(userRepository.findUserByUsername(meetinginfo.getLauncherName()));
         meeting.setName(meetinginfo.getName());
         meetingRepository.save(meeting);
         
@@ -94,7 +94,7 @@ public class MeetingServiceImpl implements MeetingService {
         retval.setBegin(meeting.getBegin().getTime());
         retval.setEnd(meeting.getEnd().getTime());
         retval.setDescription(meeting.getDescription());
-        retval.setLauncherId(meeting.getLauncher().getId());
+        retval.setLauncherName(meeting.getLauncher().getName());
         retval.setName(meeting.getName());
         return retval;
     }

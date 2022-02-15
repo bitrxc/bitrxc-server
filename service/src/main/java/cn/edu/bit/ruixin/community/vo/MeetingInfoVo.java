@@ -23,7 +23,7 @@ public class MeetingInfoVo {
     /** 活动介绍 */
     private String description;
     /** 发起此活动的用户 */
-    private int launcherId;
+    private String launcherName;
     /** 活动开始时间 */
     private long begin;
     /** 活动结束时间 */
