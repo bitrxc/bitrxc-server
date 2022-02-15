@@ -84,7 +84,7 @@ public class UserManagerController {
      * @return
      */
     @PreAuthorize("hasAuthority('basicView')")
-    @GetMapping("/byExample")
+    @PostMapping("/byExample")
     public CommonResult<PageVo<UserInfoVo>> getUserListByExample(
         @RequestBody UserInfoParamVo userinfo
     ){
