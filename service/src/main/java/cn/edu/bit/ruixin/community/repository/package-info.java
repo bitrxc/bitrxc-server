@@ -3,6 +3,9 @@
  * jpa存储库相关的函数，定义了数据库查询方法。
  * </p><p>
  * 这些函数定义于接口内，不需要函数体。spring框架会根据其函数定义来生成访问数据库的代码。
+ * 如果某个字段没有定义，spring会根据该字段的定义，自动创建对应的数据库列，
+ * 但是如果某个数据库表没有创建，spring不会创建数据库表。
+ * {@link https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.5-Release-Notes#sql-script-datasource-initialization}
  * </p><p>
  * 如果某个函数定义上方有{@link org.springframework.data.jpa.repository.Query Query}注解，
  * 则该函数将执行注解定义的sql语句。
