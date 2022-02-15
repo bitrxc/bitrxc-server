@@ -6,7 +6,6 @@
     <modules>
         <module>service-base</module>
         <module>service</module>
-        <module>docgen</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -21,7 +20,7 @@
     <description>Demo project for Spring Boot</description>
     <properties>
         <java.version>1.8</java.version>
-        <mysql.connector.version>8.0.16</mysql.connector.version>
+        <mysql.connector.version>8.0.28</mysql.connector.version>
     </properties>
 
     <repositories>

@@ -4,7 +4,6 @@ WORKDIR /usr/src/app
 
 COPY service/pom.xml service/pom.xml
 COPY service-base/pom.xml service-base/pom.xml
-COPY docgen/pom.xml docgen/pom.xml
 COPY pom.xml settings.xml ./
 RUN mvn -B -e -s settings.xml dependency:go-offline
 COPY . .
