@@ -322,6 +322,42 @@ LOCK TABLES `user` WRITE;
 INSERT INTO `user` VALUES (6,'omn3g4jycE4E2fVu3TuCXbo7lFdQ','13345678903','sdfgii姐姐','sdfghjkl',NULL,'1234567890'),(7,'omn3g4s_YpmXsN8n38iPwIrR5Gxk','13711866671','睿信书院','黄晓珊',NULL,'1120190719'),(8,'omn3g4iuEDgkwv2mbqYtBLyBHVVQ','15147124650','睿信书院','张少博',NULL,'1120180296'),(9,'omn3g4oAep9Veqonh8KGCOCtFL7M','13301008133','睿信书院','mamba',NULL,'1120000000'),(10,'omn3g4oeA5FlRRJ8Dx8Bq4n_gFZM',NULL,NULL,NULL,NULL,NULL),(11,'omn3g4iZe1ftk1OFvWFcMl7KTAmI','18249316967','睿信书院','彭曦锋',NULL,'1120201743'),(12,'omn3g4mJkLhU33ctnEsdqtez1Wao',NULL,NULL,NULL,NULL,NULL),(13,'omn3g4k87scmAtAdl_NtBHsnCPkA',NULL,NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `meeting`
+--
+
+DROP TABLE IF EXISTS `meeting`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `meeting` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `appointment_id` bigint(20) DEFAULT NULL,
+  `name` varchar(8) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `launcher_id` int(10) unsigned NOT NULL,
+  `begin` time DEFAULT NULL,
+  `end` time DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `attendence_record`
+--
+
+DROP TABLE IF EXISTS `attendence_record`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `attendence_record` (
+  `id` bigint(10) unsigned NOT NULL AUTO_INCREMENT,
+  `meeting_id` int(10) unsigned DEFAULT NULL,
+  `user_note` varchar(255) DEFAULT NULL,
+  `user_id` int(10) unsigned NOT NULL,
+  `begin` time DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

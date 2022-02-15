@@ -21,6 +21,8 @@ public class Meeting {
 
     /** 相关的房间预约信息 */
     @Column(name = "appointment_id")
+    @OneToOne
+    @JoinColumn(name = "appointment_id",referencedColumnName = "id")
     private Appointment appointment;
     /** 活动名称 */
     @Column(name = "name")
