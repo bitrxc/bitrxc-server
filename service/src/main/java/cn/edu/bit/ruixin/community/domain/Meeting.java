@@ -20,7 +20,6 @@ public class Meeting {
     private int id;
 
     /** 相关的房间预约信息 */
-    @Column(name = "appointment_id")
     @OneToOne
     @JoinColumn(name = "appointment_id",referencedColumnName = "id")
     private Appointment appointment;
