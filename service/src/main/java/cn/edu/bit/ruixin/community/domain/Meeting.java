@@ -30,7 +30,8 @@ public class Meeting {
     @Column(name = "description")
     private String description;
     /** 发起此活动的用户 */
-    @Column(name = "launcher_id")
+    @ManyToOne
+    @JoinColumn(name = "launcher_id",referencedColumnName = "id")
     private User launcher;
     /** 活动开始时间 */
     @Column(name = "begin")
