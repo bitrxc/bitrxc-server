@@ -162,6 +162,7 @@ DROP TABLE IF EXISTS `permission`;
 CREATE TABLE `permission` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT,
   `url` varchar(255) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -172,13 +173,12 @@ CREATE TABLE `permission` (
 
 LOCK TABLES `permission` WRITE;
 /*!40000 ALTER TABLE `permission` DISABLE KEYS */;
-INSERT INTO `permission` VALUES (1,'/admin/managers');
-INSERT INTO `permission` VALUES (2,'/admin/managers/%');
-INSERT INTO `permission` VALUES (3,'/admin/appointment');
-INSERT INTO `permission` VALUES (4,'/admin/appointment/%');
-INSERT INTO `permission` VALUES (5,'/admin/room');
-INSERT INTO `permission` VALUES (6,'/admin/room/%');
-INSERT INTO `permission` VALUES (7,'/admin/schedule/all');
+INSERT INTO `permission` VALUES (1,'','manager');
+INSERT INTO `permission` VALUES (2,'','appointCheck');
+INSERT INTO `permission` VALUES (3,'','room');
+INSERT INTO `permission` VALUES (4,'','appoint');
+INSERT INTO `permission` VALUES (5,'','basicView');
+INSERT INTO `permission` VALUES (6,'','user');
 /*!40000 ALTER TABLE `permission` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -202,8 +202,10 @@ CREATE TABLE `role` (
 
 LOCK TABLES `role` WRITE;
 /*!40000 ALTER TABLE `role` DISABLE KEYS */;
-INSERT INTO `role` VALUES (1,'normal');
-INSERT INTO `role` VALUES (2,'super');
+INSERT INTO `role` VALUES (1,'root');
+INSERT INTO `role` VALUES (2,'appointChecker');
+INSERT INTO `role` VALUES (3,'superAppointmentLauncher');
+INSERT INTO `role` VALUES (4,'userChecker');
 /*!40000 ALTER TABLE `role` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -228,18 +230,18 @@ CREATE TABLE `role_permission` (
 
 LOCK TABLES `role_permission` WRITE;
 /*!40000 ALTER TABLE `role_permission` DISABLE KEYS */;
-INSERT INTO `role_permission` VALUES (1,1,3);
-INSERT INTO `role_permission` VALUES (2,1,4);
-INSERT INTO `role_permission` VALUES (3,1,5);
-INSERT INTO `role_permission` VALUES (4,1,6);
-INSERT INTO `role_permission` VALUES (5,1,7);
-INSERT INTO `role_permission` VALUES (6,2,1);
-INSERT INTO `role_permission` VALUES (7,2,2);
-INSERT INTO `role_permission` VALUES (8,2,3);
-INSERT INTO `role_permission` VALUES (9,2,4);
-INSERT INTO `role_permission` VALUES (10,2,5);
-INSERT INTO `role_permission` VALUES (11,2,6);
-INSERT INTO `role_permission` VALUES (12,2,7);
+INSERT INTO `role_permission` VALUES (1,1,1);
+INSERT INTO `role_permission` VALUES (2,1,2);
+INSERT INTO `role_permission` VALUES (3,2,2);
+INSERT INTO `role_permission` VALUES (4,1,3);
+INSERT INTO `role_permission` VALUES (5,1,4);
+INSERT INTO `role_permission` VALUES (6,3,4);
+INSERT INTO `role_permission` VALUES (7,1,5);
+INSERT INTO `role_permission` VALUES (8,2,5);
+INSERT INTO `role_permission` VALUES (9,3,5);
+INSERT INTO `role_permission` VALUES (10,4,5);
+INSERT INTO `role_permission` VALUES (11,1,6);
+INSERT INTO `role_permission` VALUES (12,4,6);
 /*!40000 ALTER TABLE `role_permission` ENABLE KEYS */;
 UNLOCK TABLES;
 

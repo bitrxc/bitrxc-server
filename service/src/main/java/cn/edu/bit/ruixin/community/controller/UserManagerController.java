@@ -66,7 +66,7 @@ public class UserManagerController {
      * @param username 微信Id
      * @return
      */
-    @PreAuthorize("hasAnyAuthority('room','appointCheck')")
+    @PreAuthorize("hasAuthority('basicView')")
     @GetMapping("/byWxid")
     public CommonResult<UserInfoReturnVo> getUserInfoByWxid(
         @RequestParam("username") String username
@@ -83,7 +83,7 @@ public class UserManagerController {
      * @param userinfo
      * @return
      */
-    @PreAuthorize("hasAnyAuthority('room','appointCheck')")
+    @PreAuthorize("hasAuthority('basicView')")
     @GetMapping("/byExample")
     public CommonResult<PageVo<UserInfoVo>> getUserListByExample(
         @RequestBody UserInfoParamVo userinfo
@@ -103,7 +103,7 @@ public class UserManagerController {
      * @param schoolId
      * @return
      */
-    @PreAuthorize("hasAnyAuthority('room','appointCheck')")
+    @PreAuthorize("hasAuthority('basicView')")
     @GetMapping("/bySchoolId")
     public CommonResult<UserInfoReturnVo> getUserInfoBySchoolId(
         @RequestParam("schoolId") String schoolId
