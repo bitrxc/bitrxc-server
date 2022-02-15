@@ -16,6 +16,11 @@ import cn.edu.bit.ruixin.community.service.MeetingService;
 import cn.edu.bit.ruixin.community.vo.MeetingInfoVo;
 import lombok.Data;
 
+/**
+ * 会议相关的控制器
+ * 
+ * @author jingkaimori
+ */
 @RestController
 @RequestMapping("/meeting")
 @CrossOrigin

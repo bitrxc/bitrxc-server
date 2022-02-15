@@ -85,8 +85,7 @@ public class WechatServiceImpl implements WechatService {
     /**
      * 向微信后台请求access_token，并强制刷新已存储的token，代码复制自 {@link cn.edu.bit.ruixin.community.aop.MsgCheck} 
      * @author jingkaimori
-     * @throws JsonProcessingException
-     * @throws JsonMappingException
+     * @throws RuntimeException
      */
     @Override
     public WxAppAccessVo getAccessToken() throws RuntimeException {

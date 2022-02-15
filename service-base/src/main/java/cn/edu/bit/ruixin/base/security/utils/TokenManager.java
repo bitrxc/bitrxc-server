@@ -10,7 +10,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * TODO
+ * 利用JWT生成与解码登录凭据（token）的函数
+ * TODO 从配置文件或程序变量内读取签名密钥
+ * TODO 将sessionkey移出token
  *
  * @author 78165
  * @date 2021/2/5

@@ -8,10 +8,6 @@ import javax.persistence.*;
 
 /**
  * 会议信息
- * 
- * 数据库字段对象，是JDBC引擎对数据库表的封装，{@link cn.edu.bit.ruixin.community.domain}包内
- * 原有的字段对象当中 很大一部分本身就是视图层对象 此类对象使用id来标识其他字段对象
- * 2022年以后创建的对象当中 大多数利用JDBC的映射规则直接将id转化为对象
  */
 @Entity
 @Table(name = "meeting")

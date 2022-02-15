@@ -12,9 +12,6 @@ import java.util.List;
  * @author 78165
  * @date 2021/1/29
  */
-/*
- JpaRepository<Room, Integer>封装了基本CRUD，JpaSpecificationExecutor<Room>封装了分页等复杂查询
- */
 public interface RoomsRepository extends JpaRepository<Room, Integer>, JpaSpecificationExecutor<Room> {
     Room findRoomByName(String name);
     List<Room> findAllByNameLike(String name);

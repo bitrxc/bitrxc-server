@@ -1,6 +1,7 @@
 package cn.edu.bit.ruixin.community.exception;
 
 /**
+ * 当数据转换时，数据结构不符合规范，则抛出此异常
  * TODO
  *
  * @author 78165
