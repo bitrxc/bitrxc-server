@@ -14,6 +14,7 @@ import cn.edu.bit.ruixin.base.common.exp.CommonResult;
 import cn.edu.bit.ruixin.community.annotation.MsgSecCheck;
 import cn.edu.bit.ruixin.community.domain.User;
 import cn.edu.bit.ruixin.community.service.UserService;
+import cn.edu.bit.ruixin.community.vo.PageVo;
 import cn.edu.bit.ruixin.community.vo.UserInfoVo;
 import lombok.Data;
 
@@ -76,6 +77,27 @@ public class UserManagerController {
     }
 
     /**
+     * 通过指定的用户信息查找用户。
+     * 如果某个字段非空，则查找与该字段匹配的用户，否则忽略此字段
+     * 发送请求时，请附带请求体，或利用METHOD请求头来指定GET方法
+     * @param userinfo
+     * @return
+     */
+    @PreAuthorize("hasAnyAuthority('room','appointCheck')")
+    @GetMapping("/byExample")
+    public CommonResult<PageVo<UserInfoVo>> getUserListByExample(
+        @RequestBody UserInfoParamVo userinfo
+    ){
+        PageVo<UserInfoVo> user = userService.getAllUsers(
+            userinfo.getUserInfo(),
+            userinfo.getCurrent(),
+            userinfo.getLimit()
+        );
+        return CommonResult.<PageVo<UserInfoVo>>ok()
+            .data(user);
+    }
+
+    /**
      * 通过用户学号来查找用户
      * @see {@link AppointmentManagerController#lookupAppointmentBySchoolId(int, int, String) lookupAppointmentBySchoolId}
      * @param schoolId
@@ -100,4 +122,13 @@ class UserInfoReturnVo{
     UserInfoReturnVo(User user){
         this.userInfo = UserInfoVo.convertToVo(user);
     }
+}
+@Data
+class UserInfoParamVo{
+    /** 返回的用户信息 */
+    private UserInfoVo userInfo;
+
+    private int current;
+
+    private int limit;
 }

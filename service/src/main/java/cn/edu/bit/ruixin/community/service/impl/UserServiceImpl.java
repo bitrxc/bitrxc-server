@@ -5,9 +5,15 @@ import cn.edu.bit.ruixin.community.domain.User;
 import cn.edu.bit.ruixin.community.exception.UserDaoException;
 import cn.edu.bit.ruixin.community.repository.UserRepository;
 import cn.edu.bit.ruixin.community.service.UserService;
+import cn.edu.bit.ruixin.community.vo.PageVo;
+import cn.edu.bit.ruixin.community.vo.UserInfoVo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -106,5 +112,15 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new UserDaoException("该用户不存在!");
         }
+    }
+
+    @Override
+    public PageVo<UserInfoVo> getAllUsers(UserInfoVo userinfo,int page,int size) {
+        User user = UserInfoVo.convertToPo(userinfo);
+        Example<User> example = Example.of(user);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> userList = userRepository.findAll(example, pageable);
+        Page<UserInfoVo> userVoList = userList.map((userlocal)-> UserInfoVo.convertToVo(userlocal));
+        return PageVo.convertToVo(userVoList);
     }
 }

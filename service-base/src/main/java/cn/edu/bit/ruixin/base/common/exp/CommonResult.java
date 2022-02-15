@@ -32,12 +32,42 @@ public class CommonResult<T> {
         
     }
 
+    /**
+     * 
+     * @param resClass data字段的类型，调用时必须提供
+     * @return
+     */
     public static <S> CommonResult<S> ok(Class<S> resClass) {
         CommonResult<S> result = new CommonResult<S>(ResultCode.SUCCESS);
         return result;
     }
 
+    /**
+     * 
+     * @param resClass data字段的类型，调用时必须提供
+     * @return
+     */
     public static <S> CommonResult<S> errorCode(ResultCode resultCode,Class<S> resClass){
+        CommonResult<S> result = new CommonResult<S>(resultCode);
+        return result;
+    }
+
+    /**
+     * 泛型对象作为返回值时的构造函数
+     * @param <S> data字段的类型，调用时必须提供。由于运行时泛型类型会被抹除，因此无法通过class对象来推断泛型类的泛型成员
+     * @return
+     */
+    public static <S> CommonResult<S> ok() {
+        CommonResult<S> result = new CommonResult<S>(ResultCode.SUCCESS);
+        return result;
+    }
+
+    /**
+     * 泛型对象作为返回值时的构造函数
+     * @param <S> data字段的类型，调用时必须提供。由于运行时泛型类型会被抹除，因此无法通过class对象来推断泛型类的泛型成员
+     * @return
+     */
+    public static <S> CommonResult<S> errorCode(ResultCode resultCode){
         CommonResult<S> result = new CommonResult<S>(resultCode);
         return result;
     }
