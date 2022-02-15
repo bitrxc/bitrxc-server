@@ -239,6 +239,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<Appointment> getAllAppointmentsAppointedByAdmin() {
         List<Appointment> appointments = appointmentRepository.findAppointmentAppointedByAdmin();
@@ -310,6 +311,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<Appointment> getAppointmentPages(Pageable pageable, String status) {
         if (status != null && !"".equals(status)) {
@@ -319,6 +321,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<Appointment> getAppointmentsBySchoolId(Pageable pageable, String schoolId) {
         User user = userRepository.findUserBySchoolId(schoolId);

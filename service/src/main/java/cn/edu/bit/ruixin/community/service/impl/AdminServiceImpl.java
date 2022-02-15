@@ -41,7 +41,7 @@ public class AdminServiceImpl implements AdminService {
     @Autowired
     private AdminRoleRepository adminRoleRepository;
 
-    @Transactional(isolation = Isolation.READ_COMMITTED,rollbackFor = Exception.class)
+    @Transactional(isolation = Isolation.SERIALIZABLE,rollbackFor = Exception.class)
     @Override
     public Admin registerAdmin(Admin admin) {
         adminRepository.save(admin);
@@ -49,6 +49,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Admin login(Admin admin) {
         if (admin == null || admin.getUsername() == null || "".equals(admin.getUsername()) || admin.getPassword() == null || "".equals(admin.getPassword())) {
             throw new UserDaoException("用户名密码不能为空!");
@@ -72,6 +73,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<Admin> getAdminPages(Pageable pageable, String nameLike) {
         if (nameLike!=null && !nameLike.equals("")) {
             Admin admin = new Admin();
@@ -83,6 +85,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Admin getAdminById(int adminId) throws NoSuchElementException {
         // Throws error when element doesn't exist
         return adminRepository.findById(adminId).get();
@@ -102,7 +105,7 @@ public class AdminServiceImpl implements AdminService {
         return admin;
     }
 
-    @Transactional(isolation = Isolation.READ_COMMITTED,rollbackFor = Exception.class)
+    @Transactional(isolation = Isolation.SERIALIZABLE,rollbackFor = Exception.class)
     @Override
     public void deleteAdminById(int id) {
         adminRepository.deleteById(id);

@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import cn.edu.bit.ruixin.community.domain.AttendenceRecord;
 import cn.edu.bit.ruixin.community.domain.Meeting;
@@ -31,6 +33,7 @@ public class MeetingServiceImpl implements MeetingService {
     @Autowired
     private AttendenceRecordRepository attendenceRecordRepository;
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public void createMeeting(MeetingInfoVo meetinginfo) {
         Meeting meeting = new Meeting();
@@ -43,6 +46,7 @@ public class MeetingServiceImpl implements MeetingService {
         meetingRepository.save(meeting);
     }
 
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Override
     public void modifyMeeting(MeetingInfoVo meetinginfo) {
         Meeting meeting = meetingRepository.getOne(meetinginfo.getId());
@@ -56,6 +60,7 @@ public class MeetingServiceImpl implements MeetingService {
         
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public void signToMeeting(int meetingid, int userid, String note) {
         Meeting meeting = meetingRepository.getOne(meetingid);
@@ -69,6 +74,7 @@ public class MeetingServiceImpl implements MeetingService {
         
     }
 
+    @Transactional(readOnly = true)
     @Override
     public MeetingInfoVo getMeeting(int meetingid) {
         Meeting meeting = meetingRepository.getOne(meetingid);
@@ -76,6 +82,7 @@ public class MeetingServiceImpl implements MeetingService {
         return retval;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<MeetingInfoVo> getMeetingsByUsername(String username) {
         User launcher = userRepository.findUserByUsername(username);
