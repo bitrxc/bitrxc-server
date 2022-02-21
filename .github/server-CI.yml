@@ -1,7 +1,11 @@
 #serve-CI
 name: CI
 
-on: [push]
+on: 
+  push:
+    branches:
+      - master
+      - dev
 
 jobs:
 
