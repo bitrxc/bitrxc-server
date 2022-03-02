@@ -13,6 +13,9 @@ spring:
     host: redis-dev
     port: 6379
 
+logging:
+  file:
+    path: /app/static/logs
 
 server:
   port: 8080
