@@ -4,7 +4,6 @@ name: CI
 on: 
   push:
     branches:
-      - master
       - dev
 
 jobs:
@@ -21,7 +20,7 @@ jobs:
         password: ${{ secrets.PASSWORD }}
         port: ${{ secrets.PORT }}
         script: |
-            cd /home/bitrxcdev/github/bitrxc-server
+            cd /home/${{ secrets.USERNAME }}/github/bitrxc-server
             git pull
             docker-compose --env ./.env.dev down
             docker-compose --env ./.env.dev up --detach --build
