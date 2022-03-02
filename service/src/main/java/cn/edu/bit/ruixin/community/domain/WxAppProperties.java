@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * 微信服务器配置
+ * 微信服务器配置，该配置从配置文件中读取。
  * TODO
  *
  * @author 78165
