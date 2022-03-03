@@ -13,9 +13,9 @@
  * 否则，该函数将根据spring的DSL（领域特定语言）语法，执行数据库查询
  * </p><p>
  * {@link org.springframework.data.jpa.repository.JpaRepository JpaRepository}
- *  封装了基本CRUD，
+ *  封装了基本CRUD、按示例和通配符查询等查询方式，并将结果分页、排序返回。
  * {@link org.springframework.data.jpa.repository.JpaSpecificationExecutor JpaSpecificationExecutor}
- *  封装了分页等复杂查询
+ *  封装了JPA Spec接口，该接口可以动态构建几乎任何查询。
  * </p><p>
  * 对于大部分字段对象而言，SQL语句只接受整数ID作为参数，而不接受整个数据对象。
  * </p><p>
@@ -24,5 +24,6 @@
  * 
  * @author jingkaimori
  * @author 78165
+ * @see https://docs.spring.io/spring-data/jpa/docs/current/reference/html/
  */
 package cn.edu.bit.ruixin.community.repository;

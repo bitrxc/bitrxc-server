@@ -15,6 +15,7 @@ import java.util.List;
  * TODO
  *
  * @author 78165
+ * @author blacknick
  * @date 2021/2/6
  */
 public interface AppointmentRepository extends JpaRepository<Appointment, Integer>, JpaSpecificationExecutor<Appointment> {
