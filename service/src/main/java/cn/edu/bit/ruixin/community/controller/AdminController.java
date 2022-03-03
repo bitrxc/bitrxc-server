@@ -75,7 +75,7 @@ public class AdminController {
         List<Permission> permissions = permissionService.getPermissionsByAdmin(loginAdmin);
         List<String> urls = new ArrayList<String>();
         for(Permission i:permissions){
-            urls.add(i.getUrl());
+            urls.add(i.getName());
         }
         adminInfoVo.setUrlList(urls);
         adminInfoVo.setRoleList(roles);
