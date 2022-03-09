@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 /**
  * TODO
@@ -88,24 +89,26 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * 保存用户信息
+     */
     @Override
-    @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
+    @Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = Exception.class)
     public void modifyUser(User user) {
         User userByUsername = userRepository.findUserByUsername(user.getUsername());
         if (userByUsername != null) {
-            String username = user.getUsername();
             String name = user.getName();
             String organization = user.getOrganization();
             String password = user.getPassword();
             String phone = user.getPhone();
             String schoolId = user.getSchoolId();
 
-            userByUsername.setUsername(username);
             userByUsername.setName(name);
             userByUsername.setOrganization(organization);
             userByUsername.setPassword(password);
             userByUsername.setPhone(phone);
             userByUsername.setSchoolId(schoolId);
+            userByUsername.setChecked(autoCheck(user));
 
             userRepository.save(userByUsername);
 
@@ -122,5 +125,19 @@ public class UserServiceImpl implements UserService {
         Page<User> userList = userRepository.findAll(example, pageable);
         Page<UserInfoVo> userVoList = userList.map((userlocal)-> UserInfoVo.convertToVo(userlocal));
         return PageVo.convertToVo(userVoList);
+    }
+
+    /**
+     * 检查该用户是否满足预约条件。目前的逻辑为信息齐全即可预约
+     * TODO: 当用户在可信用户表内才能预约
+     * @param user
+     * @return
+     */
+    private Boolean autoCheck(User user) {
+        return 
+            StringUtils.hasText(user.getName()) && 
+            StringUtils.hasText(user.getOrganization()) && 
+            StringUtils.hasText(user.getPhone()) && 
+            StringUtils.hasText(user.getSchoolId());
     }
 }
