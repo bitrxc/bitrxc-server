@@ -2,7 +2,6 @@ package cn.edu.bit.ruixin.community.filter;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -14,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import cn.edu.bit.ruixin.base.common.CommonResult;
@@ -54,7 +54,7 @@ public class TokenAdminFilter extends OncePerRequestFilter {
             throws IOException, ServletException {
         logger.debug("triggered AdminF");
         String token = request.getHeader("token");
-        if (token != null && !token.equals("")) {
+        if (StringUtils.hasText(token)) {
             try {
                 logger.debug("Service: " + redisService + " " + roleService + " Token:\" " + token + " \"");
                 // 获取登录状态

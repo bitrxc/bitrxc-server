@@ -7,11 +7,10 @@ import cn.edu.bit.ruixin.base.security.utils.TokenManager;
 import cn.edu.bit.ruixin.community.domain.WxAppVO;
 import cn.edu.bit.ruixin.community.service.RedisService;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -52,7 +51,7 @@ public class TokenBasicFilter extends OncePerRequestFilter {
             throws IOException, ServletException {
         logger.debug("triggered UserF");
         String token = request.getHeader("token");
-        if (token != null && !token.equals("")) {
+        if (StringUtils.hasText(token)) {
             try {
                 UsernamePasswordAuthenticationToken authRequest = getAuthentication(token, chain);
                 // 将用户凭据放到认证权限上下文中

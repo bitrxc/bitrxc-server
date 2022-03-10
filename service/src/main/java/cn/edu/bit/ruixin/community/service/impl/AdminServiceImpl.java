@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import cn.edu.bit.ruixin.base.security.utils.DefaultPasswordEncoder;
 import cn.edu.bit.ruixin.community.domain.Admin;
@@ -24,6 +25,7 @@ import lombok.extern.apachecommons.CommonsLog;
 
 /**
  * TODO 事务管理测试
+ * TODO 加密管理员密码
  *
  * @author 78165
  * @date 2021/2/21
@@ -51,9 +53,10 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional(readOnly = true)
     public Admin login(Admin admin) {
-        if (admin == null || admin.getUsername() == null || "".equals(admin.getUsername()) || admin.getPassword() == null || "".equals(admin.getPassword())) {
-            throw new UserDaoException("用户名密码不能为空!");
-        } else {
+        if (admin != null && 
+            StringUtils.hasText(admin.getUsername()) && 
+            StringUtils.hasText(admin.getPassword()) 
+        ) {
             String username = admin.getUsername();
             Admin adminByUsername = adminRepository.findAdminByUsername(username);
             if(adminByUsername != null){
@@ -69,13 +72,15 @@ public class AdminServiceImpl implements AdminService {
                 // 用户未找到
                 throw new UserDaoException("用户名或密码错误!");
             }
+        }else{
+            throw new UserDaoException("用户名密码不能为空!");
         }
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<Admin> getAdminPages(Pageable pageable, String nameLike) {
-        if (nameLike!=null && !nameLike.equals("")) {
+        if (StringUtils.hasText(nameLike)) {
             Admin admin = new Admin();
             admin.setUsername(nameLike);
             Example<Admin> example = Example.of(admin);
@@ -95,10 +100,10 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public Admin modifyAdminById(int id, String email, String mobile) {
         Admin admin = adminRepository.getOne(id);
-        if (email != null && !email.equals("")) {
+        if (StringUtils.hasText(email)) {
             admin.setEmail(email);
         }
-        if (mobile!=null && !mobile.equals("")) {
+        if (StringUtils.hasText(mobile)) {
             admin.setMobile(mobile);
         }
         adminRepository.save(admin);

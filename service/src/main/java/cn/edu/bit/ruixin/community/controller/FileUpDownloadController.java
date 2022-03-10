@@ -6,6 +6,7 @@ import cn.edu.bit.ruixin.community.service.FileUpDownloadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.ResourceUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,7 +35,7 @@ public class FileUpDownloadController {
     public CommonResult uploadRoomImage(@RequestParam(value = "file", required = true) MultipartFile file,
                                         @PathVariable(name = "id") Integer room) {
         String url = fileUpDownloadService.uploadRoomImage(file, room);
-        if (url != null && !url.equals("")) {
+        if (StringUtils.hasLength(url)) {
             return CommonResult.ok(ResultCode.SUCCESS).msg("图片上传成功！").data("url", url);
         } else {
             return CommonResult.error(ResultCode.INTERNAL_SERVER_ERROR).msg("图片上传失败！");
@@ -48,6 +49,7 @@ public class FileUpDownloadController {
      * @param response
      * @throws IOException
      */
+    @Deprecated
     @GetMapping("/download/image/room/{url}")
     public void getRoomImage(@PathVariable(name = "url")String filename, HttpServletResponse response) throws IOException {
         File path = new File(ResourceUtils.getURL("classpath:").getPath());
