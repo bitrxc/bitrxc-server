@@ -22,7 +22,7 @@ public class AttendenceRecord {
     @Column(name = "id")
     private int id;
     /** 预约信息 */
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "meeting_id",referencedColumnName = "id")
     private Meeting meeting;
     /** 签到此活动的用户 */
