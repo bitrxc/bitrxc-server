@@ -8,5 +8,6 @@
  * 
  * @author 78165
  * @author jingkaimori
+ * @see https://shimo.im/docs/e1Az42LLOOcENEqW
  */
 package cn.edu.bit.ruixin.community.filter;
