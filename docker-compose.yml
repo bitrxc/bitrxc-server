@@ -33,7 +33,7 @@ services:
         target: /docker-entrypoint-initdb.d
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MARIADB_DATABASE: bitrxc
+      MYSQL_DATABASE: bitrxc
 
   redis:
     image: "redis:6.2"
