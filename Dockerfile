@@ -1,5 +1,5 @@
 # Build
-FROM maven:3.6.3-openjdk-8 AS build-env
+FROM maven:3.8.4-openjdk-8 AS build-env
 WORKDIR /usr/src/app
 
 COPY service/pom.xml service/pom.xml
@@ -10,7 +10,7 @@ COPY . .
 RUN mvn -B -e -s settings.xml clean package -DskipTests
 
 # Package
-FROM openjdk:8u282 AS serve-env
+FROM openjdk:8u322 AS serve-env
 WORKDIR /app
 
 COPY deploy/wait-for-it.sh /app/wait-for-it.sh
@@ -24,6 +24,7 @@ COPY --from=build-env /usr/src/app/service/target/*.jar /app/app.jar
 ENV JAVA_OPTS="-Djava.security.egd=file:/dev/urandom -Duser.timezone=Asia/Shanghai"
 ENV SERVER_PORT 8080
 
-EXPOSE ${SERVER_PORT}
+# Keep target port identical with port in application.yaml
+EXPOSE 8080
 
 ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -jar /app/app.jar" ]
