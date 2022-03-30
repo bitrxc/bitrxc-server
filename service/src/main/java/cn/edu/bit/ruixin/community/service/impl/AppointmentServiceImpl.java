@@ -272,23 +272,21 @@ public class AppointmentServiceImpl implements AppointmentService {
                 throw new AppointmentDaoException("该预约已经取消，无法审批!");
             }
             if (appointment.getStatus().equals(AppointmentStatus.RECEIVE.getStatus())) {
-                if (!AppointmentStatus.SIGNED.getStatus().equals(status) && !AppointmentStatus.MISSED.getStatus().equals(status)) {
-                    throw new AppointmentDaoException("该预约已审批通过，不可执行该操作!");
-                }
+                throw new AppointmentDaoException("该预约已审批通过，无法审批!");
             }
             if (appointment.getStatus().equals(AppointmentStatus.REJECT.getStatus())) {
                 throw new AppointmentDaoException("该预约已审批驳回，不可重复操作!");
             }
-            if (appointment.getStatus().equals(AppointmentStatus.MISSED.getStatus())) {
-                if (!AppointmentStatus.SIGNED.getStatus().equals(status)) {
-                    throw new AppointmentDaoException("该预约已爽约，只能重新签到!");
-                }
-            }
-            if (appointment.getStatus().equals(AppointmentStatus.ILLEGAL.getStatus())) {
-                if (!AppointmentStatus.FINISH.getStatus().equals(status)) {
-                    throw new AppointmentDaoException("该预约未签退，只能修改为签退！");
-                }
-            }
+            // if (appointment.getStatus().equals(AppointmentStatus.MISSED.getStatus())) {
+            //     if (!AppointmentStatus.SIGNED.getStatus().equals(status)) {
+            //         throw new AppointmentDaoException("该预约已爽约，只能重新签到!");
+            //     }
+            // }
+            // if (appointment.getStatus().equals(AppointmentStatus.ILLEGAL.getStatus())) {
+            //     if (!AppointmentStatus.FINISH.getStatus().equals(status)) {
+            //         throw new AppointmentDaoException("该预约未签退，只能修改为签退！");
+            //     }
+            // }
             if (appointment.getStatus().equals(AppointmentStatus.NEW.getStatus()) && AppointmentStatus.RECEIVE.getStatus().equals(status)) {
                 // 审批通过某一个预约，取消对该房间该时间段的其他预约，查询条件：roomId,时间段范围，状态：new
                 List<Appointment> list = appointmentRepository.getAppointmentsByRoomIdAndTimesAndStatus(appointment.getRoomId(), appointment.getBegin(), appointment.getEnd(), AppointmentStatus.NEW.getStatus());
