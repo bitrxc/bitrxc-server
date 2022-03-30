@@ -2,6 +2,7 @@ package cn.edu.bit.ruixin.community.service.impl;
 
 import cn.edu.bit.ruixin.base.security.utils.DefaultPasswordEncoder;
 import cn.edu.bit.ruixin.community.domain.User;
+import cn.edu.bit.ruixin.community.exception.ResourceNotFoundException;
 import cn.edu.bit.ruixin.community.exception.UserDaoException;
 import cn.edu.bit.ruixin.community.repository.UserRepository;
 import cn.edu.bit.ruixin.community.service.UserService;
@@ -47,7 +48,7 @@ public class UserServiceImpl implements UserService {
         if(user != null){
             return user;
         }else{
-            throw new UserDaoException("用户不存在或未录入系统");
+            throw new ResourceNotFoundException("用户不存在或未录入系统");
         }
     }
 
@@ -58,7 +59,7 @@ public class UserServiceImpl implements UserService {
         if(user != null){
             return user;
         }else{
-            throw new UserDaoException("用户不存在或未录入系统");
+            throw new ResourceNotFoundException("用户不存在或未录入系统");
         }
     }
 

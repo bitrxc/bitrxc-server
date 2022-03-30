@@ -6,6 +6,7 @@ import cn.edu.bit.ruixin.base.security.utils.TokenManager;
 import cn.edu.bit.ruixin.community.annotation.MsgSecCheck;
 import cn.edu.bit.ruixin.community.domain.User;
 import cn.edu.bit.ruixin.community.domain.WxAppVO;
+import cn.edu.bit.ruixin.community.exception.ResourceNotFoundException;
 import cn.edu.bit.ruixin.community.service.RedisService;
 import cn.edu.bit.ruixin.community.service.UserService;
 import cn.edu.bit.ruixin.community.service.WechatService;
@@ -13,7 +14,6 @@ import cn.edu.bit.ruixin.community.vo.UserInfoVo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.concurrent.TimeUnit;
@@ -49,10 +49,11 @@ public class UserController {
         // 此处的异常由微信服务封装
         appVO = wechatService.login(code);
         if (appVO.getOpenid() != null) { // 微信后台认证成功，存入数据库，表示登录成功
-            User user = userService.getUserByUsername(appVO.getOpenid());
-            // 如果是第一次登陆，将微信用户信息存入数据库
-            if (user == null) {
-                user = new User();
+            try {
+                userService.getUserByUsername(appVO.getOpenid());
+            } catch (ResourceNotFoundException e) {
+                // 如果是第一次登陆，将微信用户信息存入数据库
+                User user = new User();
                 user.setUsername(appVO.getOpenid());
                 userService.registerNewUser(user);
             }
