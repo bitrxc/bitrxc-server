@@ -297,7 +297,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                     if (!app.getId().equals(appointment.getId())) {
                         app.setStatus(AppointmentStatus.REJECT.getStatus());
                         appointmentRepository.save(app);
-                        notifyUserSuccess(appointment);
+                        notifyUserSuccess(app);
                     }
                 }
             }
