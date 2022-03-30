@@ -53,9 +53,7 @@ public class UserController {
                 userService.getUserByUsername(appVO.getOpenid());
             } catch (ResourceNotFoundException e) {
                 // 如果是第一次登陆，将微信用户信息存入数据库
-                User user = new User();
-                user.setUsername(appVO.getOpenid());
-                userService.registerNewUser(user);
+                userService.registerNewUser(appVO.getOpenid());
             }
 
             // 生成Token，用户系统身份凭证
