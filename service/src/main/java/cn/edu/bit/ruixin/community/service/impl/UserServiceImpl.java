@@ -72,7 +72,19 @@ public class UserServiceImpl implements UserService {
             String encode = passwordEncoder.encode(source);
             user.setPassword(encode);
         }
+        user.setId(null);
+        user.setChecked(false);
 
+        userRepository.save(user);
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
+    public void registerNewUser(String userwxid) {
+        User user = new User();
+        user.setUsername(userwxid);
+        user.setId(null);
+        user.setChecked(false);
         userRepository.save(user);
     }
 
