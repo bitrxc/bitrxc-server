@@ -78,7 +78,7 @@ CREATE TABLE `deal` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `room` smallint(5) unsigned NOT NULL,
   `launch_time` int(10) DEFAULT NULL,
-  `launcher` varchar(255) NOT NULL,
+  `launcher` varchar(255) DEFAULT NULL,
   `status` enum('new','receive','executing','reject','cancel','finish','missed','illegal','signed') DEFAULT NULL,
   `user_note` tinytext CHARACTER SET utf8 DEFAULT NULL,
   `check_note` tinytext DEFAULT NULL,
