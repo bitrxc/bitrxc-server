@@ -2,9 +2,6 @@ package cn.edu.bit.ruixin.community.domain;
 
 import lombok.Data;
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * `User` 数据库表，该表存储用户的个人信息
  * TODO
