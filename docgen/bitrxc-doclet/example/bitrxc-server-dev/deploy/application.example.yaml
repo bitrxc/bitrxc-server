@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://mariadb-dev:3306/bitrxc?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  redis:
+    host: redis-dev
+    port: 6379
+
+logging:
+  file:
+    path: /app/static/logs
+
+server:
+  port: 8080
+
+wx:
+  appId: wx123456789abcdef0
+  secret: 123456789abcdef0123456789abcdef0
+
+IdWorker:
+  workerId: 1
+  datacenterId: 1
+  sequence: 1

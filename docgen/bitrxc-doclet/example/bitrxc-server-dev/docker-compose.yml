@@ -1,0 +1,54 @@
+version: "3.9"
+
+services:
+  server:
+    build: .
+    container_name: ${SERVER_CONTAINER_NAME}
+    ports:
+      # Keep target port identical with port in application.yaml
+      - target: 8080
+        published: ${SERVER_PUBLISHED_PORT}
+    volumes:
+      # this volume contains server log and uploaded image
+      - type: bind
+        source: ${SERVER_STATIC_MOUNTPOINT}
+        target: /app/static
+    depends_on:
+      - mariadb
+      - redis
+    entrypoint: [ "/app/wait-for-it.sh", "mariadb:3306", "-s", "--",
+                  "/app/wait-for-it.sh", "redis:6379", "-s", "--",
+                  "sh", "-c", "java ${JAVA_OPTS} -jar /app/app.jar" ]
+
+  mariadb:
+    image: "mariadb:10.5"
+    container_name: ${MARIADB_CONTAINER_NAME}
+    volumes:
+      - type: volume
+        source: mariadb_data
+        target: /var/lib/mysql
+      # initial database definition
+      - type: bind
+        source: ./deploy/mariadb/init
+        target: /docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: bitrxc
+
+  redis:
+    image: "redis:6.2"
+    container_name: ${REDIS_CONTAINER_NAME}
+    volumes:
+      - type: bind
+        source: ./deploy/redis/conf
+        target: /etc/redis
+      - type: volume
+        source: redis_data
+        target: /data
+    entrypoint: [ "redis-server", "/etc/redis/redis.conf" ]
+
+volumes:
+  redis_data:
+    name: ${REDIS_VOLUMN_NAME}
+  mariadb_data:
+    name: ${MARIADB_VOLUMN_NAME}
