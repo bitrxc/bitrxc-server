@@ -63,8 +63,8 @@ limitations under the License.
           <!--          <version>${java.version}</version>-->
           <version>1.8</version>
           <scope>system</scope>
-          <!--          <systemPath>${java.home}/../lib/tools.jar</systemPath>-->
-          <systemPath>E:\\APP\\JDKs\\corretto-1.8.0_322\\lib\\tools.jar</systemPath>
+          <systemPath>${java.home}/../lib/tools.jar</systemPath>
+          <!--          <systemPath>E:\\APP\\JDKs\\corretto-1.8.0_322\\lib\\tools.jar</systemPath>-->
         </dependency>
       </dependencies>
     </profile>
