@@ -12,7 +12,6 @@ import cn.edu.bit.ruixin.community.service.UserService;
 import cn.edu.bit.ruixin.community.service.WechatService;
 import cn.edu.bit.ruixin.community.vo.UserInfoVo;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

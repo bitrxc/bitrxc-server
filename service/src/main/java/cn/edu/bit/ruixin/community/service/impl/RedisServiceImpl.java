@@ -35,6 +35,7 @@ public class RedisServiceImpl implements RedisService {
         redisTemplate.opsForValue().set(key, value, timeout, unit);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T opsForValueGet(String key, Class<T> clazz) throws JsonProcessingException {
         T value = (T) redisTemplate.opsForValue().get(key);
