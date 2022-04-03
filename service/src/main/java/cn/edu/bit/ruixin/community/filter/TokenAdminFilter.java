@@ -1,7 +1,6 @@
 package cn.edu.bit.ruixin.community.filter;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -41,22 +40,17 @@ public class TokenAdminFilter extends OncePerRequestFilter {
 
     private PermissionService permissionService;
 
-    private RoleService roleService;
-
     public TokenAdminFilter(RedisService redisService, PermissionService permissionService, RoleService roleService) {
         this.redisService = redisService;
         this.permissionService = permissionService;
-        this.roleService = roleService;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        logger.debug("triggered AdminF");
         String token = request.getHeader("token");
         if (StringUtils.hasText(token)) {
             try {
-                logger.debug("Service: " + redisService + " " + roleService + " Token:\" " + token + " \"");
                 // 获取登录状态
                 AdminInfoVo adminInfoVo = redisService.opsForValueGet(token, AdminInfoVo.class);
                 List<Permission> permlist = this.getPrivilege(adminInfoVo);
@@ -68,7 +62,6 @@ public class TokenAdminFilter extends OncePerRequestFilter {
                 redisService.updateExpire(token, 30, TimeUnit.MINUTES);
                 chain.doFilter(request, response);
             } catch (Exception e) {
-                logger.debug("Error:", e);
                 ResponseUtils.out((HttpServletResponse) response,
                         CommonResult.error(ResultCode.UNAUTHENTICATION_ERROR).msg("登录过期，请重新登录！"));
             }
@@ -80,12 +73,10 @@ public class TokenAdminFilter extends OncePerRequestFilter {
 
     /**
      * 
-     * Get Admin's Privilege. {@link https://shimo.im/docs/e1Az42LLOOcENEqW }
+     * Get Admin's Privilege.
      * 
      * @param adminInfoVo
-     * @param servletPath
      * @return
-     * @throws MalformedURLException
      */
     private List<Permission> getPrivilege(AdminInfoVo adminInfoVo){
         List<Permission> perms = permissionService.getPermissionsByAdmin(AdminInfoVo.convertToPo(adminInfoVo));

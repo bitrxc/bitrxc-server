@@ -25,6 +25,9 @@ public class RedisConfig {
         redisTemplate.setConnectionFactory(redisConnectionFactory);
 
         // JSON序列化方式
+        // 泛型参数<T>可能是泛型类型
+        // Spring的泛型检测对象无法不接受泛型参数输入
+        // 由于Jackson库的设计缺陷，Jackson的泛型参数检测对象`GenericType`不可能转为`JavaType`对象，因此此处无法将泛型参数传入序列化器
         Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);

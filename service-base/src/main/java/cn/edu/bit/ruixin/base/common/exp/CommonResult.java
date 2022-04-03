@@ -43,16 +43,6 @@ public class CommonResult<T> {
     }
 
     /**
-     * 
-     * @param resClass data字段的类型，调用时必须提供
-     * @return
-     */
-    public static <S> CommonResult<S> errorCode(ResultCode resultCode,Class<S> resClass){
-        CommonResult<S> result = new CommonResult<S>(resultCode);
-        return result;
-    }
-
-    /**
      * 泛型对象作为返回值时的构造函数
      * @param <S> data字段的类型，调用时必须提供。由于运行时泛型类型会被抹除，因此无法通过class对象来推断泛型类的泛型成员
      * @return
@@ -63,11 +53,31 @@ public class CommonResult<T> {
     }
 
     /**
-     * 泛型对象作为返回值时的构造函数
+     * 构造没有响应对象的正常响应体
+     * @param resultCode 错误类型，包括编号和和默认消息
+     * @return
+     */
+    public static CommonResult<Void> done(){
+        CommonResult<Void> result = new CommonResult<Void>(ResultCode.SUCCESS);
+        return result;
+    }
+    /**
+     * 构造没有响应对象的错误响应体
+     * @param resultCode 错误类型，包括编号和和默认消息
+     * @return
+     */
+    public static CommonResult<Void> error(ResultCode resultCode){
+        CommonResult<Void> result = new CommonResult<Void>(resultCode);
+        return result;
+    }
+
+    /**
+     * 构造以泛型对象作为响应的错误响应体
+     * @param resultCode 错误类型，包括编号和和默认消息
      * @param <S> data字段的类型，调用时必须提供。由于运行时泛型类型会被抹除，因此无法通过class对象来推断泛型类的泛型成员
      * @return
      */
-    public static <S> CommonResult<S> errorCode(ResultCode resultCode){
+    public static <S> CommonResult<S> errorDetail(ResultCode resultCode){
         CommonResult<S> result = new CommonResult<S>(resultCode);
         return result;
     }

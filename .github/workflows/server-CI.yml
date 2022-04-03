@@ -22,5 +22,5 @@ jobs:
         script: |
             cd /home/${{ secrets.USERNAME }}/github/bitrxc-server
             git pull
-            docker-compose --env ./.env.dev down
-            docker-compose --env ./.env.dev up --detach --build
+            docker-compose --env ./deploy/environment/.env.dev down
+            docker-compose --env ./deploy/environment/.env.dev up --detach --build

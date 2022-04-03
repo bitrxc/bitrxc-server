@@ -3,7 +3,6 @@ package cn.edu.bit.ruixin.community.repository;
 import cn.edu.bit.ruixin.community.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
 
 /**
  * TODO

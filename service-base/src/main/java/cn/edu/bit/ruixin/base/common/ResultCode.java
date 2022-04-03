@@ -9,10 +9,11 @@ package cn.edu.bit.ruixin.base.common;
 public enum ResultCode {
 
     SUCCESS(true, 200, "操作成功！"),
-    NOAHTHORITY(false, 400, "没有权限！"),
+    NOAHTHORITY(false, 400, "当前用户权限不足！"),
     INTERNAL_SERVER_ERROR(false, 500, "服务器内部异常!"),
     WECHATAUTHENTICATIONERROR(false, 500, "微信后台认证失败！请重试！"),
-    UNAUTHENTICATION_ERROR(false, 401, "未登录！");
+    UNAUTHENTICATION_ERROR(false, 401, "未登录！"),
+    RESOURCE_NOT_FOUND(false, 404, "请求的资源不存在！");
 
     private Boolean success;
     private Integer code;

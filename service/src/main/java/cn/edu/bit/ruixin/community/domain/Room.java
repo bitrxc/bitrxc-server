@@ -10,7 +10,6 @@ import javax.persistence.*;
  * @author 78165
  * @date 2021/1/29
  */
-@SuppressWarnings("all")
 @Entity
 @Table(name = "room")
 @Data

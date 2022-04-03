@@ -24,6 +24,7 @@ import java.util.Map;
  * @author 78165
  * @date 2021/3/13
  */
+@SuppressWarnings("all")
 @SpringBootTest
 public class TestRedis {
 

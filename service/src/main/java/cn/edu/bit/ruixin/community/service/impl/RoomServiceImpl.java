@@ -2,13 +2,11 @@ package cn.edu.bit.ruixin.community.service.impl;
 
 import cn.edu.bit.ruixin.base.security.utils.MapToBean;
 import cn.edu.bit.ruixin.community.domain.Appointment;
-import cn.edu.bit.ruixin.community.domain.Gallery;
 import cn.edu.bit.ruixin.community.domain.Room;
 import cn.edu.bit.ruixin.community.domain.Schedule;
 import cn.edu.bit.ruixin.community.exception.GlobalParamException;
 import cn.edu.bit.ruixin.community.myenum.AppointmentStatus;
 import cn.edu.bit.ruixin.community.repository.AppointmentRepository;
-import cn.edu.bit.ruixin.community.repository.GalleryRepository;
 import cn.edu.bit.ruixin.community.repository.RoomsRepository;
 import cn.edu.bit.ruixin.community.repository.ScheduleRepository;
 import cn.edu.bit.ruixin.community.service.RedisService;
@@ -49,9 +47,6 @@ public class RoomServiceImpl implements RoomService {
 
     @Autowired
     private RedisService redisService;
-
-    @Autowired
-    private GalleryRepository galleryRepository;
 
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = Exception.class)

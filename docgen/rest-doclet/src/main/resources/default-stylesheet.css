@@ -1,0 +1,246 @@
+/*******************************************************************************
+ * Copyright (C) 2014 The Calrissian Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
+body {
+    /*background-color: #cccccc;*/
+    background-color: #ffffff;
+    color: #333333;
+    font-size: 0.75em;
+    font-family: sans-serif;
+    margin: 0px;
+}
+h1
+{
+
+    font-weight: normal;
+    font-size: 50px;
+    text-align: center;
+
+
+
+    background: linear-gradient(90deg,#7928ca,#ff0080);
+    -webkit-background-clip: text;
+    color: transparent;
+    font-family: source-han-serif-sc,serif;
+    /*border-bottom: 4px solid #000000;*/
+}
+
+#wrapper {
+    /*background-color: #eeeeee;*/
+    background-color: #ffffff;
+    /*border-left: 2px solid #aaaaaa;*/
+    /*border-top: 2px solid #aaaaaa;*/
+    /*border-right: 2px solid #888888;*/
+    /*border-bottom: 2px solid #888888;*/
+    /*width: 900px;*/
+    margin: 20px auto;
+    padding: 30px;
+}
+
+#container {
+    margin: 0px;
+    padding: 0px;
+}
+.endPoint_wrapper
+{
+    padding-bottom: 5px;
+    padding-right: 5px;
+}
+.endPoint_wrapper:hover
+{
+    background-color: white  !important ;
+
+    box-shadow: 0px 0px 20px 0px rgba(60, 44,55,0.8) inset;
+}
+
+.div_endpoint
+{
+    margin-left: 180px;
+    margin-right: 5px;
+    border: 1px solid #002200;
+    margin-bottom: 15px;
+    padding: 20px;
+    width:fit-content;
+    font-size: 15px;
+}
+div.info_title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+div.info_text {
+    margin-bottom: 40px;
+    font-family: monospace;
+}
+table.list, table.list td {
+    border: 1px solid #002200;
+    margin-bottom: 40px;
+}
+td.code_format{
+    font-family: monospace;
+    /* font-weight: bold; */
+    /* font-style: italic; */
+    /* font-size: 1.1em; */
+    /*background-color: #dddddd;*/
+}
+
+td.descr_format{
+    font-family: monospace;
+    font-size: 1.1em;
+    padding: 15px;
+}
+.var_name
+{
+    color: #761e7c;
+    font-style: italic;
+    font-weight: bold;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+table {
+    border-collapse: collapse;
+
+}
+
+table, td, th {
+    border: 0px;
+}
+
+table.endpoint {
+    margin-left: 150px;
+    border: 1px solid #002200;
+    margin-bottom: 15px;
+}
+
+table.endpoint td, table.endpoint th {
+    padding: 3px 6px;
+    text-align: left;
+}
+
+table.endpoint th {
+    /*color: #ffffff;*/
+    font-weight: bold;
+    font-size: 1.2em;
+    /*background-color: #83aa59;*/
+    border: 1px solid #761e7c;
+}
+
+table.endpoint td {
+    border: 1px solid #761e7c;
+}
+
+table.endpoint td.field_format {
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 1.5em;
+    /*background-color: #dddddd;*/
+    vertical-align: top;
+}
+
+
+
+
+div.bean_description {
+    margin-bottom: 10px;
+}
+
+div.description {
+    margin-bottom: 15px;
+}
+
+a {
+    color: #003300;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h2 {
+    color: #761e7c;
+    font-weight: normal;
+    font-size: 2em;
+}
+
+
+.whole_class
+{
+    width:fit-content;
+    margin: auto;
+
+
+    margin-top: 130px;
+    margin-bottom: 160px;
+    border:16px solid #761e7c;
+}
+
+.class_Head
+{
+    color: white;
+    background-color: #761e7c;
+
+}
+.class_Head h3 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-block-start:0px;
+    font-weight: normal;
+    font-size: 3em;
+}
+.class_Head h5 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    font-weight: normal;
+    font-size: 2em;
+}
+.line_between_EndPoint
+{
+    display: none;
+    margin-top: 0px;
+    height: 5px;
+    width: 30%;
+    background-color: #761e7c;
+    border:1px solid #761e7c ;
+}
+.EndPoint_Head_0 {
+    color: #761e7c;
+    font-weight: normal;
+    font-size: 1.8em;
+}
+.EndPoint_Head_1 {
+    margin-left: 10px;
+    color: #761e7c;
+    font-weight: normal;
+    font-size: 1.4em;
+}
+
+
+.code {
+    font-family: monospace;
+}
+
+pre{
+    font-family: monospace;
+}

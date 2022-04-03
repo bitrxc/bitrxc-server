@@ -19,6 +19,8 @@ public interface UserService {
 
     void registerNewUser(User user);
 
+    void registerNewUser(String userwxid);
+
     void modifyUser(User user);
 
     void checkUser(String username,boolean checked);

@@ -3,7 +3,6 @@ package cn.edu.bit.ruixin.community.vo;
 import cn.edu.bit.ruixin.community.annotation.FieldNeedCheck;
 import cn.edu.bit.ruixin.community.domain.Appointment;
 import cn.edu.bit.ruixin.community.exception.GlobalParamException;
-import com.fasterxml.jackson.annotation.JacksonInject;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -168,7 +167,7 @@ public class AppointmentInfoVo {
         if (execDate != null) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             String date = dateFormat.format(execDate);
-            System.out.printf(date);
+            // System.out.printf(date);
             appointmentInfoVo.setExecDate(date);
         }
 

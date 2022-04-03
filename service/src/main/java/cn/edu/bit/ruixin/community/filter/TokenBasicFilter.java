@@ -49,11 +49,10 @@ public class TokenBasicFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        logger.debug("triggered UserF");
         String token = request.getHeader("token");
         if (StringUtils.hasText(token)) {
             try {
-                UsernamePasswordAuthenticationToken authRequest = getAuthentication(token, chain);
+                UsernamePasswordAuthenticationToken authRequest = getAuthentication(token);
                 // 将用户凭据放到认证权限上下文中
                 SecurityContextHolder.getContext().setAuthentication(authRequest);
                 chain.doFilter(request, response);
@@ -72,7 +71,7 @@ public class TokenBasicFilter extends OncePerRequestFilter {
      * 
      * @return 当前认证成功用户会话信息
      */
-    private UsernamePasswordAuthenticationToken getAuthentication(String token, FilterChain filterChain)
+    private UsernamePasswordAuthenticationToken getAuthentication(String token)
             throws JsonProcessingException, InvalidTokenException {
         WxAppVO appVO = redisService.opsForValueGet(token, WxAppVO.class);
         if (appVO != null) {

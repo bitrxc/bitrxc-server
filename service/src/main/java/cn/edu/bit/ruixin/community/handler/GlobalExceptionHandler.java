@@ -4,9 +4,9 @@ import cn.edu.bit.ruixin.base.common.CommonResult;
 import cn.edu.bit.ruixin.base.common.ResultCode;
 import cn.edu.bit.ruixin.community.exception.AppointmentDaoException;
 import cn.edu.bit.ruixin.community.exception.FileUploadDownloadException;
+import cn.edu.bit.ruixin.community.exception.ResourceNotFoundException;
 import cn.edu.bit.ruixin.community.exception.RoomDaoException;
 import cn.edu.bit.ruixin.community.exception.UserDaoException;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.security.access.AccessDeniedException;
@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @date 2021/1/29
  */
 @ControllerAdvice
-@Slf4j
 public class GlobalExceptionHandler {
 
     private Logger logger = LogManager.getLogger(GlobalExceptionHandler.class);
@@ -58,7 +57,14 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public CommonResult error(AccessDeniedException e) {
         logger.error(e.getMessage());
-        return CommonResult.error(ResultCode.NOAHTHORITY).msg("当前用户权限不足！");
+        return CommonResult.error(ResultCode.NOAHTHORITY);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseBody
+    public CommonResult error(ResourceNotFoundException e) {
+        logger.error(e.getMessage());
+        return CommonResult.error(ResultCode.RESOURCE_NOT_FOUND).msg(e.getMessage());
     }
 
     @ExceptionHandler(Exception.class)

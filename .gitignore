@@ -1,5 +1,6 @@
 app/
 application.yaml
+application.yml
 
 HELP.md
 target/
