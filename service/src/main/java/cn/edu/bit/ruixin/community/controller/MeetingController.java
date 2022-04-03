@@ -32,34 +32,32 @@ public class MeetingController {
     public CommonResult<meetingInfoReturnVo> getMeetingById(@RequestParam(name = "id") int meetingid){
         meetingInfoReturnVo mReturnVo = new meetingInfoReturnVo();
         mReturnVo.setMeeting(meetingService.getMeeting(meetingid));
-        return CommonResult.ok(meetingInfoReturnVo.class).data(mReturnVo);
+        return CommonResult.<meetingInfoReturnVo>ok().data(mReturnVo);
     }
     @GetMapping("/getMeetingByUser")
     public CommonResult<meetingListReturnVo> getMeetingByUser(@RequestParam(name = "username") String username){
         meetingListReturnVo mReturnVo = new meetingListReturnVo();
         mReturnVo.setMeetings(meetingService.getMeetingsByUsername(username));
-        return CommonResult.ok(meetingListReturnVo.class).data(mReturnVo);
+        return CommonResult.<meetingListReturnVo>ok().data(mReturnVo);
     }
 
     @PutMapping("/setMeeting")
     public CommonResult<Void> setMeeting(@RequestBody MeetingInfoVo newInfoVo) {
         meetingService.modifyMeeting(newInfoVo);
-        return CommonResult.ok(Void.class);
+        return CommonResult.done();
         
     }
     
     @PutMapping("/createMeeting")
     public CommonResult<Void> createMeeting(@RequestBody MeetingInfoVo newInfoVo) {
         meetingService.createMeeting(newInfoVo);
-        return CommonResult.ok(Void.class);
-        
+        return CommonResult.done();
     }
 
     @PutMapping("/sign")
     public CommonResult<Void> sign(@RequestParam int meetingid,@RequestParam int userid,@RequestParam String note) {
         meetingService.signToMeeting(meetingid, userid, note);
-        return CommonResult.ok(Void.class);
-        
+        return CommonResult.done();
     }
 }
 

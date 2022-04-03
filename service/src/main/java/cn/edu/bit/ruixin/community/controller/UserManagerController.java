@@ -43,7 +43,7 @@ public class UserManagerController {
     public CommonResult<Void> modifyUser(@RequestBody(required = true)UserInfoVo infoVo) {
         User user = UserInfoVo.convertToPo(infoVo);
         userService.modifyUser(user);
-        return CommonResult.ok(Void.class).msg("修改用户信息成功!");
+        return CommonResult.done().msg("修改用户信息成功!");
     }
 
     /**
@@ -58,7 +58,7 @@ public class UserManagerController {
         @RequestParam(required = true)String username,@RequestParam(required = true)boolean check
     ){
         userService.checkUser(username, check);
-        return CommonResult.ok(Void.class).msg("修改用户状态成功!");
+        return CommonResult.done().msg("修改用户状态成功!");
     }
 
     /**
