@@ -102,6 +102,7 @@
                         <version>0.0.1-SNAPSHOT</version>
                     </docletArtifact>
                     <useStandardDocletOptions>false</useStandardDocletOptions>
+                    <show>private</show>
                 </configuration>
             </plugin>
         </plugins>
