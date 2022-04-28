@@ -187,7 +187,9 @@ public class RoomServiceImpl implements RoomService {
         int i = 0;
 
         for (i = 0; i < allTime.size(); i++) {
-            String dateTime = date + " " + allTime.get(i).getBegin();
+//            String dateTime = date + " " + allTime.get(i).getBegin();
+            String dateTime = date + " " + allTime.get(i).getEnd();
+
             Date execDateTime = null;
             try {
                 execDateTime = dateTimeFormat.parse(dateTime);
@@ -288,7 +290,8 @@ public class RoomServiceImpl implements RoomService {
         // 已过时间段
         List<Schedule> passTime = allTime.stream()
                 .filter(schedule -> {
-                    String dateTime = date + " " + schedule.getBegin();
+//                    String dateTime = date + " " + schedule.getBegin();
+                    String dateTime = date + " " + schedule.getEnd();
                     Date execDateTime = null;
                     try {
                         execDateTime = dateTimeFormat.parse(dateTime);
