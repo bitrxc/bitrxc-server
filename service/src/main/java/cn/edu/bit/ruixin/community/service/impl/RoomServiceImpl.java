@@ -170,99 +170,68 @@ public class RoomServiceImpl implements RoomService {
     public Map<String, List<Schedule>> getRoomFreeTime(Integer roomId, String username, String date) {
 
         Date nowDate = new Date();
-
-        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date execDate = getExecDate(date);
 
         List<Schedule> allTime = scheduleRepository.findAll();
 
-        List<Schedule> pastTime = new ArrayList<>();
+        List<Schedule> pastTime;
+        List<Schedule> busyTime;
+        List<Schedule> freeTime;
+        List<Schedule> myTime;
 
-        List<Schedule> busyTime = new ArrayList<>();
+        Set<Integer> passTimeId = new HashSet<>();
+        Set<Integer>busyTimeId = new HashSet<>();
+        Set<Integer>myTimeId = new HashSet<>();
 
-        List<Schedule> freeTime = new ArrayList<>();
-
-        List<Schedule> myTime = new ArrayList<>();
-
-        int i = 0;
-
-        for (i = 0; i < allTime.size(); i++) {
-            String dateTime = date + " " + allTime.get(i).getBegin();
-            Date execDateTime = null;
-            try {
-                execDateTime = dateTimeFormat.parse(dateTime);
-            } catch (ParseException e) {
-                throw new GlobalParamException("日期格式有误！");
-            }
-            if (execDateTime.before(nowDate)) {
-                pastTime.add(allTime.get(i));
-            } else {
-                break;
-            }
-        }
-
-        Date execDate = null;
-        try {
-            execDate = dateFormat.parse(date);
-        } catch (ParseException e) {
-            throw new GlobalParamException("日期格式有误！");
-        }
-
-        List<Appointment> appointments = appointmentRepository.findLaunchTimeByRoomIdAndExecuteDateAndStatus(roomId, execDate, AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.SIGNED.getStatus());
-
-        // 获取所有占用时间段
-        List<Integer> busyTimeId = new ArrayList<>();
-        if (appointments != null) {
-            for (Appointment appointment :
-                    appointments) {
-                for (int j = appointment.getBegin(); j <= appointment.getEnd(); j++) {
-                    busyTimeId.add(j);
-                }
-            }
-            Collections.sort(busyTimeId);
-        }
-
-        for (int k = 0; k < busyTimeId.size() && i < allTime.size(); ) {
-            if (busyTimeId.get(k) == allTime.get(i).getId()) {
-                busyTime.add(allTime.get(i));
-                k++;
-                i++;
-            } else if (busyTimeId.get(k) < allTime.get(i).getId()) {
-                k++;
-            } else {
-                i++;
-            }
-        }
-
-
-        Appointment appointment = appointmentRepository.findLaunchTimeByRoomIdAndLauncherAndExecuteDateAndStatus(roomId, username, execDate, AppointmentStatus.NEW.getStatus());
-        ArrayList<Integer> myTimeId = new ArrayList<>();
-
-        if (appointment != null) {
-            for (int j = appointment.getBegin(); j <= appointment.getEnd(); j++) {
-                myTimeId.add(j);
-            }
-            for (Integer id :
-                    myTimeId) {
-                for (Schedule schedule :
-                        allTime) {
-                    if (schedule.getId() == id) {
-                        myTime.add(schedule);
-                    }
-                }
-            }
-
-            // 需保证同一时间段被审批后，其余所有申请都驳回
-            myTime = myTime.stream()
-                    .filter(schedule -> (!pastTime.contains(schedule) && !busyTime.contains(schedule)))
-                    .collect(Collectors.toList());
-        }
-
-        List<Schedule> finalMyTime = myTime;
-        freeTime = allTime.stream()
-                .filter(schedule -> (!pastTime.contains(schedule) && !busyTime.contains(schedule) && !finalMyTime.contains(schedule)))
+        // 获取所有已过时间段
+        pastTime = allTime.stream()
+                .filter(schedule -> getExecDateTime(date, schedule.getEnd()).before(nowDate))
                 .collect(Collectors.toList());
 
+        pastTime.forEach(schedule -> passTimeId.add(schedule.getId()));
+
+        // 某房间某日期的预约记录(预约状态：已预约未签到、已签到未签退)
+        List<Appointment> appointments = appointmentRepository.findLaunchTimeByRoomIdAndExecuteDateAndStatus(roomId, execDate, AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.SIGNED.getStatus());
+
+        appointments.forEach(appointment -> {
+            int scheduleNum;
+            if(username.equals(appointment.getLauncher())) {
+                for(scheduleNum = appointment.getBegin(); scheduleNum <= appointment.getEnd(); scheduleNum++) {
+                    myTimeId.add(scheduleNum);
+                }
+            } else { // 管理员预约(发起者为空)或其他用户预约(username与launcher不一致)
+                for(scheduleNum = appointment.getBegin(); scheduleNum <= appointment.getEnd(); scheduleNum++) {
+                    busyTimeId.add(scheduleNum);
+                }
+            }
+        });
+
+        // 获取被他人占用的时间段(不包含已过时间段)
+        busyTime = allTime.stream()
+                .filter(schedule -> busyTimeId.contains(schedule.getId())
+                                && !passTimeId.contains(schedule.getId()))
+                .collect(Collectors.toList());
+
+        // 当前用户发起的未审批的预约
+        Appointment myNewAppointment = appointmentRepository.findLaunchTimeByRoomIdAndLauncherAndExecuteDateAndStatus(roomId, username, execDate, AppointmentStatus.NEW.getStatus());
+        if(myNewAppointment != null) {
+            for(int scheduleIdNum = myNewAppointment.getBegin(); scheduleIdNum <= myNewAppointment.getEnd(); scheduleIdNum++) {
+                myTimeId.add(scheduleIdNum);
+            }
+        }
+
+        // 当前用户预约的时间段(状态：未审批、已预约未签到、已签到，且不包含已过时间段)
+        myTime = allTime.stream()
+                .filter(schedule -> myTimeId.contains(schedule.getId())
+                                && !passTimeId.contains(schedule.getId())
+                                && !busyTimeId.contains(schedule.getId()))
+                .collect(Collectors.toList());
+
+        freeTime = allTime.stream()
+                .filter(schedule -> !myTimeId.contains(schedule.getId())
+                                && !passTimeId.contains(schedule.getId())
+                                && !busyTimeId.contains(schedule.getId()))
+                .collect(Collectors.toList());
 
         Map<String, List<Schedule>> map = new HashMap<>();
         map.put("passTime", pastTime);
@@ -276,66 +245,55 @@ public class RoomServiceImpl implements RoomService {
     @Override
     @Transactional(readOnly = true)
     public Map<String, List<Schedule>> getRoomFreeTimeByAdmin(Integer roomId, String conductor, String date) {
+
+        Date execDate = getExecDate(date);
         Date nowDate = new Date();
 
-        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
         List<Schedule> allTime = scheduleRepository.findAll();
+        List<Schedule> passTime;
+        List<Schedule> busyTime;
+        List<Schedule> freeTime;
+        List<Schedule> myTime;
+
         // <时段,是否被预约> 标记被占用的时段
         Map<Integer, Boolean> scheduleMap = new HashMap<>();
 
-        // 已过时间段
-        List<Schedule> passTime = allTime.stream()
+        // 获取已过时间段列表
+        passTime = allTime.stream()
                 .filter(schedule -> {
-                    String dateTime = date + " " + schedule.getBegin();
-                    Date execDateTime = null;
-                    try {
-                        execDateTime = dateTimeFormat.parse(dateTime);
-                    } catch (ParseException e) {
-                        throw new GlobalParamException("日期格式有误！");
-                    }
+                    Date execDateTime = getExecDateTime(date, schedule.getEnd());
                     return execDateTime.before(nowDate);
                 }).collect(Collectors.toList());
+
         passTime.forEach(schedule -> scheduleMap.put(schedule.getId(), false));
 
-        Date execDate = null;
-        try {
-            execDate = dateFormat.parse(date);
-        } catch (ParseException e) {
-            throw new GlobalParamException("日期格式有误！");
-        }
-
-
+        // 其他管理员的预约(不包括当前管理员)
         List<Appointment> conflictingAppointments = appointmentRepository.findConflictingAppointmentsAppointedByAdminThroughConductor(roomId, conductor, execDate, AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.SIGNED.getStatus());
+
         conflictingAppointments.forEach(appointment -> {
-            scheduleMap.putIfAbsent(appointment.getBegin(), true);
-            scheduleMap.putIfAbsent(appointment.getEnd(), true);
+            for(int i = appointment.getBegin(); i <= appointment.getEnd(); i++) {
+                scheduleMap.putIfAbsent(i, true); // 排除已过时间段
+            }
         });
 
-        // 被其他管理员占用的时间段
-        List<Schedule> busyTime = allTime.stream()
+        busyTime = allTime.stream()
                 .filter(schedule -> scheduleMap.get(schedule.getId()) != null && scheduleMap.get(schedule.getId()))
                 .collect(Collectors.toList());
-        passTime.forEach(schedule -> scheduleMap.put(schedule.getId(), true));
 
+        // 管理员自己占用的时间段(不包含已过时间段)
+        passTime.forEach(schedule -> scheduleMap.put(schedule.getId(), true));
         List<Appointment> adminAppointments = appointmentRepository.findAppointmentAppointedByAdminThroughAdminAndRoomIdAndExecDate(conductor, roomId, execDate, AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.SIGNED.getStatus());
         adminAppointments.forEach(appointment -> {
-            scheduleMap.put(appointment.getBegin(), false);
-            scheduleMap.put(appointment.getEnd(), false);
+            for(int i = appointment.getBegin(); i <= appointment.getEnd(); i++) {
+                scheduleMap.putIfAbsent(i, false); // 排除已过时间段
+            }
         });
-
-        // 管理员自己占用的时间段
-        List<Schedule> myTime = allTime.stream()
+        myTime = allTime.stream()
                 .filter(schedule -> scheduleMap.get(schedule.getId()) != null && !scheduleMap.get(schedule.getId()))
                 .collect(Collectors.toList());
-        adminAppointments.forEach(appointment -> {
-            scheduleMap.put(appointment.getBegin(), true);
-            scheduleMap.put(appointment.getEnd(), true);
-        });
 
         // 可用时间段
-        List<Schedule> freeTime = allTime.stream()
+        freeTime = allTime.stream()
                 .filter(schedule -> scheduleMap.get(schedule.getId()) == null)
                 .collect(Collectors.toList());
 
@@ -345,5 +303,35 @@ public class RoomServiceImpl implements RoomService {
         map.put("myTime", myTime);
         map.put("freeTime", freeTime);
         return map;
+    }
+
+    /**
+     * 将指定格式的日期字符串转换为Date对象
+     * @param dateStr
+     * @return
+     * @throws GlobalParamException
+     */
+    private Date getExecDate(String dateStr) throws GlobalParamException {
+        try {
+            return new SimpleDateFormat("yyyy-MM-dd").parse(dateStr);
+        } catch (ParseException e) {
+            throw new GlobalParamException("日期格式有误！");
+        }
+    }
+
+    /**
+     * 根据日期和时间字符串生成Date对象
+     * @param dateStr
+     * @param timeStr
+     * @return
+     * @throws GlobalParamException
+     */
+    private Date getExecDateTime(String dateStr, String timeStr) throws GlobalParamException {
+        String dateTimeStr = dateStr + " " + timeStr;
+        try {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(dateTimeStr);
+        } catch (ParseException e) {
+            throw new GlobalParamException("时间格式有误！");
+        }
     }
 }
