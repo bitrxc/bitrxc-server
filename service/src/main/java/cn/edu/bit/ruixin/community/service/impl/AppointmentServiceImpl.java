@@ -16,6 +16,7 @@ import cn.edu.bit.ruixin.community.repository.ScheduleRepository;
 import cn.edu.bit.ruixin.community.repository.UserRepository;
 import cn.edu.bit.ruixin.community.service.AppointmentService;
 import cn.edu.bit.ruixin.community.service.WechatService;
+import cn.edu.bit.ruixin.community.service.RoomService;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,10 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -62,6 +60,9 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Autowired
     private RoomsRepository roomsRepository;
 
+    @Autowired
+    private RoomService roomService;
+
     private Log logger = LogFactory.getLog(AppointmentService.class);
 
     @Transactional(readOnly = true)
@@ -82,42 +83,46 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
     @Override
     public void addANewAppointment(Appointment appointment) {
-        // 基于起始时间段和结束时间段
 
+        // 获取用户预约请求中包含的字段
         String launcher = appointment.getLauncher();
-//            getAppointment = appointmentRepository.findAppointmentByLauncherEqualsAndRoomIdEqualsAndExecDateEqualsAndLaunchTimeEqualsAndStatusEquals(launcher, roomId, execDate, launchTime, AppointmentStatus.NEW.getStatus());
-        // 用户有新发起待批准、已批准通过、已签到的预约时不可再预约
+        Integer roomId = appointment.getRoomId();
+        Date execDate = appointment.getExecDate();
+        Integer appointmentBegin = appointment.getBegin();
+        Integer appointmentEnd = appointment.getEnd();
+
+        // 用户有新发起待批准、已批准通过、已签到的预约(任何房间任何时间段)时不可再预约
         Appointment myAppointment = appointmentRepository.findAppointmentByLauncherWithStatus(launcher, AppointmentStatus.NEW.getStatus(), AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.SIGNED.getStatus());
         if (myAppointment != null) {
             throw new AppointmentDaoException("你有正在执行的预约，请等待审批！");
         }
 
-        // 判断该房间所预约时间段是否空闲，比较房间ID，预约的日期，预约的时间段，不能对含有预约记录状态为receive、Signed
-        Integer roomId = appointment.getRoomId();
-//        Integer launchTime = appointment.getLaunchTime();
-        Integer appointmentBegin = appointment.getBegin();
-        Integer appointmentEnd = appointment.getEnd();
+        // 获取各时间段状态
+        String dateStr = new SimpleDateFormat("yyyy-MM-dd").format(execDate);
+        Map<String, List<Schedule>>scheduleListMap = roomService.getRoomFreeTime(roomId, launcher, dateStr);
 
-        Date execDate = appointment.getExecDate();
-//        Appointment getAppointment = appointmentRepository.findReceivedAppointment(roomId, execDate, launchTime, AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.SIGNED.getStatus());
-        Appointment getAppointment = appointmentRepository.findReceivedAppointment(roomId, execDate, appointmentBegin, appointmentEnd, AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.SIGNED.getStatus());
-
-        if (getAppointment != null) {
-            throw new AppointmentDaoException("该房间此时间段已被占用!");
-        } else {
-            appointment.setStatus(AppointmentStatus.NEW.getStatus());
-            Date launchDate = new Date();
-            // 还应该保证预约发起时间早于要预约的时间段的起始
-            Schedule schedule = scheduleRepository.getOne(appointmentBegin);
-            String begin = schedule.getBegin();
-            Date executeDate = getExecDate(execDate,begin);
-            if (launchDate.before(executeDate)) {
-                appointment.setLaunchDate(launchDate);
-                appointmentRepository.save(appointment);
-            } else {
-                throw new AppointmentDaoException("该时间段已过，不可预约！");
+        // 检查用户新发起的预约是否与已有预约冲突
+        List<Schedule>busyTime = scheduleListMap.get("busyTime");
+        Set<Integer>busyTimeId = new HashSet<>();
+        busyTime.forEach(schedule -> busyTimeId.add(schedule.getId()));
+        for(int scheduleNum = appointmentBegin; scheduleNum <= appointmentEnd; scheduleNum++) {
+            if(busyTimeId.contains(scheduleNum)) {
+                throw new AppointmentDaoException("该房间此时间段已被占用!");
             }
         }
+
+        // 检查用户的预约时段是否已过
+        List<Schedule>passTime = scheduleListMap.get("passTime");
+        Set<Integer>passTimeId = new HashSet<>();
+        passTime.forEach(schedule -> passTimeId.add(schedule.getId()));
+        if(passTimeId.contains(appointmentBegin))  {
+            throw new AppointmentDaoException("该时间段已过，不可预约！");
+        }
+
+        // 检查通过则执行预约
+        appointment.setLaunchDate(new Date());
+        appointment.setStatus(AppointmentStatus.NEW.getStatus());
+        appointmentRepository.save(appointment);
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
@@ -139,38 +144,52 @@ public class AppointmentServiceImpl implements AppointmentService {
                 throw new AppointmentDaoException("管理员预约的格式有误，审核者不为管理员!");
             }
 
-            // 查找发生冲突的管理员预约管理员
+            // 获取管理员预约请求中包含的字段
             Integer roomId = appointment.getRoomId();
+            String conductor = appointment.getConductor();
             Integer appointmentBegin = appointment.getBegin();
             Integer appointmentEnd = appointment.getEnd();
             Date execDate = appointment.getExecDate();
-            List<Appointment> conflictingAppointments = appointmentRepository.findConflictingAppointmentsAppointedByAdmin(roomId, execDate, appointmentBegin, appointmentEnd, AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.SIGNED.getStatus());
-            if (conflictingAppointments != null && conflictingAppointments.size() > 0) {
-                throw new AppointmentDaoException("该房间此时间段已被其他管理员的预约占用！");
-            } else {
-                // 预约时间检查
-                // 保证预约发起时间早于要预约的时间段的起始
-                Date launchDate = new Date();
-                Schedule schedule = scheduleRepository.getOne(appointmentBegin);
-                String begin = schedule.getBegin();
-                Date executeDate = getExecDate(execDate,begin);
-                if (launchDate.after(executeDate)) {
-                    throw new AppointmentDaoException("该时间段已过，不可预约！");
-                } else {
-                    appointment.setLaunchDate(launchDate);
+
+            // 获取各时间段状态
+            String dateStr = new SimpleDateFormat("yyyy-MM-dd").format(execDate);
+            Map<String, List<Schedule>> scheduleListMap = roomService.getRoomFreeTimeByAdmin(roomId, conductor, dateStr);
+
+            Map<Integer, Boolean> scheduleIdMap = new HashMap<>(); // <scheduleId, 是否被占用>
+            // 占用状态包括所有管理员(包括当前管理员)的预约
+            scheduleListMap.get("busyTime").forEach(schedule -> scheduleIdMap.put(schedule.getId(), true));
+            scheduleListMap.get("myTime").forEach(schedule -> scheduleIdMap.put(schedule.getId(), true));
+            scheduleListMap.get("passTime").forEach(schedule -> scheduleIdMap.put(schedule.getId(), false));
+
+            boolean scheduleOccupied = false;
+            boolean scheduleAvailable = true;
+            for(int scheduleIdNum = appointmentBegin; scheduleIdNum <= appointmentEnd; scheduleIdNum++) {
+                if(scheduleIdMap.get(scheduleIdNum) != null) {
+                    scheduleOccupied = scheduleIdMap.get(scheduleIdNum);
+                    scheduleAvailable = scheduleIdMap.get(scheduleIdNum);
+                    break;
                 }
+            }
+
+            if(scheduleOccupied)  {
+                throw new AppointmentDaoException("预约时间段已被管理员占用！");
+            }
+
+            if(!scheduleAvailable) {
+                throw new AppointmentDaoException("已过时间段不可预约！");
             }
         }
 
         List<Appointment> result = new ArrayList<>();
+        // 执行管理员预约
         for (Appointment appointment : appointments) {
+
+            appointment.setLaunchDate(new Date());
             appointment.setStatus(AppointmentStatus.RECEIVE.getStatus());
-            Integer roomId = appointment.getRoomId();
-            Integer appointmentBegin = appointment.getBegin();
-            Integer appointmentEnd = appointment.getEnd();
-            Date execDate = appointment.getExecDate();
-            List<Appointment> conflictingAppointments = appointmentRepository.findConflictingAppointmentsAppointedByUser(roomId, execDate, appointmentBegin, appointmentEnd, AppointmentStatus.NEW.getStatus(), AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.SIGNED.getStatus());
+
+            List<Appointment> conflictingAppointments = appointmentRepository.findConflictingAppointmentsAppointedByUser(appointment.getRoomId(), appointment.getExecDate(), appointment.getBegin(), appointment.getEnd(), AppointmentStatus.NEW.getStatus(), AppointmentStatus.RECEIVE.getStatus(), AppointmentStatus.SIGNED.getStatus());
             if (conflictingAppointments != null && conflictingAppointments.size() > 0) {
+                //管理员预约覆盖冲突的用户预约
                 conflictingAppointments.stream().forEach(a -> {
                     a.setStatus(AppointmentStatus.REJECT.getStatus());
                     notifyUserChange(a);
@@ -337,16 +356,15 @@ public class AppointmentServiceImpl implements AppointmentService {
     /**
      * 根据预约执行的日期和当天的时间来生成预约执行的时间
      * @param execDate
-     * @param begin 预约开始的时间，应为某一个时间段的begin或end属性
+     * @param timeStr 预约的时间，应为某一个时间段的begin或end属性
      * @return
      * @throws AppointmentDaoException
      */
-    private Date getExecDate(Date execDate,String begin) throws AppointmentDaoException{
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String date = dateFormat.format(execDate);
-        String dateTime = date + " " + begin;
+    private Date getExecDate(Date execDate,String timeStr) throws AppointmentDaoException{
+        String execDateStr = new SimpleDateFormat("yyyy-MM-dd").format(execDate);
+        String dateTimeStr = execDateStr + " " + timeStr;
         try {
-            return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(dateTime);
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(dateTimeStr);
         } catch (ParseException e) {
             throw new AppointmentDaoException("实际执行预约使用的时间格式有误！");
         }
